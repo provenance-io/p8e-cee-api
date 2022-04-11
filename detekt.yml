@@ -1,0 +1,14 @@
+style:
+    ReturnCount:
+        active: false
+    MagicNumber:
+        active: false
+    MaxLineLength:
+        active: false
+complexity:
+    NestedBlockDepth:
+        active: false
+    LongParameterList:
+        active: false
+    LongMethod:
+        active: false

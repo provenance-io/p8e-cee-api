@@ -1,0 +1,76 @@
+version: '3.5'
+
+services:
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password1
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: [ CMD-SHELL, pg_isready -U postgres ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  object-store-1:
+    image: ghcr.io/provenance-io/object-store:0.7.0
+    container_name: object-store-1
+    depends_on:
+      - postgres
+    env_file:
+      - ./common-object-store-1.env
+    ports:
+      - 5001:8081
+    volumes:
+        - ./object_store_1:/mnt/data
+
+  object-store-2:
+    image: ghcr.io/provenance-io/object-store:0.7.0
+    container_name: object-store-2
+    depends_on:
+      - postgres
+    env_file:
+      - ./common-object-store-2.env
+    ports:
+      - 5002:8082
+    volumes:
+        - ./object_store-2:/mnt/data
+
+  provenance:
+    image: provenanceio/provenance:v1.8.0-rc9
+    container_name: provenance
+    command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
+    ports:
+      - 1317:1317
+      - 9090:9090
+      - 26657:26657
+    volumes:
+      - ./prov-init:/home/provenance_seed:ro
+      - provenance:/home/provenance
+
+  vault:
+      image: vault:latest
+      container_name: vault
+      ports:
+          - "8200:8200"
+      restart: always
+      volumes:
+          - ./volumes/logs:/vault/logs
+          - ./volumes/file:/vault/file
+          - ./volumes/config:/vault/config
+      cap_add:
+          - IPC_LOCK
+      entrypoint: vault server -config=/vault/config/vault.json
+
+volumes:
+  postgres:
+  object-store-1:
+  object-store-2:
+  provenance:
+  wallet:

@@ -1,0 +1,76 @@
+apiVersion: ctl.figure.com/v1
+kind: FigureDeployment
+metadata:
+  name: service-loan-onboarding
+  namespace: dart
+  labels:
+    fd: service-loan-onboarding
+spec:
+  selector:
+    matchLabels:
+      fd: service-loan-onboarding
+  template:
+    metadata:
+      labels:
+        fd: service-loan-onboarding
+    spec:
+      kong:
+        enabled: true
+        services:
+          - name: service-loan-onboarding
+            proxy:
+              path: /service-loan-onboarding/external
+            route:
+              path: /service-loan-onboarding/external
+              strip_path: true
+              preserve_host: true
+            jwt:
+              enabled: false
+      deployment:
+        commonV2:
+          enabled: true
+        configMap:
+          test:
+            VAULT_ADDRESS: "https://vault.test.figure.com:8200/v1/kv2_originations/data/originators"
+            PORTFOLIO_MANAGER_PUBLIC_KEY: "AoXp62d+/MNs9Jokzemb4NjrQy5caucVED0iRR4oGCAl"
+            DART_PUBLIC_KEY: "Akf4FbRggw8xHsz4NidwH0H/EdITZ9OA/SjaCsjDNd1U"
+          prod:
+            VAULT_ADDRESS: "https://vault.figure.com:8200/v1/kv2_originations/data/originators"
+            PORTFOLIO_MANAGER_PUBLIC_KEY: "AoXp62d+/MNs9Jokzemb4NjrQy5caucVED0iRR4oGCAl"
+            DART_PUBLIC_KEY: "Akf4FbRggw8xHsz4NidwH0H/EdITZ9OA/SjaCsjDNd1U"
+        business_unit: lending
+        business_product: dart
+        port: 8080
+        replicas:
+          prod: 1
+          test: 1
+        image:
+          prod: us-east1-docker.pkg.dev/figure-production/figure-docker-repo/service-loan-onboarding:latest
+          test: us-east1-docker.pkg.dev/figure-development/figure-docker-repo/service-loan-onboarding:latest
+        spring:
+          enabled: true
+        readinessProbe:
+          path: /service-loan-onboarding/manage/health
+          periodSeconds: 3
+          initialDelaySeconds: 5
+        livenessProbe:
+          path: /service-loan-onboarding/manage/health
+          periodSeconds: 3
+          initialDelaySeconds: 60
+        env:
+          - name: KAFKA_GROUP_ID
+            value: service-loan-onboarding
+          - name: JAVA_OPTS
+            value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Xms512m -Xmx3g"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 3Gi
+          limits:
+            cpu: 3000m
+            memory: 6Gi
+        vault:
+          enabled: true
+          vault.hashicorp.com/agent-inject: true
+          vault.hashicorp.com/log-level: info
+          vault.hashicorp.com/agent-inject-token: true
