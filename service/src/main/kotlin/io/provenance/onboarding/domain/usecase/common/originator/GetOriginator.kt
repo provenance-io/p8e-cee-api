@@ -1,15 +1,15 @@
 package io.provenance.onboarding.domain.usecase.common.originator
 
-import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.frameworks.config.VaultProperties
 import io.provenance.core.Originator
 import io.provenance.core.OriginatorManager
+import io.provenance.onboarding.domain.usecase.AbstractUseCase
+import io.provenance.onboarding.frameworks.config.VaultProperties
 import io.provenance.plugins.vault.VaultPlugin
 import io.provenance.plugins.vault.VaultSpec
-import java.io.File
-import java.util.UUID
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import java.io.File
+import java.util.UUID
 
 @Component
 class GetOriginator(

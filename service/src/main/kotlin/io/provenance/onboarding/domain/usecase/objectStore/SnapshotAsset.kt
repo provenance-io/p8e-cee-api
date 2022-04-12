@@ -1,5 +1,6 @@
 package io.provenance.onboarding.domain.usecase.objectStore
 
+import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.provenance.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
@@ -7,15 +8,14 @@ import io.provenance.onboarding.domain.usecase.objectStore.model.SnapshotAssetRe
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
-import io.provenance.core.KeyType
 import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.objectstore.util.base64Decode
-import java.lang.IllegalStateException
-import java.net.URI
 import org.springframework.stereotype.Component
 import tech.figure.asset.v1beta1.Asset
+import java.lang.IllegalStateException
+import java.net.URI
 import java.util.UUID
 
 @Component

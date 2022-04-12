@@ -1,7 +1,7 @@
 package io.provenance.onboarding.domain.usecase.objectStore.model
 
-import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
 import io.provenance.objectstore.proto.Objects
+import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
 
 data class StoreAssetResponse(
     val hash: String,
