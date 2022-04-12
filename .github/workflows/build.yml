@@ -1,18 +1,22 @@
-# This workflow will build and deploy the docker image to test/production based on the branch.
-
 name: Build
 
 # Runs build on every push up
 on:
   pull_request:
     branches:
-      - develop
       - main
 
 jobs:
+  cleanup-runs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: rokroskar/workflow-run-cleanup-action@v0.3.2
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/main'"
+
   build:
-    name: Build
-    runs-on: [ self-hosted, linux ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -23,26 +27,3 @@ jobs:
           distribution: 'adopt'
       - name: Gradle Build
         run: ./gradlew build --parallel
-
-
-
-  slack:
-    name: Send Slack Message
-    runs-on: [ linux, self-hosted ]
-    needs: [ build ] # Include all jobs that should be in message
-    if: always()
-    steps:
-      - name: Checkout Shared Actions
-        uses: actions/checkout@v2-beta
-        with:
-          repository: FigureTechnologies/shared-actions
-          ref: main
-          token: ${{secrets.PAT}}
-          path: shared-actions
-      - name: Notify via Slack
-        uses: ./shared-actions/notify-slack-action
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DEPLOYMENTS_WEBHOOK }}
-        with:
-          needs: ${{ toJSON(needs) }}
-          emoji: ":deathpledge:"

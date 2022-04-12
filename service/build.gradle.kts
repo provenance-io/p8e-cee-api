@@ -102,9 +102,6 @@ tasks.register<JavaExec>("ktlintFormat") {
     args("-F", "src/**/*.kt")
 }
 
-// Prevent creating service-1.0-snapshot-plain.jar as part of using SpringBoot 2.5.+
-// The additional jar file will cause Dockerfile to fail when calling
-// ADD build/libs/service*.jar /service-loan-onboarding.jar
 tasks.jar {
   enabled = false
 }

@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     val project = this
-    group = "com.figure.onboarding"
+    group = "io.provenance.p8e-cee-api"
     version = this.findProperty("artifactVersion")?.toString()
         ?: "1.0-snapshot"
 

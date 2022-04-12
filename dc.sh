@@ -5,7 +5,7 @@ function up {
   sh service/docker/vault/config.sh
 
   docker volume prune -f
-  docker-compose -p loan-onboarding -f service/docker/dependencies.yaml up --build -d
+  docker-compose -p p8e-cee-api -f service/docker/dependencies.yaml up --build -d
 
   sleep 2
   sh service/docker/vault/init-and-unseal.sh 'http://127.0.0.1:8200' 'kv2_originations'
@@ -31,7 +31,7 @@ function up {
 }
 
 function down {
-  docker-compose -p loan-onboarding -f service/docker/dependencies.yaml down
+  docker-compose -p p8e-cee-api -f service/docker/dependencies.yaml down
 }
 
 function bounce {
