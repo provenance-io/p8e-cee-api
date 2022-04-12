@@ -37,5 +37,4 @@ ADD service/docker/service-configure /configure
 
 EXPOSE 8080/tcp
 
-ENTRYPOINT ["/configure"]
-CMD ["java", "-jar", "/service.jar"]
+ENTRYPOINT ./docker-entrypoint.sh /p8e-cee-api.jar
