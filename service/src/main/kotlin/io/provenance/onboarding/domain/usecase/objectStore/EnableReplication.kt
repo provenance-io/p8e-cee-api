@@ -7,9 +7,9 @@ import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.ProtoJsonUtil.toJson
 import mu.KotlinLogging
-import java.net.URI
 import org.springframework.stereotype.Component
 import java.lang.IllegalStateException
+import java.net.URI
 
 @Component
 class EnableReplication(

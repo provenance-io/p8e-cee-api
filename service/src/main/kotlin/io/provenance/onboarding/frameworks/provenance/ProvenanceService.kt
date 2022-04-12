@@ -1,10 +1,5 @@
 package io.provenance.onboarding.frameworks.provenance
 
-import io.provenance.onboarding.domain.provenance.Provenance
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
-import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
-import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
-import io.provenance.onboarding.domain.usecase.provenance.tx.model.OnboardAssetResponse
 import com.google.common.io.BaseEncoding
 import com.google.protobuf.Any
 import cosmos.tx.v1beta1.ServiceOuterClass
@@ -13,9 +8,14 @@ import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.hdwallet.wallet.Account
+import io.provenance.onboarding.domain.provenance.Provenance
+import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
+import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.onboarding.domain.usecase.provenance.tx.model.OnboardAssetResponse
+import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
+import org.springframework.stereotype.Component
 import java.net.URI
 import java.util.UUID
-import org.springframework.stereotype.Component
 
 @Component
 class ProvenanceService : Provenance {

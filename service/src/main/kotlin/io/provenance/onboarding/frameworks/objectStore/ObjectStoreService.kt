@@ -1,23 +1,23 @@
 package io.provenance.onboarding.frameworks.objectStore
 
+import com.google.protobuf.Message
+import io.provenance.objectstore.proto.Objects
 import io.provenance.onboarding.domain.provenance.ObjectStore
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.domain.usecase.objectStore.model.toModel
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.provenance.extensions.getEncryptedPayload
-import com.google.protobuf.Message
-import io.provenance.objectstore.proto.Objects
 import io.provenance.scope.encryption.crypto.Pen
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.objectstore.client.OsClient
+import org.springframework.stereotype.Component
+import tech.figure.asset.v1beta1.Asset
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.concurrent.TimeUnit
-import org.springframework.stereotype.Component
-import tech.figure.asset.v1beta1.Asset
 
 @Component
 class ObjectStoreService(

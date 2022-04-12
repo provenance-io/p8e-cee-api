@@ -2,12 +2,6 @@ package io.provenance.onboarding.frameworks.provenance.utility
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
-import io.provenance.onboarding.frameworks.provenance.extensions.toAny
-import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
-import io.provenance.onboarding.frameworks.provenance.extensions.toJson
-import io.provenance.onboarding.frameworks.provenance.extensions.toTxBody
 import com.google.protobuf.ByteString
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
@@ -30,6 +24,12 @@ import io.provenance.metadata.v1.RecordInput
 import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.RecordOutput
 import io.provenance.metadata.v1.ResultStatus
+import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
+import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.onboarding.frameworks.provenance.extensions.toAny
+import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
+import io.provenance.onboarding.frameworks.provenance.extensions.toJson
+import io.provenance.onboarding.frameworks.provenance.extensions.toTxBody
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString
 import java.util.UUID

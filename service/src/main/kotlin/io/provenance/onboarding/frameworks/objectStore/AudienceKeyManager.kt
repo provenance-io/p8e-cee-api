@@ -1,10 +1,10 @@
 package io.provenance.onboarding.frameworks.objectStore
 
-import io.provenance.onboarding.frameworks.config.ServiceKeysProperties
 import com.google.common.io.BaseEncoding
+import io.provenance.onboarding.frameworks.config.ServiceKeysProperties
 import io.provenance.scope.encryption.ecies.ECUtils
-import java.security.PublicKey
 import org.springframework.stereotype.Component
+import java.security.PublicKey
 
 @Component
 class AudienceKeyManager(

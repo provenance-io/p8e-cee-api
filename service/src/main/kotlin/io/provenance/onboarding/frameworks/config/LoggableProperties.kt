@@ -1,10 +1,10 @@
 package io.provenance.onboarding.frameworks.config
 
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.findAnnotation
+import org.springframework.util.ClassUtils
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
-import org.springframework.util.ClassUtils
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

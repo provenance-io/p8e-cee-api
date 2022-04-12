@@ -1,8 +1,5 @@
 package io.provenance.onboarding.domain.usecase.objectstore
 
-import io.provenance.onboarding.domain.usecase.objectStore.EnableReplication
-import io.provenance.onboarding.domain.usecase.objectStore.model.EnableReplicationRequest
-import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
@@ -12,6 +9,9 @@ import io.mockk.mockkClass
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.provenance.objectstore.proto.PublicKeys
+import io.provenance.onboarding.domain.usecase.objectStore.EnableReplication
+import io.provenance.onboarding.domain.usecase.objectStore.model.EnableReplicationRequest
+import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import java.security.PublicKey

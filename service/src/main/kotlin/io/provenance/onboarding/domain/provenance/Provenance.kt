@@ -1,8 +1,8 @@
 package io.provenance.onboarding.domain.provenance
 
+import io.provenance.hdwallet.wallet.Account
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.OnboardAssetResponse
-import io.provenance.hdwallet.wallet.Account
 import java.util.UUID
 
 interface Provenance {
