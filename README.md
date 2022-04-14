@@ -21,3 +21,20 @@ The p8e-cee-api allows for operations against the encrypted object store, with i
 ## Overview
 
 The [Asset Originator's Guide](https://docs.provenance.io/integrating/asset-originators-guide) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain is recommended.
+
+## Setup
+To run this service locally, be sure to have [Docker](https://www.docker.com/) and [Vault by Hashicorp](https://www.vaultproject.io/) installed:
+
+```
+brew install docker
+```
+
+```
+brew tap hashicorp/tap
+brew install hashicorp/tap/vault
+```
+
+once installed, all you need to do is run the included docker setup script
+```
+./dc.sh up
+```
