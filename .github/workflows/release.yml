@@ -13,7 +13,7 @@ on:
                     - 'minor'
                     - 'major'
 jobs:
-    docker:
+    Release:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -39,7 +39,7 @@ jobs:
               id: prep
               run: |
                   DOCKER_IMAGE=provenanceio/p8e-cee-api
-                  VERSION={{ steps.ci-release-create-outputs.outputs.semVersion }}
+                  VERSION=${{ steps.ci-release-create-outputs.outputs.semVersion }}
                   TAGS=${{ steps.ci-release-create-outputs.outputs.semVersionTag }}
 
                   echo ::set-output name=version::${VERSION}
