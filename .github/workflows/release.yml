@@ -40,7 +40,7 @@ jobs:
               run: |
                   DOCKER_IMAGE=provenanceio/p8e-cee-api
                   VERSION=${{ steps.ci-release-create-outputs.outputs.semVersion }}
-                  TAGS=${{ steps.ci-release-create-outputs.outputs.semVersionTag }}
+                  TAGS="${{ steps.ci-release-create-outputs.outputs.semVersionTag }}"
 
                   echo ::set-output name=version::${VERSION}
                   echo ::set-output name=tags::${TAGS}
