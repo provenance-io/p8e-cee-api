@@ -38,3 +38,7 @@ once installed, all you need to do is run the included docker setup script
 ```
 ./dc.sh up
 ```
+and run the service - either via an Intellij run configuration or via the command line with the following command:
+```
+./gradlew bootRun
+```
