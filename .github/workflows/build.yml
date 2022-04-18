@@ -26,4 +26,4 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Gradle Build
-        run: ./gradlew build --parallel
+        run: ./gradlew build -i --parallel
