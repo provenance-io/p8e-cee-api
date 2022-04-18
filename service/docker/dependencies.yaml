@@ -4,12 +4,12 @@ services:
 
   postgres:
     image: postgres:13
-    container_name: postgres
+    container_name: postgres-cee
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password1
     ports:
-      - 5432:5432
+      - 5435:5435
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d/
     healthcheck:
@@ -20,9 +20,9 @@ services:
 
   object-store-1:
     image: ghcr.io/provenance-io/object-store:0.7.0
-    container_name: object-store-1
+    container_name: object-store-1-cee
     depends_on:
-      - postgres
+      - postgres-cee
     env_file:
       - ./common-object-store-1.env
     ports:
@@ -32,9 +32,9 @@ services:
 
   object-store-2:
     image: ghcr.io/provenance-io/object-store:0.7.0
-    container_name: object-store-2
+    container_name: object-store-2-cee
     depends_on:
-      - postgres
+      - postgres-cee
     env_file:
       - ./common-object-store-2.env
     ports:
@@ -44,7 +44,7 @@ services:
 
   provenance:
     image: provenanceio/provenance:v1.8.0-rc9
-    container_name: provenance
+    container_name: provenance-cee
     command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
     ports:
       - 1317:1317
@@ -56,7 +56,7 @@ services:
 
   vault:
       image: vault:latest
-      container_name: vault
+      container_name: vault-cee
       ports:
           - "8200:8200"
       restart: always
@@ -69,7 +69,6 @@ services:
       entrypoint: vault server -config=/vault/config/vault.json
 
 volumes:
-  postgres:
   object-store-1:
   object-store-2:
   provenance:
