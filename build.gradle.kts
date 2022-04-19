@@ -13,7 +13,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("com.github.breadmoirai.github-release") version "2.2.12"
-    id("io.github.nefilim.gradle.semver-plugin") version "0.3.10"
+    id("io.github.nefilim.gradle.semver-plugin") version "0.3.13"
 }
 
 subprojects {
