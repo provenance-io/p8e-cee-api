@@ -2,43 +2,51 @@ version: '3.5'
 
 services:
 
-    postgres:
-        image: postgres:13
+    postgres-cee:
+        image: postgres:13-alpine
         container_name: postgres-cee
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password1
+        networks:
+            - p8e-network
         ports:
-            - 5435:5435
+            - "5432:5432"
         volumes:
+            - postgres-cee:/var/lib/postgresql/data
             - ./db-init:/docker-entrypoint-initdb.d/
         healthcheck:
             test: [ CMD-SHELL, pg_isready -U postgres ]
             interval: 5s
             timeout: 10s
             retries: 5
+        command: postgres
 
     object-store-1:
         image: ghcr.io/provenance-io/object-store:0.7.0
-        container_name: object-store-1-cee
+        container_name: object-store-1
         depends_on:
             - postgres-cee
         env_file:
-            - ./common-object-store-1.env
+            - object-store-1.env
+        networks:
+            - p8e-network
         ports:
-            - 5001:8081
+            - "5001:8080"
         volumes:
             - ./object_store_1:/mnt/data
 
     object-store-2:
         image: ghcr.io/provenance-io/object-store:0.7.0
-        container_name: object-store-2-cee
+        container_name: object-store-2
         depends_on:
             - postgres-cee
         env_file:
-            - ./common-object-store-2.env
+            - object-store-2.env
+        networks:
+            - p8e-network
         ports:
-            - 5002:8082
+            - "5002:8080"
         volumes:
             - ./object_store-2:/mnt/data
 
@@ -46,10 +54,12 @@ services:
         image: provenanceio/provenance:v1.8.0-rc9
         container_name: provenance-cee
         command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
+        networks:
+            - p8e-network
         ports:
-            - 1317:1317
-            - 9090:9090
-            - 26657:26657
+            - "1317:1317"
+            - "9090:9090"
+            - "26657:26657"
         volumes:
             - ./prov-init:/home/provenance_seed:ro
             - provenance:/home/provenance
@@ -57,6 +67,8 @@ services:
     vault:
         image: vault:latest
         container_name: vault-cee
+        networks:
+            - p8e-network
         ports:
             - "8200:8200"
         restart: always
@@ -69,7 +81,15 @@ services:
         entrypoint: vault server -config=/vault/config/vault.json
 
 volumes:
+    postgres-cee:
+    provenance:
     object-store-1:
     object-store-2:
-    provenance:
-    wallet:
+#    wallet:
+
+networks:
+  p8e-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.10.0/24

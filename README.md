@@ -22,7 +22,7 @@ The p8e-cee-api allows for operations against the encrypted object store, with i
 
 The [Asset Originator's Guide](https://docs.provenance.io/integrating/asset-originators-guide) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain is recommended.
 
-## Setup
+## Local Setup
 To run this service locally, be sure to have [Docker](https://www.docker.com/) and [Vault by Hashicorp](https://www.vaultproject.io/) installed:
 
 ```
@@ -34,11 +34,26 @@ brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
 
-once installed, all you need to do is run the included docker setup script
+The default configuration assumes that the following ports are available:
+
+| **Container**  |    **Port(s)**    |
+|:--------------:|:-----------------:|
+|   PostgreSQL   |       5432        |
+| Object Store 1 |       5001        |
+| Object Store 2 |       5002        |
+|     Vault      |       8200        |
+|   Provenance   | 1317, 9090, 26657 |
+
+If any are taken on your local machine, feel free to update the default values in the `/service/docker/dependencies.yaml` file and associated `/service/docker/*.env` files.
+
+Once ready, all you need to do is run the included docker setup script from the root directory:
+
 ```
 ./dc.sh up
 ```
-and run the service - either via an Intellij run configuration or via the command line with the following command:
+
+Then, run the service - either via an Intellij run configuration or via the command line with the following command:
+
 ```
 ./gradlew bootRun
 ```
