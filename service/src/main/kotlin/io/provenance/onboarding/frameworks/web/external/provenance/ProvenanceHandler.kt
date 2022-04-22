@@ -1,6 +1,5 @@
 package io.provenance.onboarding.frameworks.web.external.provenance
 
-import io.provenance.onboarding.domain.usecase.provenance.specifications.WriteSpecifications
 import io.provenance.onboarding.domain.usecase.provenance.tx.CreateTx
 import io.provenance.onboarding.domain.usecase.provenance.tx.CreateTxOnboardAsset
 import io.provenance.onboarding.domain.usecase.provenance.tx.ExecuteTx
@@ -14,8 +13,7 @@ import org.springframework.web.reactive.function.server.awaitBody
 class ProvenanceHandler(
     private val executeTx: ExecuteTx,
     private val createTx: CreateTx,
-    private val createTxAndOnboardAsset: CreateTxOnboardAsset,
-    private val writeSpecifications: WriteSpecifications,
+    private val createTxAndOnboardAsset: CreateTxOnboardAsset
 ) {
     suspend fun createTxAndOnboard(req: ServerRequest): ServerResponse = runCatching {
         createTxAndOnboardAsset.execute(req.awaitBody())
@@ -27,9 +25,5 @@ class ProvenanceHandler(
 
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
         executeTx.execute(req.awaitBody())
-    }.foldToServerResponse()
-
-    suspend fun writeSpecifications(req: ServerRequest): ServerResponse = runCatching {
-        writeSpecifications.execute(req.awaitBody())
     }.foldToServerResponse()
 }

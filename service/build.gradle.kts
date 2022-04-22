@@ -46,12 +46,17 @@ dependencies {
         Dependencies.Provenance.HdWallet.HdWallet,
         Dependencies.Provenance.HdWallet.HdWalletBip39,
         Dependencies.Provenance.Client.GrpcClientKotlin,
+        Dependencies.Provenance.ProtoKotlin,
+        Dependencies.Provenance.LoanPackage,
         Dependencies.Jackson.Databind,
         Dependencies.Jackson.Datatype,
         Dependencies.Jackson.Hubspot,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Protobuf.JavaUtil,
         Dependencies.Kong.Unirest,
+        Dependencies.Grpc.Protobuf,
+        Dependencies.Grpc.Stub,
+
     ).forEach { dep ->
         dep.implementation(this)
     }

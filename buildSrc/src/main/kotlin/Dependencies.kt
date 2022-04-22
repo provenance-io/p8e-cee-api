@@ -31,15 +31,15 @@ object Versions {
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
-    const val AssetModel = "0.1.2"
+    const val AssetModel = "0.1.+"
     const val P8eScope = "0.4.9"
-    const val ProvenancePbc = Master
-    const val ProvenanceProtobuf = Master
-    const val WalletPbClient = Develop
     const val ProvenanceHdWallet = "0.1.15"
-    const val ProvenanceClient = "1.0.5"
+    const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
     const val KeyAccessLib = "0.2.+"
+    const val LoanPackage = "0.1.+"
+    const val Grpc = "1.45.0"
+    const val ProvenanceProto = "1.8.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -158,6 +158,7 @@ object Dependencies {
         val CoreKcache = DependencySpec("io.provenance:core-kcache", Versions.ProvenanceCore)
         val CoreKcacheSpring = DependencySpec("io.provenance:core-kcache-spring", Versions.ProvenanceCore)
         val CoreKafkaAggregator = DependencySpec("io.provenance:core-kafka-aggregator", Versions.ProvenanceCore)
+        val ProtoKotlin = DependencySpec("io.provenance:proto-kotlin", Versions.ProvenanceProto)
         val CoreKafkaAggregatorSpring =
             DependencySpec(
                 "io.provenance:core-kafka-aggregator-spring",
@@ -167,23 +168,22 @@ object Dependencies {
                     "org.springframework.boot:spring-boot-starter-security"
                 )
             )
-        val CoreLogging = DependencySpec("io.provenance:core-logging", Versions.ProvenanceCore)
         val AssetModel = DependencySpec("io.provenance.model:metadata-asset-model", Versions.AssetModel)
+        val LoanPackage = DependencySpec("io.provenance.loan-package:contract", Versions.LoanPackage)
+
         object Client {
             val GrpcClientKotlin = DependencySpec("io.provenance.client:pb-grpc-client-kotlin", Versions.ProvenanceClient)
         }
 
         object HdWallet {
             val HdWallet = DependencySpec("io.provenance.hdwallet:hdwallet", Versions.ProvenanceHdWallet)
-            val HdWalletBase58 = DependencySpec("io.provenance.hdwallet:hdwallet-base58", Versions.ProvenanceHdWallet)
-            val HdWalletBech32 = DependencySpec("io.provenance.hdwallet:hdwallet-bech32", Versions.ProvenanceHdWallet)
-            val HdWalletBip32 = DependencySpec("io.provenance.hdwallet:hdwallet-bip32", Versions.ProvenanceHdWallet)
             val HdWalletBip39 = DependencySpec("io.provenance.hdwallet:hdwallet-bip39", Versions.ProvenanceHdWallet)
-            val HdWalletBip44 = DependencySpec("io.provenance.hdwallet:hdwallet-bip44", Versions.ProvenanceHdWallet)
-            val HdWalletEc = DependencySpec("io.provenance.hdwallet:hdwallet-ec", Versions.ProvenanceHdWallet)
-            val HdWalletSigner = DependencySpec("io.provenance.hdwallet:hdwallet-signer", Versions.ProvenanceHdWallet)
-            val HdWalletCommon = DependencySpec("io.provenance.hdwallet:hdwallet-common", Versions.ProvenanceHdWallet)
         }
+    }
+
+    object Grpc {
+        val Protobuf = DependencySpec("io.grpc:grpc-protobuf", Versions.Grpc)
+        val Stub = DependencySpec("io.grpc:grpc-stub", Versions.Grpc)
     }
 
     val KotlinLogging = DependencySpec("io.github.microutils:kotlin-logging-jvm", Versions.KotlinLogging)

@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
 
-    postgres:
+    postgres-cee:
         image: postgres:13
         container_name: postgres-cee
         environment:
