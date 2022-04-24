@@ -85,7 +85,6 @@ volumes:
     provenance:
     object-store-1:
     object-store-2:
-#    wallet:
 
 networks:
   p8e-network:
