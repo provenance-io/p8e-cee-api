@@ -40,8 +40,6 @@ function up {
    0A2100F5FE00731E3BC71F22CF054712A7C1F9A610848FC04BA81E6822D82D82C3562E \
    "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
 
-   source ./service/docker/bootstrap.env
-
   docker ps -a
 }
 
@@ -51,6 +49,7 @@ function publish() {
         exit
     fi
 
+   source ./service/docker/bootstrap.env
     export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
 
     if [[ -d "$FULL_PATH" ]]; then
