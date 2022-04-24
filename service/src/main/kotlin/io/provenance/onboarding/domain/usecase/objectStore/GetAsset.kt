@@ -31,11 +31,6 @@ class GetAsset(
     private val objectStoreConfig: ObjectStoreConfig,
 ) : AbstractUseCase<GetAssetRequest, String>() {
     override suspend fun execute(args: GetAssetRequest): String {
-
-        val utils = ProvenanceUtils()
-        val account = utils.getAccount("jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp", true, 0, 0)
-        log.info(account.keyPair.publicKey.toJavaECPublicKey().toHex())
-
         val originator = getOriginator.execute(args.originatorUuid)
         val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
         val publicKey = (originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY] as? String)?.toJavaPublicKey()

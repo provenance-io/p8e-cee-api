@@ -29,14 +29,9 @@ class P8eContractService : ContractService {
         provider.addIncludeFilter(AnnotationTypeFilter(LoanPackageContract::class.java))
         val candidates = provider.findCandidateComponents(basePackage)
         val contractType = candidates.map { Class.forName(it.beanClassName) }.singleOrNull { it.getAnnotation(LoanPackageContract::class.java)?.type == contractName }
-            ?: throw IllegalStateException("NO~!")
+            ?: throw IllegalStateException("Failed to find contract.")
 
-//        val a = contractType.kotlin.createInstance() as P8eContract
-//        return a.javaClass
-        val a = contractType.asSubclass(P8eContract::class.java)
-
-
-        return a
+        return contractType.asSubclass(P8eContract::class.java)
     }
 
     override fun <T : P8eContract> setupContract(
