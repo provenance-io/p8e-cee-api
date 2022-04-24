@@ -46,3 +46,8 @@ build/
 out/
 /.settings/
 /.datastore
+
+# Vault
+service/docker/volumes/
+service/docker/vault/init.output
+service/docker/vault/keys.output
