@@ -5,16 +5,15 @@ import cosmos.base.abci.v1beta1.Abci
 import io.provenance.client.grpc.Signer
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.frameworks.provenance.SingleTx
+import io.provenance.scope.contract.contracts.ContractHash
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.loan.LoanScopeSpecification
-import io.provenance.scope.loan.contracts.AppendLoanDocContract
 import io.provenance.scope.loan.utility.LoanPackageContract
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
+import java.util.ServiceLoader
 import java.util.UUID
-import kotlin.reflect.cast
-import kotlin.reflect.full.createInstance
 import mu.KotlinLogging
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AnnotationTypeFilter
@@ -24,14 +23,8 @@ import org.springframework.stereotype.Component
 class P8eContractService : ContractService {
     private val log = KotlinLogging.logger { }
 
-    override fun getContract(contractName: String, basePackage: String): Class<out P8eContract> {
-        val provider = ClassPathScanningCandidateComponentProvider(false)
-        provider.addIncludeFilter(AnnotationTypeFilter(LoanPackageContract::class.java))
-        val candidates = provider.findCandidateComponents(basePackage)
-        val contractType = candidates.map { Class.forName(it.beanClassName) }.singleOrNull { it.getAnnotation(LoanPackageContract::class.java)?.type == contractName }
-            ?: throw IllegalStateException("Failed to find contract.")
-
-        return contractType.asSubclass(P8eContract::class.java)
+    override fun getContract(contractName: String): Class<out P8eContract> {
+        return Class.forName(contractName).asSubclass(P8eContract::class.java)
     }
 
     override fun <T : P8eContract> setupContract(

@@ -10,7 +10,7 @@ import io.provenance.scope.sdk.Session
 import java.util.UUID
 
 interface ContractService {
-    fun getContract(contractName: String, basePackage: String = "io.provenance.scope.loan.contracts"): Class<out P8eContract>
+    fun getContract(contractName: String): Class<out P8eContract>
     fun <T : P8eContract> setupContract(client: Client, contractClass: Class<T>, records: Map<String, Message>, scopeUuid: UUID, sessionUuid: UUID? = null): Session
     fun executeContract(client: Client, signer: Signer, contractClass: Class<out P8eContract>, session: Session, executeTransaction: (SingleTx) -> Abci.TxResponse)
 }
