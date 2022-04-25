@@ -57,3 +57,19 @@ Then, run the service - either via an Intellij run configuration or via the comm
 ```
 ./gradlew bootRun
 ```
+
+## Publishing p8e Contracts Locally
+
+As a convenience, you can publish contracts from another repository without leaving this project in the command line.
+
+```
+./dc.sh -p <path to contracts repository> publish
+```
+
+For example:
+
+```
+./dc.sh -p ../../provenance-io/loan-package-contracts publish
+```
+
+Note: This convenience method uses preset environment variables found in `/service/docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/docker/prov-init/config/genesis.json`).

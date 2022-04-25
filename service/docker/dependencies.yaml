@@ -26,7 +26,7 @@ services:
         image: ghcr.io/provenance-io/object-store:0.7.0
         container_name: object-store-1
         depends_on:
-            - postgres-cee
+            - postgres
         env_file:
             - object-store-1.env
         networks:
@@ -40,7 +40,7 @@ services:
         image: ghcr.io/provenance-io/object-store:0.7.0
         container_name: object-store-2
         depends_on:
-            - postgres-cee
+            - postgres
         env_file:
             - object-store-2.env
         networks:
@@ -85,7 +85,6 @@ volumes:
     provenance:
     object-store-1:
     object-store-2:
-#    wallet:
 
 networks:
   p8e-network:

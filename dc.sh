@@ -1,5 +1,19 @@
 #!/bin/bash
 
+while getopts 'p:' OPTION; do
+  case "$OPTION" in
+    p)
+      PATH_TO_CONTRACTS="$OPTARG"
+      echo "Path to contracts you wish to publish: $OPTARG"
+      ;;
+    ?)
+      echo "script usage: $(basename \$0) [-p <path to p8e contracts directory>]" >&2
+      exit 1
+      ;;
+  esac
+done
+shift "$(($OPTIND -1))"
+
 function up {
   #config vault
   sh service/docker/vault/config.sh
@@ -27,6 +41,24 @@ function up {
    "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
 
   docker ps -a
+}
+
+function publish() {
+    if [ -z ${PATH_TO_CONTRACTS+x} ]; then
+        echo "Provide a valid path to the contracts directory you wish to publish using the -p argument."
+        exit
+    fi
+
+   source ./service/docker/bootstrap.env
+    export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
+
+    if [[ -d "$FULL_PATH" ]]; then
+        pushd $PATH_TO_CONTRACTS > /dev/null
+        ./gradlew p8eClean p8eBootstrap --info
+        popd > /dev/null
+    else
+        echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
+    fi
 }
 
 function down {
