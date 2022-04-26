@@ -4,9 +4,11 @@ import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci.TxResponse
 import cosmos.base.tendermint.v1beta1.Query
 import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastTxResponse
+import io.provenance.client.grpc.PbClient
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.proto.Contracts
 import java.util.concurrent.TimeUnit
+import io.provenance.client.protobuf.extensions.getBaseAccount
 
 fun BroadcastTxResponse.isError() = txResponse.isError()
 
@@ -24,10 +26,10 @@ fun cosmos.tx.v1beta1.ServiceGrpc.ServiceBlockingStub.getTx(hash: String) = this
     .getTx(cosmos.tx.v1beta1.ServiceOuterClass.GetTxRequest.newBuilder().setHash(hash).build())
     .txResponse
 
-fun cosmos.base.tendermint.v1beta1.ServiceGrpc.ServiceBlockingStub.getCurrentHeight(): Long = this
+fun getCurrentHeight(pbClient: PbClient): Long = pbClient.tendermintService
     .withDeadlineAfter(10, TimeUnit.SECONDS)
     .getLatestBlock(Query.GetLatestBlockRequest.getDefaultInstance()).block.header.height
 
-fun cosmos.auth.v1beta1.QueryGrpc.QueryBlockingStub.getBaseAccount(address: String): Auth.BaseAccount = this
+fun getBaseAccount(pbClient: PbClient, address: String): Auth.BaseAccount = pbClient.authClient
     .withDeadlineAfter(10, TimeUnit.SECONDS)
     .getBaseAccount(address)

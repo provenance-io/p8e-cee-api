@@ -5,18 +5,13 @@ import cosmos.base.abci.v1beta1.Abci
 import io.provenance.client.grpc.Signer
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.frameworks.provenance.SingleTx
-import io.provenance.scope.contract.contracts.ContractHash
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.loan.LoanScopeSpecification
-import io.provenance.scope.loan.utility.LoanPackageContract
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
-import java.util.ServiceLoader
 import java.util.UUID
 import mu.KotlinLogging
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AnnotationTypeFilter
 import org.springframework.stereotype.Component
 
 @Component

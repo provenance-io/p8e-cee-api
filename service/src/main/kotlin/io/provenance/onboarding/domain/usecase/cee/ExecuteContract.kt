@@ -1,6 +1,8 @@
 package io.provenance.onboarding.domain.usecase.cee
 
 import io.provenance.core.KeyType
+import io.provenance.hdwallet.ec.extensions.toJavaECPrivateKey
+import io.provenance.hdwallet.ec.extensions.toJavaECPublicKey
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
@@ -10,8 +12,10 @@ import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.encryption.model.DirectKeyRef
+import io.provenance.scope.encryption.util.toHex
 import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
+import io.provenance.scope.objectstore.util.toHex
 import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
@@ -19,8 +23,10 @@ import io.provenance.scope.sdk.SharedClient
 import java.net.URI
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
+private val log = KotlinLogging.logger {  }
 @Component
 class ExecuteContract(
     private val getOriginator: GetOriginator,
@@ -57,6 +63,9 @@ class ExecuteContract(
 
         val client = Client(sharedClient, affiliate)
         val account = getAccount.execute(args.account)
+        log.info(account.keyPair.privateKey.toJavaECPrivateKey().toHex())
+        log.info(account.keyPair.publicKey.toJavaECPublicKey().toHex())
+        log.info(account.address.toString())
 
         val contract = contractService.getContract(args.contractName)
         val session = contractService.setupContract(client, contract, emptyMap(), args.scopeUuid, args.sessionUuid)

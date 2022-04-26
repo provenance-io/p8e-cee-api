@@ -48,13 +48,13 @@ class ProvenanceService : Provenance {
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] Building the tx.")
                         val messages = tx.value.messages.map { Any.pack(it, "") }
                         val txBody = TxOuterClass.TxBody.newBuilder()
-                            .setTimeoutHeight(pbClient.tendermintService.getCurrentHeight() + 12L)
+                            .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
                             .addAllMessages(messages)
                             .build()
 
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] Determining account information for the tx.")
                         val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-                        val account = pbClient.authClient.getBaseAccount(signer.address())
+                        val account = getBaseAccount(pbClient, signer.address())
                         val baseSigner = BaseReqSigner(
                             signer,
                             account = account,

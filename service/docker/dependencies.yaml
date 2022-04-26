@@ -26,7 +26,7 @@ services:
         image: ghcr.io/provenance-io/object-store:0.7.0
         container_name: object-store-1
         depends_on:
-            - postgres
+            - postgres-cee
         env_file:
             - object-store-1.env
         networks:
@@ -40,7 +40,7 @@ services:
         image: ghcr.io/provenance-io/object-store:0.7.0
         container_name: object-store-2
         depends_on:
-            - postgres
+            - postgres-cee
         env_file:
             - object-store-2.env
         networks:
@@ -52,7 +52,7 @@ services:
 
     provenance:
         image: provenanceio/provenance:v1.8.0-rc9
-        container_name: provenance-cee
+        container_name: provenance
         command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
         networks:
             - p8e-network
