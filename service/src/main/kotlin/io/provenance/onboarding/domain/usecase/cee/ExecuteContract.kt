@@ -35,7 +35,7 @@ class ExecuteContract(
     private val contractService: ContractService,
     private val provenanceService: Provenance,
     private val getAccount: GetAccount,
-    private val contractInputParser: ContractParser,
+    private val contractParser: ContractParser,
 ) : AbstractUseCase<ExecuteContractRequest, TxResponse>() {
 
     override suspend fun execute(args: ExecuteContractRequest): TxResponse {
@@ -98,7 +98,7 @@ class ExecuteContract(
                         val parameterClass = Class.forName(param.type.toString())
                         val recordToParse = records.getOrDefault(input.name, null)
                             ?: throw IllegalStateException("Contract required input record with name ${input.name} but none was found!")
-                        val record = contractInputParser.parse(recordToParse, parameterClass)
+                        val record = contractParser.parseInput(recordToParse, parameterClass)
                         contractRecords[input.name] = record
                     }
                 }

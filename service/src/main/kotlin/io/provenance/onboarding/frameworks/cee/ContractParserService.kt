@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class ContractParserService(
     private val parsers: List<InputParser>
 ) : ContractParser {
-    override fun parse(input: Any, type: Class<*>): Message =
+    override fun parseInput(input: Any, type: Class<*>): Message =
         parsers.firstOrNull { type.kotlin.isSubclassOf(it.type.kotlin) }?.parse(input, type)
             ?: throw IllegalStateException("Failed to find parser for contract input.")
 }
