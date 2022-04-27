@@ -19,7 +19,7 @@ import java.lang.IllegalStateException
 import java.net.URI
 import mu.KotlinLogging
 
-private val log = KotlinLogging.logger {  }
+private val log = KotlinLogging.logger { }
 
 @Component
 class GetAsset(

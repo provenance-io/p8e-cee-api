@@ -2,7 +2,6 @@ package io.provenance.onboarding.frameworks.cee
 
 import com.google.protobuf.Message
 import cosmos.base.abci.v1beta1.Abci
-import io.provenance.client.grpc.Signer
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.spec.P8eContract
@@ -37,20 +36,13 @@ class P8eContractService : ContractService {
                 log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
             }
 
-    override fun executeContract(client: Client, signer: Signer, contractClass: Class<out P8eContract>, session: Session, executeTransaction: (SingleTx) -> Abci.TxResponse) =
+    override fun executeContract(client: Client, session: Session, executeTransaction: (SingleTx) -> Abci.TxResponse): Result<Abci.TxResponse> =
         runCatching {
             when (val result = client.execute(session)) {
                 is SignedResult -> executeTransaction(SingleTx(result))
                 else -> throw IllegalStateException("Must be a signed result since this is a single party contract.")
             }
-        }.fold(
-            onSuccess = { result ->
-                log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} is pending. The tx hash is ${result.txhash}.")
-            },
-            onFailure = { throwable ->
-                log.error("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has failed execution. An error occurred.", throwable)
-            }
-        )
+        }
 
     private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null): Session =
         this.setSessionUuid(sessionUuid ?: UUID.randomUUID())

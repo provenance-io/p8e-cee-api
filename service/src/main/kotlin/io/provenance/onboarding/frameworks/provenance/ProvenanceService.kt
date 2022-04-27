@@ -11,8 +11,9 @@ import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.onboarding.domain.provenance.Provenance
+import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
-import io.provenance.onboarding.domain.usecase.provenance.tx.model.OnboardAssetResponse
+import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.frameworks.provenance.exceptions.ContractExceptionException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight
@@ -38,8 +39,8 @@ class ProvenanceService : Provenance {
     private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun executeTransaction(chainId: String, nodeEndpoint: String, session: Session, tx: ProvenanceTx, signer: Signer): Abci.TxResponse {
-        val pbClient = PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+    override fun executeTransaction(config: ProvenanceConfig, session: Session, tx: ProvenanceTx, signer: Signer): Abci.TxResponse {
+        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
 
         return when (tx) {
             is SingleTx -> {
@@ -65,7 +66,7 @@ class ProvenanceService : Provenance {
                         val result = pbClient.estimateAndBroadcastTx(
                             txBody = txBody,
                             signers = listOf(baseSigner),
-                            gasAdjustment = 1.5,
+                            gasAdjustment = config.gasAdjustment,
                             mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
                         )
 
@@ -82,7 +83,7 @@ class ProvenanceService : Provenance {
         }
     }
 
-    override fun onboard(chainId: String, nodeEndpoint: String, account: Account, storeTxBody: TxBody): OnboardAssetResponse {
+    override fun onboard(chainId: String, nodeEndpoint: String, account: Account, storeTxBody: TxBody): TxResponse {
         val pbClient = PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
         val utility = ProvenanceUtils()
 
@@ -99,6 +100,6 @@ class ProvenanceService : Provenance {
             gasAdjustment = 1.5
         ).txResponse
 
-        return OnboardAssetResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
+        return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
     }
 }
