@@ -1,7 +1,7 @@
 package io.provenance.onboarding.domain.usecase.objectStore
 
 import io.provenance.core.KeyType
-import io.provenance.onboarding.domain.provenance.ObjectStore
+import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest

@@ -6,8 +6,8 @@ import com.google.protobuf.ByteString
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.Signer
-import io.provenance.client.wallet.NetworkType
 import io.provenance.hdwallet.bip39.MnemonicWords
+import io.provenance.hdwallet.hrp.Hrp
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.hdwallet.wallet.Wallet
 import io.provenance.metadata.v1.DefinitionType
@@ -262,7 +262,7 @@ class ProvenanceUtils {
 
     fun getAccount(keyMnemonic: String, isTestNet: Boolean, keyRingIndex: Int, keyIndex: Int) =
         Wallet.fromMnemonic(
-            hrp = NetworkType.TESTNET.prefix,
+            hrp = Hrp.ProvenanceBlockchain.testnet,
             passphrase = "",
             mnemonicWords = MnemonicWords.of(keyMnemonic),
             testnet = isTestNet

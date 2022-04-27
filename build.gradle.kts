@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import net.swiftzer.semver.SemVer
 
 buildscript {
@@ -24,6 +23,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
@@ -107,6 +107,7 @@ allprojects {
     version = semVersion
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 }

@@ -2,7 +2,7 @@ package io.provenance.onboarding.frameworks.objectStore
 
 import com.google.protobuf.Message
 import io.provenance.objectstore.proto.Objects
-import io.provenance.onboarding.domain.provenance.ObjectStore
+import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.domain.usecase.objectStore.model.toModel
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig

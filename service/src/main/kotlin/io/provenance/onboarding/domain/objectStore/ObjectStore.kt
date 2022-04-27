@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.provenance
+package io.provenance.onboarding.domain.objectStore
 
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.scope.encryption.proto.Encryption

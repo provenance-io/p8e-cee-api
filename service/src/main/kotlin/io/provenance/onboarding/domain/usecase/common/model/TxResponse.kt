@@ -1,6 +1,6 @@
-package io.provenance.onboarding.domain.usecase.provenance.tx.model
+package io.provenance.onboarding.domain.usecase.common.model
 
-data class OnboardAssetResponse(
+data class TxResponse(
     val hash: String,
     val gasWanted: String,
     val gasUsed: String,
