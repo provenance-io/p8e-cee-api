@@ -1,8 +1,8 @@
 package io.provenance.onboarding.domain.usecase.cee
 
+import com.google.protobuf.Message
+import com.google.protobuf.util.JsonFormat
 import io.provenance.core.KeyType
-import io.provenance.hdwallet.ec.extensions.toJavaECPrivateKey
-import io.provenance.hdwallet.ec.extensions.toJavaECPublicKey
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
@@ -10,23 +10,28 @@ import io.provenance.onboarding.domain.usecase.cee.model.ExecuteContractRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
+import io.provenance.onboarding.util.toPrettyJson
+import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.encryption.model.DirectKeyRef
-import io.provenance.scope.encryption.util.toHex
 import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
-import io.provenance.scope.objectstore.util.toHex
 import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
 import java.net.URI
+import io.provenance.scope.contract.annotations.Record
+import io.provenance.scope.contract.spec.P8eContract
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.full.functions
+import kotlin.reflect.full.primaryConstructor
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
-private val log = KotlinLogging.logger {  }
+private val log = KotlinLogging.logger { }
+
 @Component
 class ExecuteContract(
     private val getOriginator: GetOriginator,
@@ -34,17 +39,26 @@ class ExecuteContract(
     private val provenanceService: Provenance,
     private val getAccount: GetAccount
 ) : AbstractUseCase<ExecuteContractRequest, Unit>() {
+
     override suspend fun execute(args: ExecuteContractRequest) {
         val utils = ProvenanceUtils()
+        val account = getAccount.execute(args.config.account)
+        val originator = getOriginator.execute(args.config.account.originatorUuid)
+        val affiliate = Affiliate(
+            signingKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.SIGNING_PRIVATE_KEY].toString().toJavaPrivateKey())),
+            encryptionKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.SIGNING_PRIVATE_KEY].toString().toJavaPrivateKey())),
+            Specifications.PartyType.valueOf(args.config.partyType),
+        )
+
         val sharedClient = SharedClient(
             ClientConfig(
-                mainNet = !args.isTestNet,
+                mainNet = !args.config.isTestNet,
                 cacheJarSizeInBytes = 4L * 1024 * 1024, // ~ 4 MB,
                 cacheRecordSizeInBytes = 0L,
                 cacheSpecSizeInBytes = 0L,
-                disableContractLogs = !args.isTestNet,
+                disableContractLogs = !args.config.isTestNet,
                 osConcurrencySize = 6,
-                osGrpcUrl = URI(args.objectStoreUrl),
+                osGrpcUrl = URI(args.config.objectStoreUrl),
                 osChannelCustomizeFn = { channelBuilder ->
                     channelBuilder
                         .idleTimeout(1, TimeUnit.MINUTES)
@@ -54,25 +68,40 @@ class ExecuteContract(
             )
         )
 
-        val originator = getOriginator.execute(args.account.originatorUuid)
-        val affiliate = Affiliate(
-            signingKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.SIGNING_PRIVATE_KEY].toString().toJavaPrivateKey())),
-            encryptionKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.SIGNING_PRIVATE_KEY].toString().toJavaPrivateKey())),
-            Specifications.PartyType.valueOf(args.partyType),
-        )
+        val contract = contractService.getContract(args.config.contractName)
+        val records = getRecords(args.records, contract)
 
         val client = Client(sharedClient, affiliate)
-        val account = getAccount.execute(args.account)
-        log.info(account.keyPair.privateKey.toJavaECPrivateKey().toHex())
-        log.info(account.keyPair.publicKey.toJavaECPublicKey().toHex())
-        log.info(account.address.toString())
-
-        val contract = contractService.getContract(args.contractName)
-        val session = contractService.setupContract(client, contract, emptyMap(), args.scopeUuid, args.sessionUuid)
+        val session = contractService.setupContract(client, contract, records, args.config.scopeUuid, args.config.sessionUuid)
         val signer = utils.getSigner(account)
 
         contractService.executeContract(client, signer, contract, session) { tx ->
-            provenanceService.executeTransaction(args.chainId, args.nodeEndpoint, session, tx, signer)
+            provenanceService.executeTransaction(args.config.chainId, args.config.nodeEndpoint, session, tx, signer)
         }
+    }
+
+    private fun getRecords(records: Map<String, Any>, contract: Class<out P8eContract>): Map<String, Message> {
+        val contractRecords = mutableMapOf<String, Message>()
+
+        try {
+            contract.kotlin.functions.forEach { func ->
+                func.parameters.forEach { param ->
+
+                    val parameterClass = Class.forName(param.type.toString())
+                    val builder = parameterClass.getMethod("newBuilder").invoke(null) as Message.Builder
+
+                    val input = param.annotations.filter { it is Input }.singleOrNull() as Input
+                    val record = records.getOrDefault(input.name, null)
+                        ?: throw IllegalStateException("Contract required input record with name ${input.name} but none was found!")
+
+                    JsonFormat.parser().merge(record.toPrettyJson(), builder)
+                    contractRecords[input.name] = builder.build()
+                }
+            }
+        } catch (ex: Exception) {
+            log.error("Failed to get inputs for contract ${contract}")
+        }
+
+        return contractRecords
     }
 }

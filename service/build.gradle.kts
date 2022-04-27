@@ -56,6 +56,7 @@ dependencies {
         Dependencies.Kong.Unirest,
         Dependencies.Grpc.Protobuf,
         Dependencies.Grpc.Stub,
+        Dependencies.Reflections,
 
     ).forEach { dep ->
         dep.implementation(this)

@@ -37,9 +37,10 @@ object Versions {
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
     const val KeyAccessLib = "0.2.+"
-    const val LoanPackage = "0.1.+"
+    const val LoanPackage = "0.1.8"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
+    const val Reflections = "0.9.10"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -201,6 +202,8 @@ object Dependencies {
     object Swagger {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }
+
+    val Reflections = DependencySpec("org.reflections:reflections", Versions.Reflections)
 }
 
 data class PluginSpec(
