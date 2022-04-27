@@ -14,7 +14,7 @@ import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
 import io.provenance.onboarding.domain.usecase.common.model.TxResponse
-import io.provenance.onboarding.frameworks.provenance.exceptions.ContractExceptionException
+import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTransactionException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight
 import io.provenance.onboarding.frameworks.provenance.extensions.getErrorResult
@@ -76,7 +76,7 @@ class ProvenanceService : Provenance {
                         }
                         result.txResponse
                     }
-                    else -> throw ContractExceptionException(error.result.errorMessage)
+                    else -> throw ContractTransactionException(error.result.errorMessage)
                 }
             }
             is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")

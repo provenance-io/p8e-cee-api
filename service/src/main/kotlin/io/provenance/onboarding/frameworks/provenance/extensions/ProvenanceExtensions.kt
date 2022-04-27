@@ -22,10 +22,6 @@ fun TxResponse.getError(): String =
 fun SingleTx.getErrorResult() =
     this.value.envelopeState.result.contract.considerationsList.firstOrNull { it.result.result == Contracts.ExecutionResult.Result.FAIL }
 
-fun cosmos.tx.v1beta1.ServiceGrpc.ServiceBlockingStub.getTx(hash: String) = this.withDeadlineAfter(10, TimeUnit.SECONDS)
-    .getTx(cosmos.tx.v1beta1.ServiceOuterClass.GetTxRequest.newBuilder().setHash(hash).build())
-    .txResponse
-
 fun getCurrentHeight(pbClient: PbClient): Long = pbClient.tendermintService
     .withDeadlineAfter(10, TimeUnit.SECONDS)
     .getLatestBlock(Query.GetLatestBlockRequest.getDefaultInstance()).block.header.height
