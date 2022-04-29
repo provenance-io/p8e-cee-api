@@ -1,15 +1,18 @@
 package io.provenance.onboarding.domain.usecase.cee
 
 import com.google.protobuf.Message
+import cosmos.base.abci.v1beta1.Abci
 import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.cee.ContractParser
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.model.ExecuteContractRequest
+import io.provenance.onboarding.domain.usecase.common.model.FragmentResultResponse
 import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
+import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.encryption.model.DirectKeyRef
@@ -21,6 +24,8 @@ import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
 import java.net.URI
 import io.provenance.scope.contract.spec.P8eContract
+import io.provenance.scope.sdk.FragmentResult
+import io.provenance.scope.sdk.SignedResult
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.functions
@@ -36,9 +41,9 @@ class ExecuteContract(
     private val provenanceService: Provenance,
     private val getAccount: GetAccount,
     private val contractParser: ContractParser,
-) : AbstractUseCase<ExecuteContractRequest, TxResponse>() {
+) : AbstractUseCase<ExecuteContractRequest, Any>() {
 
-    override suspend fun execute(args: ExecuteContractRequest): TxResponse {
+    override suspend fun execute(args: ExecuteContractRequest): Any {
         val utils = ProvenanceUtils()
         val account = getAccount.execute(args.config.account)
         val originator = getOriginator.execute(args.config.account.originatorUuid)
@@ -73,18 +78,15 @@ class ExecuteContract(
         val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid)
         val signer = utils.getSigner(account)
 
-        contractService.executeContract(client, session) { tx ->
-            provenanceService.executeTransaction(args.config.provenanceConfig, session, tx, signer)
-        }.fold(
-            onSuccess = { result ->
-                log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contract.simpleName} is pending. The tx hash is ${result.txhash}.")
-                return TxResponse(result.txhash, result.gasWanted.toString(), result.gasUsed.toString(), result.height.toString())
-            },
-            onFailure = { throwable ->
-                log.error("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contract.simpleName} has failed execution. An error occurred.", throwable)
-                throw throwable
+        return when (val result = contractService.executeContract(client, session)) {
+            is SignedResult -> {
+                provenanceService.executeTransaction(args.config.provenanceConfig, session, SingleTx(result), signer).let {
+                    TxResponse(it.txhash, it.gasWanted.toString(), it.gasUsed.toString(), it.height.toString())
+                }
             }
-        )
+            is FragmentResult -> FragmentResultResponse("a")
+            else -> throw IllegalStateException("failed")
+        }
     }
 
     @Suppress("TooGenericExceptionCaught")
