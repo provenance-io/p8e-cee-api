@@ -1,5 +1,6 @@
-package io.provenance.onboarding.domain.usecase.cee.model
+package io.provenance.onboarding.domain.usecase.cee.execute.model
 
+import io.provenance.onboarding.domain.usecase.cee.common.model.ClientConfig
 import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
 import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 

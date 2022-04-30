@@ -7,3 +7,4 @@ open class ResourceNotFoundException(message: String? = "", cause: Throwable? = 
 open class WontRunLoanValidationException(message: String? = "", cause: Throwable? = null) : RuntimeException(message, cause)
 
 open class ExistingScopeNotChangedException(message: String) : RuntimeException(message)
+open class ContractTxException(message: String) : RuntimeException(message)
