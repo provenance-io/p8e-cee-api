@@ -9,6 +9,6 @@ data class ApproveContractRequest(
     val account: AccountInfo,
     val client: ClientConfig,
     val provenanceConfig: ProvenanceConfig,
-    val envelopeState: Any,
+    val envelope: String,
     val expiration: OffsetDateTime = OffsetDateTime.now().plusHours(1),
 )

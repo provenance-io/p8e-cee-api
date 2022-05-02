@@ -12,6 +12,7 @@ import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.onboarding.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
+import io.provenance.scope.sdk.FragmentResult
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -25,28 +26,32 @@ class ApproveContract(
     private val log = KotlinLogging.logger { }
 
     override suspend fun execute(args: ApproveContractRequest) {
+        log.info("EXECUTE APPROVE CONTRACT")
         val utils = ProvenanceUtils()
         val client = createClient.execute(CreateClientRequest(args.account, args.client))
-        val builder = Envelopes.EnvelopeState.newBuilder()
+        val builder = Envelopes.Envelope.newBuilder()
 
         try {
-            JsonFormat.parser().merge(args.envelopeState.toPrettyJson(), builder)
+            JsonFormat.parser().merge(args.envelope, builder)
         } catch(ex: Exception) {
             log.error("failed to create enveloped state from passed into parameter.", ex)
         }
 
-        val state = builder.build()
+        val envelope = builder.build()
+        when (val result = client.execute(envelope)) {
+            is FragmentResult -> {
+                val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.expiration).let {
+                    val account = getAccount.execute(args.account)
+                    val signer = utils.getSigner(account)
+                    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
+                    val broadcast = provenance.executeTransaction(args.provenanceConfig, txBody, signer)
 
-        val approvalTxHash = client.approveScopeUpdate(state, args.expiration).let {
-            val account = getAccount.execute(args.account)
-            val signer = utils.getSigner(account)
-            val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
-            val broadcast = provenance.executeTransaction(args.provenanceConfig, txBody, signer)
+                    broadcast.txhash
+                }
 
-            broadcast.txhash
+                client.respondWithApproval(result.envelopeState, approvalTxHash)
+            }
         }
-
-        client.respondWithApproval(state, approvalTxHash)
     }
 }
 

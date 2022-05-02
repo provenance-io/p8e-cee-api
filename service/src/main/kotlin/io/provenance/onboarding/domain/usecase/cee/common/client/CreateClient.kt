@@ -44,7 +44,14 @@ class CreateClient(
                         .keepAliveTimeout(10, TimeUnit.SECONDS)
                 }
             )
-        )
+        ).also { client ->
+            args.affiliates.forEach {
+                val keys = getOriginator.execute(it.originatorUuid).keys
+                client.affiliateRepository.addAffiliate(keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
+            }
+
+            client.affiliateRepository.addAffiliate(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
+        }
 
         return Client(sharedClient, affiliate)
     }

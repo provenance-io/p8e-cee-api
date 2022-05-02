@@ -1,23 +1,44 @@
 package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
+import io.provenance.client.protobuf.extensions.isSet
+import io.provenance.hdwallet.ec.extensions.toJavaECPrivateKey
+import io.provenance.hdwallet.ec.extensions.toJavaECPublicKey
+import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractParser
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
+import io.provenance.onboarding.domain.usecase.cee.approve.ApproveContract
+import io.provenance.onboarding.domain.usecase.cee.approve.model.ApproveContractRequest
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.cee.common.model.ContractExecutionResponse
 import io.provenance.onboarding.domain.usecase.cee.execute.model.ExecuteContractRequest
+import io.provenance.onboarding.domain.usecase.cee.reject.RejectContract
+import io.provenance.onboarding.domain.usecase.cee.submit.SubmitContractExecutionResult
+import io.provenance.onboarding.domain.usecase.cee.submit.model.SubmitContractExecutionResultRequest
+import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
 import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
+import io.provenance.onboarding.util.toPrettyJson
 import io.provenance.scope.contract.annotations.Input
+import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.contract.spec.P8eContract
+import io.provenance.scope.encryption.util.toHex
+import io.provenance.scope.objectstore.util.toHex
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
+import io.provenance.scope.sdk.extensions.mergeInto
+import io.provenance.scope.sdk.mailbox.ExecutionErrorEvent
+import io.provenance.scope.sdk.mailbox.ExecutionRequestEvent
+import io.provenance.scope.sdk.mailbox.ExecutionResponseEvent
+import io.provenance.scope.util.ThreadPoolFactory
+import io.provenance.scope.util.toUuid
+import java.util.UUID
 import kotlin.reflect.full.functions
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
@@ -38,7 +59,7 @@ class ExecuteContract(
         val utils = ProvenanceUtils()
         val account = getAccount.execute(args.config.account)
         val signer = utils.getSigner(account)
-        val client = createClient.execute(CreateClientRequest(args.config.account, args.config.client))
+        val client = createClient.execute(CreateClientRequest(args.config.account, args.config.client, args.participants))
         val contract = contractService.getContract(args.config.contract.contractName)
         val records = getRecords(args.records, contract)
 
@@ -46,7 +67,9 @@ class ExecuteContract(
             it.partyType to getOriginator.execute(it.originatorUuid)
         }
 
-        val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid, participants)
+        val scope = provenanceService.getScope(args.config.provenanceConfig, args.config.contract.scopeUuid)
+        val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
+        val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid, participants, scopeToUse)
 
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {

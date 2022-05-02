@@ -16,7 +16,9 @@ import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
 import io.provenance.scope.sdk.extensions.mergeInto
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
 
+@Component
 class SubmitContractExecutionResult(
     private val provenanceService: Provenance,
     private val contractService: ContractService,

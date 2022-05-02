@@ -1,11 +1,14 @@
 package io.provenance.onboarding.domain.usecase.objectStore
 
+import io.dartinc.registry.v1beta1.ENote
 import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.objectStore.model.GetAssetRequest
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
+import io.provenance.onboarding.frameworks.provenance.extensions.decodeBase64ToString
+import io.provenance.onboarding.util.toPrettyJson
 import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
@@ -31,6 +34,6 @@ class GetAsset(
             ?: throw IllegalStateException("Private key was not present for originator: ${args.originatorUuid}")
 
         val asset = objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)
-        return Asset.parseFrom(asset).toString()
+        return ENote.parseFrom(asset).toString()
     }
 }

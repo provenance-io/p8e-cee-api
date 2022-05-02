@@ -11,6 +11,8 @@ import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.hdwallet.wallet.Account
+import io.provenance.metadata.v1.ScopeRequest
+import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
@@ -26,6 +28,7 @@ import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
 import org.springframework.stereotype.Component
 import java.net.URI
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import mu.KotlinLogging
 
@@ -108,5 +111,16 @@ class ProvenanceService : Provenance {
         ).txResponse
 
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
+    }
+
+    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse {
+        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+        return pbClient.metadataClient.scope(
+            ScopeRequest.newBuilder()
+                .setScopeId(scopeUuid.toString())
+                .setIncludeRecords(true)
+                .setIncludeSessions(true)
+                .build()
+        )
     }
 }

@@ -4,6 +4,7 @@ import com.google.protobuf.Message
 import io.provenance.core.KeyType
 import io.provenance.core.Originator
 import io.provenance.hdwallet.wallet.Account
+import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.scope.contract.proto.Envelopes.Envelope
 import io.provenance.scope.contract.proto.Specifications
@@ -32,14 +33,25 @@ class P8eContractService : ContractService {
         scopeUuid: UUID,
         sessionUuid: UUID?,
         participants: Map<Specifications.PartyType, Originator>?,
+        scope: ScopeResponse?,
     ): Session =
-        client
-            .newSession(contractClass, LoanScopeSpecification::class.java)
-            .setScopeUuid(scopeUuid)
-            .configureSession(records, sessionUuid, participants)
-            .also { session ->
-                log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
-            }
+        when (scope) {
+            null ->
+                client
+                .newSession(contractClass, LoanScopeSpecification::class.java)
+                .setScopeUuid(scopeUuid)
+                .configureSession(records, sessionUuid, participants)
+                .also { session ->
+                    log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
+                }
+            else -> client
+                .newSession(contractClass, scope)
+                .configureSession(records, sessionUuid, participants)
+                .also { session ->
+                    log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
+                }
+        }
+
 
     override fun executeContract(client: Client, session: Session): ExecutionResult =
         runCatchingExecutionResult<Session>() {
