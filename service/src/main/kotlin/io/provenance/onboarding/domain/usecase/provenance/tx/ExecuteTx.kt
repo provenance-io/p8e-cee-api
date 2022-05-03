@@ -2,9 +2,9 @@ package io.provenance.onboarding.domain.usecase.provenance.tx
 
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
+import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.ExecuteTxRequest
-import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import org.springframework.stereotype.Component
 
 @Component

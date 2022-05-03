@@ -12,6 +12,7 @@ import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.annotations.Input
+import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
@@ -19,13 +20,12 @@ import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
-import java.net.URI
-import io.provenance.scope.contract.spec.P8eContract
-import java.security.KeyPair
-import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.functions
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import java.net.URI
+import java.security.KeyPair
+import java.util.concurrent.TimeUnit
 
 private val log = KotlinLogging.logger { }
 

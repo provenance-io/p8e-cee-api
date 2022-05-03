@@ -9,9 +9,9 @@ import io.provenance.scope.loan.LoanScopeSpecification
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
-import java.util.UUID
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 class P8eContractService : ContractService {
