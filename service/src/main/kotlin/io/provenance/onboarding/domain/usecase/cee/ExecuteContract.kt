@@ -20,12 +20,12 @@ import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
-import kotlin.reflect.full.functions
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.full.functions
 
 private val log = KotlinLogging.logger { }
 
