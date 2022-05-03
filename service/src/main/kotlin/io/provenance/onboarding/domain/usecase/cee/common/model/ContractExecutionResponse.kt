@@ -4,5 +4,7 @@ import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 
 data class ContractExecutionResponse(
     val multiparty: Boolean,
-    val metadata: TxResponse?
+    val envelopeState: String? = null,
+    val metadata: TxResponse? = null,
 )
+

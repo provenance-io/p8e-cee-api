@@ -17,7 +17,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
-class ApproveContract(
+class ApproveContractExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,
     private val getAccount: GetAccount,
@@ -26,15 +26,15 @@ class ApproveContract(
     private val log = KotlinLogging.logger { }
 
     override suspend fun execute(args: ApproveContractRequest) {
-        log.info("EXECUTE APPROVE CONTRACT")
         val utils = ProvenanceUtils()
         val client = createClient.execute(CreateClientRequest(args.account, args.client))
         val builder = Envelopes.Envelope.newBuilder()
 
         try {
-            JsonFormat.parser().merge(args.envelope, builder)
+            builder.mergeFrom(args.envelope)
         } catch(ex: Exception) {
             log.error("failed to create enveloped state from passed into parameter.", ex)
+            throw ex
         }
 
         val envelope = builder.build()

@@ -1,5 +1,6 @@
 package io.provenance.onboarding.domain.usecase.cee.approve.model
 
+import com.google.protobuf.ByteString
 import io.provenance.onboarding.domain.usecase.cee.common.model.ClientConfig
 import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
 import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
@@ -9,6 +10,6 @@ data class ApproveContractRequest(
     val account: AccountInfo,
     val client: ClientConfig,
     val provenanceConfig: ProvenanceConfig,
-    val envelope: String,
+    val envelope: ByteArray,
     val expiration: OffsetDateTime = OffsetDateTime.now().plusHours(1),
 )

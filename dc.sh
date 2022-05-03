@@ -50,7 +50,7 @@ function publish() {
     fi
 
    source ./service/docker/bootstrap.env
-    export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
+   export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
 
     if [[ -d "$FULL_PATH" ]]; then
         pushd $PATH_TO_CONTRACTS > /dev/null

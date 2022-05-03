@@ -11,7 +11,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
-class RejectContract(
+class RejectContractExecution(
     private val createClient: CreateClient
 ) : AbstractUseCase<RejectContractRequest, Unit>() {
 
@@ -22,7 +22,7 @@ class RejectContract(
         val error = Envelopes.EnvelopeError.newBuilder()
 
         try {
-            JsonFormat.parser().merge(args.rejection.toPrettyJson(), error)
+            error.mergeFrom(args.rejection)
         } catch (ex: Exception) {
             log.error("Failed to parse envelope error!", ex)
         }

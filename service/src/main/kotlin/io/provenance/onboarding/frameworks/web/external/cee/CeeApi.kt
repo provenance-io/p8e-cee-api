@@ -15,7 +15,10 @@ class CeeApi {
     fun externalCeeApiV1(handler: CeeHandler) = coRouter {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/cee".nest {
+            POST("/approve", handler::approveContractExecution)
             POST("/execute", handler::executeContract)
+            POST("/submit", handler::submitContractResult)
+            POST("/reject", handler::rejectContractExecution)
         }
     }
 }

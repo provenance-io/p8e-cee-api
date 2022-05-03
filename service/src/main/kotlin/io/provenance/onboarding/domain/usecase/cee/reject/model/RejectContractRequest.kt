@@ -7,5 +7,5 @@ import java.time.OffsetDateTime
 data class RejectContractRequest(
     val account: AccountInfo,
     val client: ClientConfig,
-    val rejection: Any,
+    val rejection: ByteArray,
 )

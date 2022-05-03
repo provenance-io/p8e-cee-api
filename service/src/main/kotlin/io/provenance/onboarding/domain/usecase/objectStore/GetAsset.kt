@@ -34,6 +34,6 @@ class GetAsset(
             ?: throw IllegalStateException("Private key was not present for originator: ${args.originatorUuid}")
 
         val asset = objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)
-        return ENote.parseFrom(asset).toString()
+        return asset.decodeToString()
     }
 }
