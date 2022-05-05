@@ -26,21 +26,11 @@ class ApproveContractExecution(
     override suspend fun execute(args: ApproveContractRequest) {
         val utils = ProvenanceUtils()
         val client = createClient.execute(CreateClientRequest(args.account, args.client))
-        val builder = Envelopes.Envelope.newBuilder()
+        val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.envelope).build()
 
-        try {
-            builder.mergeFrom(args.envelope)
-        } catch(ex: Exception) {
-            log.error("failed to create enveloped state from passed into parameter.", ex)
-            throw ex
-        }
-
-        val envelope = builder.build()
         when (val result = client.execute(envelope)) {
             is FragmentResult -> {
                 val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.expiration).let {
-                    log.info("APPROVAL MESSAGE:")
-
                     val account = getAccount.execute(args.account)
                     val signer = utils.getSigner(account)
                     val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()

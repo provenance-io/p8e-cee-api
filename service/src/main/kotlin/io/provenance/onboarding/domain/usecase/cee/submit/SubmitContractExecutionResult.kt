@@ -1,9 +1,9 @@
 package io.provenance.onboarding.domain.usecase.cee.submit
 
+import io.provenance.cee.api.models.cee.SubmitContractExecutionResultRequest
+import io.provenance.cee.api.models.p8e.TxResponse
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.domain.usecase.cee.submit.model.SubmitContractExecutionResultRequest
-import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
@@ -13,38 +13,22 @@ import io.provenance.scope.sdk.extensions.mergeInto
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
-private val log = KotlinLogging.logger { }
-
 @Component
 class SubmitContractExecutionResult(
     private val provenanceService: Provenance,
     private val getAccount: GetAccount,
 ): AbstractUseCase<SubmitContractExecutionResultRequest, TxResponse>() {
     override suspend fun execute(args: SubmitContractExecutionResultRequest): TxResponse {
-
         val utils = ProvenanceUtils()
         val account = getAccount.execute(args.account)
         val signer = utils.getSigner(account)
 
-        val envelope = Envelopes.Envelope.newBuilder()
-        val state = Envelopes.EnvelopeState.newBuilder()
+        val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.envelope).build()
+        val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(args.state).build()
 
-        try {
-            envelope.mergeFrom(args.envelope)
-            state.mergeFrom(args.state)
-        } catch (ex: Exception) {
-            log.error("Failed to parse the envelope / envelope state input.", ex)
-        }
-
-        return when (val result = envelope.build().mergeInto(state.build())) {
+        return when (val result = envelope.mergeInto(state)) {
             is SignedResult -> {
-
                 provenanceService.buildContractTx(args.provenance, SingleTx(result))?.let {
-                    log.info("SUBMIT MESSAGE")
-                    result.messages.forEach { msg ->
-                        log.info(msg.toString())
-                    }
-
                     provenanceService.executeTransaction(args.provenance, it, signer).let { pbResponse ->
                         TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString())
                     }

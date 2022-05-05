@@ -1,6 +1,9 @@
 package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
+import io.provenance.cee.api.models.cee.ContractExecutionResponse
+import io.provenance.cee.api.models.cee.ExecuteContractRequest
+import io.provenance.cee.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractParser
@@ -9,9 +12,6 @@ import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
-import io.provenance.onboarding.domain.usecase.cee.common.model.ContractExecutionResponse
-import io.provenance.onboarding.domain.usecase.cee.execute.model.ExecuteContractRequest
-import io.provenance.onboarding.domain.usecase.common.model.TxResponse
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.SingleTx
@@ -20,10 +20,10 @@ import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
-import java.util.Base64
-import kotlin.reflect.full.functions
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import java.util.Base64
+import kotlin.reflect.full.functions
 
 private val log = KotlinLogging.logger { }
 
@@ -56,21 +56,16 @@ class ExecuteContract(
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {
                 provenanceService.buildContractTx(args.config.provenanceConfig, SingleTx(result))?.let {
-                    log.info("EXECUTION MESSAGE:")
-                    result.messages.forEach { msg ->
-                        log.info(msg.toString())
-                    }
-
                     provenanceService.executeTransaction(args.config.provenanceConfig, it, signer).let { pbResponse ->
                         ContractExecutionResponse(false, null, TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString()))
                     }
-                } ?: throw IllegalStateException("Failed")
+                } ?: throw IllegalStateException("Failed to build contract for execution output.")
             }
             is FragmentResult -> {
                 client.requestAffiliateExecution(result.envelopeState)
                 ContractExecutionResponse(true, Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), null)
             }
-            else -> throw IllegalStateException("failed")
+            else -> throw IllegalStateException("Contract execution result was not of an expected type.")
         }
     }
 

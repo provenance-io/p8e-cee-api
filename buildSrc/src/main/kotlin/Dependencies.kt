@@ -32,7 +32,7 @@ object Versions {
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
     const val AssetModel = "0.1.+"
-    const val P8eScope = "0.5.0"
+    const val P8eScope = "0.5.+"
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"

@@ -14,8 +14,8 @@ plugins {
     id("java-library")
     id("com.github.breadmoirai.github-release") version "2.2.12"
     id("io.github.nefilim.gradle.semver-plugin") version "0.3.10"
+    id("io.github.gradle-nexus.publish-plugin") version Versions.NexusPublishing
     signing
-    id(Plugins.NexusPublishing.id) version Versions.NexusPublishing
 }
 
 subprojects {
