@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 @Component
 class CreateClient(
     private val getOriginator: GetOriginator
-): AbstractUseCase<CreateClientRequest, Client>() {
+) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
         val originator = getOriginator.execute(args.account.originatorUuid)
         val affiliate = Affiliate(

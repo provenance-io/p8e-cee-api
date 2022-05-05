@@ -10,14 +10,13 @@ import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
 import io.provenance.scope.sdk.extensions.mergeInto
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
 class SubmitContractExecutionResult(
     private val provenanceService: Provenance,
     private val getAccount: GetAccount,
-): AbstractUseCase<SubmitContractExecutionResultRequest, TxResponse>() {
+) : AbstractUseCase<SubmitContractExecutionResultRequest, TxResponse>() {
     override suspend fun execute(args: SubmitContractExecutionResultRequest): TxResponse {
         val utils = ProvenanceUtils()
         val account = getAccount.execute(args.account)

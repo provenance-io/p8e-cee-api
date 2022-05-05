@@ -1,11 +1,8 @@
 package io.provenance.onboarding.domain.cee
 
 import com.google.protobuf.Message
-import cosmos.base.abci.v1beta1.Abci
 import io.provenance.core.Originator
-import io.provenance.hdwallet.wallet.Account
 import io.provenance.metadata.v1.ScopeResponse
-import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.contract.spec.P8eContract

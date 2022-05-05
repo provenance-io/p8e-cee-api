@@ -11,7 +11,6 @@ import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,9 +19,6 @@ class ApproveContractExecution(
     private val provenance: Provenance,
     private val getAccount: GetAccount,
 ) : AbstractUseCase<ApproveContractRequest, Unit>() {
-
-    private val log = KotlinLogging.logger { }
-
     override suspend fun execute(args: ApproveContractRequest) {
         val utils = ProvenanceUtils()
         val client = createClient.execute(CreateClientRequest(args.account, args.client))
@@ -44,5 +40,3 @@ class ApproveContractExecution(
         }
     }
 }
-
-

@@ -3,7 +3,6 @@ package io.provenance.onboarding.frameworks.cee
 import com.google.protobuf.Message
 import io.provenance.core.KeyType
 import io.provenance.core.Originator
-import io.provenance.hdwallet.wallet.Account
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractService
 import io.provenance.scope.contract.proto.Envelopes.Envelope
@@ -38,20 +37,20 @@ class P8eContractService : ContractService {
         when (scope) {
             null ->
                 client
-                .newSession(contractClass, LoanScopeSpecification::class.java)
-                .setScopeUuid(scopeUuid)
-                .configureSession(records, sessionUuid, participants)
-                .also { session ->
-                    log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
-                }
-            else -> client
-                .newSession(contractClass, scope)
-                .configureSession(records, sessionUuid, participants)
-                .also { session ->
-                    log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
-                }
+                    .newSession(contractClass, LoanScopeSpecification::class.java)
+                    .setScopeUuid(scopeUuid)
+                    .configureSession(records, sessionUuid, participants)
+                    .also { session ->
+                        log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
+                    }
+            else ->
+                client
+                    .newSession(contractClass, scope)
+                    .configureSession(records, sessionUuid, participants)
+                    .also { session ->
+                        log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
+                    }
         }
-
 
     override fun executeContract(client: Client, session: Session): ExecutionResult =
         runCatchingExecutionResult<Session>() {
@@ -78,6 +77,14 @@ class P8eContractService : ContractService {
     private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>?): Session =
         this.setSessionUuid(sessionUuid ?: UUID.randomUUID())
             .also { records.forEach { record -> it.addProposedRecord(record.key, record.value) } }
-            .also { participants?.forEach { participant -> it.addParticipant(participant.key, participant.value.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), participant.value.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey()) } }
+            .also {
+                participants?.forEach { participant ->
+                    it.addParticipant(
+                        participant.key,
+                        participant.value.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(),
+                        participant.value.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey()
+                    )
+                }
+            }
             .build()
 }
