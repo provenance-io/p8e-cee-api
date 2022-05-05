@@ -5,10 +5,10 @@ import cosmos.base.abci.v1beta1.Abci.TxResponse
 import cosmos.base.tendermint.v1beta1.Query
 import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastTxResponse
 import io.provenance.client.grpc.PbClient
+import io.provenance.client.protobuf.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.proto.Contracts
 import java.util.concurrent.TimeUnit
-import io.provenance.client.protobuf.extensions.getBaseAccount
 
 fun BroadcastTxResponse.isError() = txResponse.isError()
 

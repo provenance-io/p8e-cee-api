@@ -3,8 +3,8 @@ package io.provenance.onboarding.frameworks.cee
 import com.google.protobuf.Message
 import io.provenance.onboarding.domain.cee.ContractParser
 import io.provenance.onboarding.domain.cee.InputParser
-import kotlin.reflect.full.isSubclassOf
 import org.springframework.stereotype.Component
+import kotlin.reflect.full.isSubclassOf
 
 @Component
 class ContractParserService(

@@ -1,13 +1,3 @@
-#FROM openjdk:11-jre
-#
-#COPY --from=build /app/service/build/libs/*.jar /service.jar
-#ADD service/docker/service-configure /configure
-#
-#EXPOSE 8080/tcp
-#
-#ENTRYPOINT ./docker-entrypoint.sh /p8e-cee-api.jar
-
-
 FROM gradle:7.3.3-jdk11 AS build
 RUN gradle --version && java -version
 WORKDIR /app
@@ -32,9 +22,9 @@ RUN gradle clean build --no-daemon
 
 FROM openjdk:11-jre
 
-COPY --from=build /app/service/build/libs/*.jar /service.jar
+ADD service/build/libs/*.jar /p8e-cee-api.jar
 ADD service/docker/service-configure /configure
 
-EXPOSE 8085/tcp
+EXPOSE 8080/tcp
 
-ENTRYPOINT ./docker-entrypoint.sh /p8e-cee-api.jar
+ENTRYPOINT /configure /p8e-cee-api.jar
