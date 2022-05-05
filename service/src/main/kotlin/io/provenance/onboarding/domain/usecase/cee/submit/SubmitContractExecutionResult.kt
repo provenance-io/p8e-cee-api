@@ -19,8 +19,8 @@ private val log = KotlinLogging.logger { }
 class SubmitContractExecutionResult(
     private val provenanceService: Provenance,
     private val getAccount: GetAccount,
-): AbstractUseCase<SubmitContractExecutionResultRequest, Unit>() {
-    override suspend fun execute(args: SubmitContractExecutionResultRequest) {
+): AbstractUseCase<SubmitContractExecutionResultRequest, TxResponse>() {
+    override suspend fun execute(args: SubmitContractExecutionResultRequest): TxResponse {
 
         val utils = ProvenanceUtils()
         val account = getAccount.execute(args.account)
@@ -36,9 +36,15 @@ class SubmitContractExecutionResult(
             log.error("Failed to parse the envelope / envelope state input.", ex)
         }
 
-        when (val result = envelope.build().mergeInto(state.build())) {
+        return when (val result = envelope.build().mergeInto(state.build())) {
             is SignedResult -> {
+
                 provenanceService.buildContractTx(args.provenance, SingleTx(result))?.let {
+                    log.info("SUBMIT MESSAGE")
+                    result.messages.forEach { msg ->
+                        log.info(msg.toString())
+                    }
+
                     provenanceService.executeTransaction(args.provenance, it, signer).let { pbResponse ->
                         TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString())
                     }

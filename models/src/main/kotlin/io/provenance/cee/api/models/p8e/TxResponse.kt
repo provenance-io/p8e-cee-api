@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.common.model
+package io.provenance.cee.api.models.p8e
 
 data class TxResponse(
     val hash: String,

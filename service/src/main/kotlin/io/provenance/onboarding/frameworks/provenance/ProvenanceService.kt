@@ -2,7 +2,6 @@ package io.provenance.onboarding.frameworks.provenance
 
 import com.google.common.io.BaseEncoding
 import com.google.protobuf.Any
-import com.google.protobuf.Message
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
@@ -17,14 +16,12 @@ import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
 import io.provenance.onboarding.domain.usecase.common.model.TxResponse
-import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTransactionException
 import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTxException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight
 import io.provenance.onboarding.frameworks.provenance.extensions.getErrorResult
 import io.provenance.onboarding.frameworks.provenance.extensions.isError
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
-import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
 import org.springframework.stereotype.Component
 import java.net.URI

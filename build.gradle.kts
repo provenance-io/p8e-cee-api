@@ -11,8 +11,11 @@ plugins {
     kotlin("jvm") version Versions.Kotlin
     id("java")
     id("maven-publish")
+    id("java-library")
     id("com.github.breadmoirai.github-release") version "2.2.12"
     id("io.github.nefilim.gradle.semver-plugin") version "0.3.10"
+    signing
+    id(Plugins.NexusPublishing.id) version Versions.NexusPublishing
 }
 
 subprojects {
@@ -20,6 +23,12 @@ subprojects {
         Plugins.Kotlin.addTo(this)
         Plugins.Idea.addTo(this)
         plugin("java")
+        plugin("signing")
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
 
     repositories {
@@ -38,6 +47,18 @@ subprojects {
             )
             jvmTarget = "11"
             allWarningsAsErrors = true
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri(RepositoryLocations.Sonatype))
+            snapshotRepositoryUrl.set(uri(RepositoryLocations.SonatypeSnapshot))
+            username.set(findProject("ossrhUsername")?.toString() ?: System.getenv("OSSRH_USERNAME"))
+            password.set(findProject("ossrhPassword")?.toString() ?: System.getenv("OSSRH_PASSWORD"))
+            stagingProfileId.set("3180ca260b82a7") // prevents querying for the staging profile id, performance optimization
         }
     }
 }

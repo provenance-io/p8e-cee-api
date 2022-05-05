@@ -1,6 +1,6 @@
-package io.provenance.onboarding.domain.usecase.cee.common.model
+package io.provenance.cee.api.models.cee
 
-import io.provenance.onboarding.domain.usecase.common.model.TxResponse
+import io.provenance.cee.api.models.p8e.TxResponse
 
 data class ContractExecutionResponse(
     val multiparty: Boolean,

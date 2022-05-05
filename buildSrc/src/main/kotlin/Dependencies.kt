@@ -37,10 +37,11 @@ object Versions {
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
     const val KeyAccessLib = "0.2.+"
-    const val LoanPackage = "0.1.8"
+    const val LoanPackage = "0.1.10"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
     const val Reflections = "0.9.10"
+    const val NexusPublishing = "1.1.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -52,9 +53,13 @@ object Plugins { // please keep this sorted in sections
     val Detekt = PluginSpec("io.gitlab.arturbosch.detekt", Versions.Detekt)
     val Flyway = PluginSpec("org.flywaydb.flyway", Versions.Flyaway)
     val Idea = PluginSpec("idea")
+    val MavenPublish = PluginSpec("maven-publish")
+    val JavaLibrary = PluginSpec("java-library")
+    val Signing = PluginSpec("signing")
     val Protobuf = PluginSpec("com.google.protobuf", "0.8.16")
     val SpringBoot = PluginSpec("org.springframework.boot", Versions.SpringBoot)
     val SpringDependencyManagement = PluginSpec("io.spring.dependency-management", "1.0.11.RELEASE")
+    val NexusPublishing = PluginSpec("io.github.gradle-nexus.publish-plugin", Versions.NexusPublishing)
 }
 
 object Dependencies {

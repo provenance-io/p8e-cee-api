@@ -15,6 +15,7 @@ dependencyManagement {
 
 dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
+    implementation(project(":models"))
 
     listOf(
         Dependencies.Kotlin.AllOpen,

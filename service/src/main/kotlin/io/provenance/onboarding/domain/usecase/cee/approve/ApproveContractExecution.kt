@@ -1,16 +1,14 @@
 package io.provenance.onboarding.domain.usecase.cee.approve
 
 import com.google.protobuf.Any
-import com.google.protobuf.util.JsonFormat
 import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.cee.api.models.cee.ApproveContractRequest
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.domain.usecase.cee.approve.model.ApproveContractRequest
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
-import io.provenance.onboarding.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
 import mu.KotlinLogging
@@ -41,6 +39,8 @@ class ApproveContractExecution(
         when (val result = client.execute(envelope)) {
             is FragmentResult -> {
                 val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.expiration).let {
+                    log.info("APPROVAL MESSAGE:")
+
                     val account = getAccount.execute(args.account)
                     val signer = utils.getSigner(account)
                     val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()

@@ -1,6 +1,6 @@
-package io.provenance.onboarding.domain.usecase.cee.execute.model
+package io.provenance.cee.api.models.cee
 
-import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
+import io.provenance.cee.api.models.account.AccountInfo
 
 data class ExecuteContractRequest(
     val config: ExecuteContractConfig,

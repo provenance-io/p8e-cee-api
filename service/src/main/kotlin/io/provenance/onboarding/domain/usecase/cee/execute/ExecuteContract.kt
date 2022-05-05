@@ -56,6 +56,11 @@ class ExecuteContract(
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {
                 provenanceService.buildContractTx(args.config.provenanceConfig, SingleTx(result))?.let {
+                    log.info("EXECUTION MESSAGE:")
+                    result.messages.forEach { msg ->
+                        log.info(msg.toString())
+                    }
+
                     provenanceService.executeTransaction(args.config.provenanceConfig, it, signer).let { pbResponse ->
                         ContractExecutionResponse(false, null, TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString()))
                     }

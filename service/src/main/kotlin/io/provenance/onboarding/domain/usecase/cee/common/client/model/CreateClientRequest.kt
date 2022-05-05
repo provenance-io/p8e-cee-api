@@ -1,11 +1,10 @@
 package io.provenance.onboarding.domain.usecase.cee.common.client.model
 
-import io.provenance.onboarding.domain.usecase.cee.common.model.ClientConfig
-import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
-import io.provenance.scope.sdk.Affiliate
+import io.provenance.cee.api.models.account.AccountInfo
+import io.provenance.cee.api.models.eos.ObjectStoreConfig
 
 data class CreateClientRequest(
     val account: AccountInfo,
-    val client: ClientConfig,
+    val client: ObjectStoreConfig,
     val affiliates: List<AccountInfo> = emptyList(),
 )

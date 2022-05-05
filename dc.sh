@@ -54,7 +54,7 @@ function publish() {
 
     if [[ -d "$FULL_PATH" ]]; then
         pushd $PATH_TO_CONTRACTS > /dev/null
-        ./gradlew p8eClean p8eCheck p8eBootstrap --info && ./gradlew publishToMavenLocal -xsignMavenPublication --info
+        ./gradlew p8eClean p8eCheck p8eBootstrap --info && ./gradlew publishToMavenLocal --info
         popd > /dev/null
     else
         echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
