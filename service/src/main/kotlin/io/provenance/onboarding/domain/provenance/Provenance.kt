@@ -2,8 +2,8 @@ package io.provenance.onboarding.domain.provenance
 
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.TxOuterClass
-import io.provenance.cee.api.models.p8e.ProvenanceConfig
-import io.provenance.cee.api.models.p8e.TxResponse
+import io.provenance.api.models.p8e.ProvenanceConfig
+import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.grpc.Signer
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.metadata.v1.ScopeResponse

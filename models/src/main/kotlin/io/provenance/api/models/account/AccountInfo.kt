@@ -1,4 +1,4 @@
-package io.provenance.cee.api.models.account
+package io.provenance.api.models.account
 
 import io.provenance.scope.contract.proto.Specifications
 import java.util.UUID

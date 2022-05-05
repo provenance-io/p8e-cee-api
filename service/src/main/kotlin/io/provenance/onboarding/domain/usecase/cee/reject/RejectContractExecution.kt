@@ -1,6 +1,6 @@
 package io.provenance.onboarding.domain.usecase.cee.reject
 
-import io.provenance.cee.api.models.cee.RejectContractRequest
+import io.provenance.api.models.cee.RejectContractRequest
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest

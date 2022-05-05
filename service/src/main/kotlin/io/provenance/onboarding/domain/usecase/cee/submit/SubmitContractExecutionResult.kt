@@ -1,7 +1,7 @@
 package io.provenance.onboarding.domain.usecase.cee.submit
 
-import io.provenance.cee.api.models.cee.SubmitContractExecutionResultRequest
-import io.provenance.cee.api.models.p8e.TxResponse
+import io.provenance.api.models.cee.SubmitContractExecutionResultRequest
+import io.provenance.api.models.p8e.TxResponse
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount

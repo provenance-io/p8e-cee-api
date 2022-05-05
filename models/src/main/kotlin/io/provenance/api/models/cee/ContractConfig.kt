@@ -1,4 +1,4 @@
-package io.provenance.cee.api.models.cee
+package io.provenance.api.models.cee
 
 import java.util.UUID
 

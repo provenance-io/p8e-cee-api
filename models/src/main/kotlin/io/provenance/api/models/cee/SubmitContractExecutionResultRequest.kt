@@ -1,7 +1,7 @@
-package io.provenance.cee.api.models.cee
+package io.provenance.api.models.cee
 
-import io.provenance.cee.api.models.account.AccountInfo
-import io.provenance.cee.api.models.p8e.ProvenanceConfig
+import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.ProvenanceConfig
 
 data class SubmitContractExecutionResultRequest(
     val account: AccountInfo,

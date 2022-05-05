@@ -1,9 +1,9 @@
 package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
-import io.provenance.cee.api.models.cee.ContractExecutionResponse
-import io.provenance.cee.api.models.cee.ExecuteContractRequest
-import io.provenance.cee.api.models.p8e.TxResponse
+import io.provenance.api.models.cee.ContractExecutionResponse
+import io.provenance.api.models.cee.ExecuteContractRequest
+import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractParser

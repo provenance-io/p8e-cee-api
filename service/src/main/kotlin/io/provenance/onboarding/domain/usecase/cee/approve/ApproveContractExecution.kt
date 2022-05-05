@@ -2,7 +2,7 @@ package io.provenance.onboarding.domain.usecase.cee.approve
 
 import com.google.protobuf.Any
 import cosmos.tx.v1beta1.TxOuterClass
-import io.provenance.cee.api.models.cee.ApproveContractRequest
+import io.provenance.api.models.cee.ApproveContractRequest
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient

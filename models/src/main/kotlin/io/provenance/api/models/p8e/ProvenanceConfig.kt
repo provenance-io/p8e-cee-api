@@ -1,4 +1,4 @@
-package io.provenance.cee.api.models.p8e
+package io.provenance.api.models.p8e
 
 data class ProvenanceConfig(
     val chainId: String,

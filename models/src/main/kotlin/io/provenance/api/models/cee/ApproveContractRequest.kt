@@ -1,8 +1,8 @@
-package io.provenance.cee.api.models.cee
+package io.provenance.api.models.cee
 
-import io.provenance.cee.api.models.eos.ObjectStoreConfig
-import io.provenance.cee.api.models.account.AccountInfo
-import io.provenance.cee.api.models.p8e.ProvenanceConfig
+import io.provenance.api.models.eos.ObjectStoreConfig
+import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.ProvenanceConfig
 import java.time.OffsetDateTime
 
 data class ApproveContractRequest(

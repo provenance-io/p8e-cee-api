@@ -1,4 +1,4 @@
-package io.provenance.cee.api.models.eos
+package io.provenance.api.models.eos
 
 data class ObjectStoreConfig(
     val objectStoreUrl: String,
