@@ -5,26 +5,28 @@ import com.google.protobuf.Any
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.api.models.p8e.ProvenanceConfig
+import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.hdwallet.wallet.Account
+import io.provenance.metadata.v1.ScopeRequest
+import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.provenance.Provenance
-import io.provenance.onboarding.domain.usecase.common.model.ProvenanceConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
-import io.provenance.onboarding.domain.usecase.common.model.TxResponse
-import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTransactionException
+import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTxException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight
 import io.provenance.onboarding.frameworks.provenance.extensions.getErrorResult
 import io.provenance.onboarding.frameworks.provenance.extensions.isError
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
-import io.provenance.scope.sdk.Session
 import io.provenance.scope.sdk.SignedResult
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.net.URI
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class ProvenanceTxException(message: String) : Exception(message)
@@ -39,48 +41,53 @@ class ProvenanceService : Provenance {
     private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun executeTransaction(config: ProvenanceConfig, session: Session, tx: ProvenanceTx, signer: Signer): Abci.TxResponse {
+    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? {
         val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-
         return when (tx) {
             is SingleTx -> {
                 when (val error = tx.getErrorResult()) {
                     null -> {
-                        log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] Building the tx.")
+                        log.info("Building the tx.")
                         val messages = tx.value.messages.map { Any.pack(it, "") }
-                        val txBody = TxOuterClass.TxBody.newBuilder()
+
+                        TxOuterClass.TxBody.newBuilder()
                             .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
                             .addAllMessages(messages)
                             .build()
-
-                        log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] Determining account information for the tx.")
-                        val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-                        val account = getBaseAccount(pbClient, signer.address())
-                        val baseSigner = BaseReqSigner(
-                            signer,
-                            account = account,
-                            sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
-                        )
-
-                        log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] Sending tx.")
-                        val result = pbClient.estimateAndBroadcastTx(
-                            txBody = txBody,
-                            signers = listOf(baseSigner),
-                            gasAdjustment = config.gasAdjustment,
-                            mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
-                        )
-
-                        if (result.isError()) {
-                            cachedOffset.getAndDecrement(account.sequence)
-                            throw ProvenanceTxException(result.txResponse.toString())
-                        }
-                        result.txResponse
                     }
-                    else -> throw ContractTransactionException(error.result.errorMessage)
+                    else -> throw ContractTxException(error.result.errorMessage)
                 }
             }
             is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
         }
+    }
+
+    override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
+        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+
+        log.info("Determining account information for the tx.")
+        val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
+        val account = getBaseAccount(pbClient, signer.address())
+        val baseSigner = BaseReqSigner(
+            signer,
+            account = account,
+            sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
+        )
+
+        log.info("Sending tx.")
+        val result = pbClient.estimateAndBroadcastTx(
+            txBody = tx,
+            signers = listOf(baseSigner),
+            gasAdjustment = config.gasAdjustment,
+            mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
+        )
+
+        if (result.isError()) {
+            cachedOffset.getAndDecrement(account.sequence)
+            throw ProvenanceTxException(result.txResponse.toString())
+        }
+
+        return result.txResponse
     }
 
     override fun onboard(chainId: String, nodeEndpoint: String, account: Account, storeTxBody: TxBody): TxResponse {
@@ -101,5 +108,16 @@ class ProvenanceService : Provenance {
         ).txResponse
 
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
+    }
+
+    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse {
+        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+        return pbClient.metadataClient.scope(
+            ScopeRequest.newBuilder()
+                .setScopeId(scopeUuid.toString())
+                .setIncludeRecords(true)
+                .setIncludeSessions(true)
+                .build()
+        )
     }
 }

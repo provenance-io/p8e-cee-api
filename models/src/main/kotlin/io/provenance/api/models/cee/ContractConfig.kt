@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.cee.model
+package io.provenance.api.models.cee
 
 import java.util.UUID
 

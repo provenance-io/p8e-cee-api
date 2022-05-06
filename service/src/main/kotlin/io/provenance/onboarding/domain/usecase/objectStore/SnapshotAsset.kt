@@ -1,6 +1,5 @@
 package io.provenance.onboarding.domain.usecase.objectStore
 
-import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
@@ -8,14 +7,14 @@ import io.provenance.onboarding.domain.usecase.objectStore.model.SnapshotAssetRe
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
-import io.provenance.scope.encryption.util.toJavaPrivateKey
-import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.objectstore.util.base64Decode
 import org.springframework.stereotype.Component
 import tech.figure.asset.v1beta1.Asset
 import java.lang.IllegalStateException
 import java.net.URI
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.util.UUID
 
 @Component
@@ -29,10 +28,10 @@ class SnapshotAsset(
 
         val originator = getOriginator.execute(args.account.originatorUuid)
         val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
-        val publicKey = (originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY] as? String)?.toJavaPublicKey()
+        val publicKey = (originator.signingPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.account.originatorUuid}")
 
-        val privateKey = (originator.keys[KeyType.SIGNING_PRIVATE_KEY] as? String)?.toJavaPrivateKey()
+        val privateKey = (originator.signingPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.account.originatorUuid}")
 
         val asset = objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)

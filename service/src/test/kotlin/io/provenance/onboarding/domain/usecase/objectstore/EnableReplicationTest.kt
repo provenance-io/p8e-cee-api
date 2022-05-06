@@ -63,6 +63,7 @@ class EnableReplicationTest : FunSpec({
             EnableReplicationRequest(
                 REPLICATION_SOURCE_OBJECT_STORE_ADDRESS,
                 REPLICATION_TARGET_OBJECT_STORE_ADDRESS,
+                REPLICATION_TARGET_PUBLIC_KEY,
                 REPLICATION_TARGET_PUBLIC_KEY
             )
         )
@@ -81,7 +82,8 @@ class EnableReplicationTest : FunSpec({
                 EnableReplicationRequest(
                     REPLICATION_SOURCE_OBJECT_STORE_ADDRESS,
                     REPLICATION_TARGET_OBJECT_STORE_ADDRESS,
-                    REPLICATION_TARGET_PUBLIC_KEY
+                    REPLICATION_TARGET_PUBLIC_KEY,
+                    REPLICATION_TARGET_PUBLIC_KEY,
                 )
             )
         }

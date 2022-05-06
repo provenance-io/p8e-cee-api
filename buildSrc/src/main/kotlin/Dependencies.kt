@@ -15,13 +15,11 @@ object Versions {
     const val Kotlin = "1.5.31"
     const val KotlinCoroutines = "1.5.2"
     const val Protobuf = "3.18.1"
-    const val Kafka = "2.7.0"
     const val SpringBoot = "2.5.6"
     const val KotlinLogging = "2.0.11"
     const val Reactor = "3.4.9"
     const val Jackson = "2.12.5"
     const val Redisson = "3.16.0"
-    const val Flyaway = "8.0.2"
     const val Ktlint = "0.42.1"
     const val Detekt = "1.18.1"
     const val Hamkrest = "1.8.0.1"
@@ -32,15 +30,16 @@ object Versions {
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
     const val AssetModel = "0.1.+"
-    const val P8eScope = "0.4.9"
+    const val P8eScope = "0.5.+"
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
-    const val KeyAccessLib = "0.2.+"
-    const val LoanPackage = "0.1.8"
+    const val KeyAccessLib = "0.2.15"
+    const val LoanPackage = "0.1.9"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
     const val Reflections = "0.9.10"
+    const val NexusPublishing = "1.1.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -50,11 +49,11 @@ object Plugins { // please keep this sorted in sections
 
     // 3rd Party
     val Detekt = PluginSpec("io.gitlab.arturbosch.detekt", Versions.Detekt)
-    val Flyway = PluginSpec("org.flywaydb.flyway", Versions.Flyaway)
     val Idea = PluginSpec("idea")
     val Protobuf = PluginSpec("com.google.protobuf", "0.8.16")
     val SpringBoot = PluginSpec("org.springframework.boot", Versions.SpringBoot)
     val SpringDependencyManagement = PluginSpec("io.spring.dependency-management", "1.0.11.RELEASE")
+    val NexusPublishing = PluginSpec("io.github.gradle-nexus.publish-plugin", Versions.NexusPublishing)
 }
 
 object Dependencies {
@@ -87,6 +86,8 @@ object Dependencies {
         val OsClient = DependencySpec("io.provenance.scope:os-client", Versions.P8eScope)
         val Sdk = DependencySpec("io.provenance.scope:sdk", Versions.P8eScope)
         val Util = DependencySpec("io.provenance.scope:util", Versions.P8eScope)
+        val ContractBase = DependencySpec("io.provenance.scope:contract-base", Versions.P8eScope)
+        val ContractProto = DependencySpec("io.provenance.scope:contract-proto", Versions.P8eScope)
     }
 
     // Spring Boot
@@ -126,11 +127,6 @@ object Dependencies {
         val JavaUtil = DependencySpec("com.google.protobuf:protobuf-java-util", Versions.Protobuf)
     }
 
-    // Apache Kafka
-    object Kafka {
-        val Clients = DependencySpec("org.apache.kafka:kafka-clients", Versions.Kafka)
-    }
-
     object Kong {
         val Unirest = DependencySpec("com.konghq:unirest-java", Versions.Unirest)
     }
@@ -156,19 +152,7 @@ object Dependencies {
 
     object Provenance {
         val KeyAccessLib = DependencySpec("io.provenance.originator-key-access-lib:lib", Versions.KeyAccessLib)
-        val CoreKcache = DependencySpec("io.provenance:core-kcache", Versions.ProvenanceCore)
-        val CoreKcacheSpring = DependencySpec("io.provenance:core-kcache-spring", Versions.ProvenanceCore)
-        val CoreKafkaAggregator = DependencySpec("io.provenance:core-kafka-aggregator", Versions.ProvenanceCore)
         val ProtoKotlin = DependencySpec("io.provenance:proto-kotlin", Versions.ProvenanceProto)
-        val CoreKafkaAggregatorSpring =
-            DependencySpec(
-                "io.provenance:core-kafka-aggregator-spring",
-                Versions.ProvenanceCore,
-                exclude = listOf(
-                    "org.springframework.boot:spring-boot-starter-web",
-                    "org.springframework.boot:spring-boot-starter-security"
-                )
-            )
         val AssetModel = DependencySpec("io.provenance.model:metadata-asset-model", Versions.AssetModel)
         val LoanPackage = DependencySpec("io.provenance.loan-package:contract", Versions.LoanPackage)
 

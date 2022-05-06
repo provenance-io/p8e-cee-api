@@ -20,8 +20,7 @@ class EnableReplication(
 
     override suspend fun execute(args: EnableReplicationRequest) {
         val osClientReplicatingFrom = OsClient(URI.create(args.sourceObjectStoreAddress), objectStoreConfig.timeoutMs)
-        val publicKeyReplicatingTo = args.targetPublicKey.toJavaPublicKey()
-        val publicKeyResponse = osClientReplicatingFrom.createPublicKey(publicKeyReplicatingTo, args.targetObjectStoreAddress)
+        val publicKeyResponse = osClientReplicatingFrom.createPublicKey(args.targetSigningPublicKey.toJavaPublicKey(), args.targetEncryptionPublicKey.toJavaPublicKey(), args.targetObjectStoreAddress)
         log.info("createPublicKey() response: ${publicKeyResponse?.toJson()}")
         if (publicKeyResponse == null) {
             throw IllegalStateException("Error performing operation")

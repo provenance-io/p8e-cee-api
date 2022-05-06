@@ -1,6 +1,6 @@
 package io.provenance.onboarding.domain.usecase.objectStore.model
 
-import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
+import io.provenance.api.models.account.AccountInfo
 import io.provenance.onboarding.domain.usecase.common.model.PermissionInfo
 import java.util.UUID
 

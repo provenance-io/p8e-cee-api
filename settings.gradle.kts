@@ -9,5 +9,6 @@ pluginManagement {
 }
 
 include(
-    "service"
+    "models",
+    "service",
 )

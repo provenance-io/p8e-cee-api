@@ -1,9 +1,9 @@
 package io.provenance.onboarding.domain.usecase.provenance.account
 
+import io.provenance.api.models.account.AccountInfo
 import io.provenance.core.KeyType
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.domain.usecase.common.model.AccountInfo
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import org.springframework.stereotype.Component
