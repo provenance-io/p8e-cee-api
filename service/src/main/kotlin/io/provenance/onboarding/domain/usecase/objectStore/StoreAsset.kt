@@ -1,6 +1,5 @@
 package io.provenance.onboarding.domain.usecase.objectStore
 
-import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
@@ -9,7 +8,6 @@ import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRespo
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
-import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.objectstore.util.base64Decode
 import org.springframework.stereotype.Component

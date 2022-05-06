@@ -5,7 +5,6 @@ import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.scope.encryption.model.DirectKeyRef
-import io.provenance.scope.encryption.util.toJavaPrivateKey
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
