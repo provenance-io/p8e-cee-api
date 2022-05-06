@@ -7,4 +7,3 @@ data class ContractExecutionResponse(
     val envelopeState: String? = null,
     val metadata: TxResponse? = null,
 )
-
