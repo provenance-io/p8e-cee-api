@@ -51,3 +51,7 @@ out/
 service/docker/volumes/
 service/docker/vault/init.output
 service/docker/vault/keys.output
+
+# Object store files
+service/docker/object-store-1/
+service/docker/object-store-2/
