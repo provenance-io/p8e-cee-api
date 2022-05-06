@@ -13,6 +13,8 @@ import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
 import java.net.URI
 import java.security.KeyPair
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.util.concurrent.TimeUnit
 import org.springframework.stereotype.Component
 
@@ -23,8 +25,8 @@ class CreateClient(
     override suspend fun execute(args: CreateClientRequest): Client {
         val originator = getOriginator.execute(args.account.originatorUuid)
         val affiliate = Affiliate(
-            signingKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.SIGNING_PRIVATE_KEY].toString().toJavaPrivateKey())),
-            encryptionKeyRef = DirectKeyRef(KeyPair(originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey(), originator.keys[KeyType.ENCRYPTION_PRIVATE_KEY].toString().toJavaPrivateKey())),
+            signingKeyRef = DirectKeyRef(KeyPair(originator.signingPublicKey() as PublicKey, originator.signingPrivateKey() as PrivateKey)),
+            encryptionKeyRef = DirectKeyRef(KeyPair(originator.encryptionPublicKey() as PublicKey, originator.encryptionPrivateKey() as PrivateKey)),
             args.account.partyType,
         )
 

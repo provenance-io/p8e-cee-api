@@ -5,6 +5,7 @@ import io.provenance.core.KeyType
 import io.provenance.core.Originator
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.cee.ContractService
+import io.provenance.onboarding.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.scope.contract.proto.Envelopes.Envelope
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.contract.spec.P8eContract
@@ -13,6 +14,7 @@ import io.provenance.scope.loan.LoanScopeSpecification
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.Session
+import io.provenance.scope.sdk.SignedResult
 import java.util.UUID
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
@@ -66,11 +68,9 @@ class P8eContractService : ContractService {
         runCatching {
             execution()
         }.fold(
-            onSuccess = { result ->
-                return result
-            },
+            onSuccess = { result -> result },
             onFailure = { throwable ->
-                throw throwable
+                throw ContractExecutionException("Contract execution failed.", throwable)
             }
         )
 

@@ -18,6 +18,7 @@ import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
 import java.lang.IllegalStateException
 import java.net.URI
+import java.security.PublicKey
 
 @Component
 class StoreAsset(
@@ -39,7 +40,7 @@ class StoreAsset(
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER))
         }
 
-        val publicKey = (originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY] as? String)?.toJavaPublicKey()
+        val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.account.originatorUuid}")
 
         val asset = AssetOuterClassBuilders.Asset {

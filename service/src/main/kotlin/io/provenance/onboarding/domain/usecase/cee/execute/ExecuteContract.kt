@@ -42,6 +42,8 @@ class ExecuteContract(
         val account = getAccount.execute(args.config.account)
         val signer = utils.getSigner(account)
         val client = createClient.execute(CreateClientRequest(args.config.account, args.config.client, args.participants))
+        val client2 = createClient.execute(CreateClientRequest(args.config.account, args.config.client, args.participants))
+        log.info(client2.toString())
         val contract = contractService.getContract(args.config.contract.contractName)
         val records = getRecords(args.records, contract)
 

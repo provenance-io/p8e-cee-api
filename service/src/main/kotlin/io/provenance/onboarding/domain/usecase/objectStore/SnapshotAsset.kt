@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component
 import tech.figure.asset.v1beta1.Asset
 import java.lang.IllegalStateException
 import java.net.URI
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.util.UUID
 
 @Component
@@ -29,10 +31,10 @@ class SnapshotAsset(
 
         val originator = getOriginator.execute(args.account.originatorUuid)
         val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
-        val publicKey = (originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY] as? String)?.toJavaPublicKey()
+        val publicKey = (originator.signingPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.account.originatorUuid}")
 
-        val privateKey = (originator.keys[KeyType.SIGNING_PRIVATE_KEY] as? String)?.toJavaPrivateKey()
+        val privateKey = (originator.signingPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.account.originatorUuid}")
 
         val asset = objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)
