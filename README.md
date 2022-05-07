@@ -34,6 +34,11 @@ brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
 
+You'll additionally need `CoreUtils` if your system is missing it:
+```
+brew install coreutils
+```
+
 The default configuration assumes that the following ports are available:
 
 | **Container**  |    **Port(s)**    |
