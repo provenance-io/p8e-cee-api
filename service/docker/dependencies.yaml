@@ -34,7 +34,7 @@ services:
         ports:
             - "5001:8080"
         volumes:
-            - ./object_store_1:/mnt/data
+            - ./object-store-1:/mnt/data
 
     object-store-2:
         image: ghcr.io/provenance-io/object-store:0.7.0
@@ -48,7 +48,7 @@ services:
         ports:
             - "5002:8080"
         volumes:
-            - ./object_store-2:/mnt/data
+            - ./object-store-2:/mnt/data
 
     provenance:
         image: provenanceio/provenance:v1.8.0-rc9
