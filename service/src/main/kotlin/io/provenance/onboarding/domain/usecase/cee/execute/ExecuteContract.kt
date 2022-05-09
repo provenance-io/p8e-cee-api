@@ -52,7 +52,7 @@ class ExecuteContract(
 
         val scope = provenanceService.getScope(args.config.provenanceConfig, args.config.contract.scopeUuid)
         val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
-        val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid, participants, scopeToUse)
+        val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid, participants, scopeToUse, args.config.contract.scopeSpecificationName)
 
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {

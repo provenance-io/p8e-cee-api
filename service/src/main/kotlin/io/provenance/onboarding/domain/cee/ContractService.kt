@@ -13,7 +13,7 @@ import java.util.UUID
 
 interface ContractService {
     fun getContract(contractName: String): Class<out P8eContract>
-    fun <T : P8eContract> setupContract(client: Client, contractClass: Class<T>, records: Map<String, Message>, scopeUuid: UUID, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>? = null, scope: ScopeResponse? = null): Session
+    fun <T : P8eContract> setupContract(client: Client, contractClass: Class<T>, records: Map<String, Message>, scopeUuid: UUID, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>? = null, scope: ScopeResponse? = null, scopeSpecification: String): Session
     fun executeContract(client: Client, session: Session): ExecutionResult
     fun executeContract(client: Client, envelope: Envelopes.Envelope): ExecutionResult
 }

@@ -9,12 +9,14 @@ import io.provenance.onboarding.frameworks.provenance.exceptions.ContractExecuti
 import io.provenance.scope.contract.proto.Envelopes.Envelope
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.contract.spec.P8eContract
+import io.provenance.scope.contract.spec.P8eScopeSpecification
 import io.provenance.scope.encryption.util.toJavaPublicKey
-import io.provenance.scope.loan.LoanScopeSpecification
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.Session
+import java.lang.IllegalArgumentException
 import java.util.UUID
+import kotlin.reflect.full.isSubclassOf
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -34,16 +36,24 @@ class P8eContractService : ContractService {
         sessionUuid: UUID?,
         participants: Map<Specifications.PartyType, Originator>?,
         scope: ScopeResponse?,
+        scopeSpecification: String,
     ): Session =
         when (scope) {
-            null ->
+            null -> {
+                val scopeSpec = Class.forName(scopeSpecification).let { specification ->
+                    specification.kotlin.isSubclassOf(P8eScopeSpecification::class).takeIf { it }?.let {
+                        specification.asSubclass(P8eScopeSpecification::class.java)
+                    } ?: throw IllegalArgumentException("Defined scope specification name was not a subclass of P8eScopeSpecification.")
+                }
+
                 client
-                    .newSession(contractClass, LoanScopeSpecification::class.java)
+                    .newSession(contractClass, scopeSpec)
                     .setScopeUuid(scopeUuid)
                     .configureSession(records, sessionUuid, participants)
                     .also { session ->
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
                     }
+            }
             else ->
                 client
                     .newSession(contractClass, scope)
