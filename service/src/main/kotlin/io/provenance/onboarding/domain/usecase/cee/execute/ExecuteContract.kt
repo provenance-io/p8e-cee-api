@@ -23,6 +23,7 @@ import io.provenance.scope.sdk.SignedResult
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.Base64
+import kotlin.reflect.KType
 import kotlin.reflect.full.functions
 
 private val log = KotlinLogging.logger { }
@@ -77,7 +78,7 @@ class ExecuteContract(
             contract.kotlin.functions.forEach { func ->
                 func.parameters.forEach { param ->
                     (param.annotations.firstOrNull { it is Input } as? Input)?.let { input ->
-                        val parameterClass = Class.forName(param.type.toString())
+                        val parameterClass = Class.forName(param.type.toClassNameString())
                         val recordToParse = records.getOrDefault(input.name, null)
                             ?: throw IllegalStateException("Contract required input record with name ${input.name} but none was found!")
                         val record = contractParser.parseInput(recordToParse, parameterClass)
@@ -92,4 +93,6 @@ class ExecuteContract(
 
         return contractRecords
     }
+
+    private fun KType?.toClassNameString(): String? = this?.classifier?.toString()?.drop("class ".length)
 }
