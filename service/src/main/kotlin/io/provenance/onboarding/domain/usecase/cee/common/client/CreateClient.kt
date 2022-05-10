@@ -10,12 +10,12 @@ import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
+import org.springframework.stereotype.Component
 import java.net.URI
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.concurrent.TimeUnit
-import org.springframework.stereotype.Component
 
 @Component
 class CreateClient(
