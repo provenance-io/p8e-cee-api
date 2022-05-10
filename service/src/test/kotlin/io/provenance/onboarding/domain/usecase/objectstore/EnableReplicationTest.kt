@@ -56,7 +56,7 @@ class EnableReplicationTest : FunSpec({
     }
 
     test("happy path") {
-        every { anyConstructed<OsClient>().createPublicKey(any(), any()) } returns publicKeyResponse
+        every { anyConstructed<OsClient>().createPublicKey(any(), any(), any()) } returns publicKeyResponse
 
         // Execute enable replication code
         enableReplication.execute(
@@ -72,6 +72,7 @@ class EnableReplicationTest : FunSpec({
     test("empty result from createPublicKey call") {
         every {
             anyConstructed<OsClient>().createPublicKey(
+                any(),
                 any(),
                 any()
             )

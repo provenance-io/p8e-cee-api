@@ -14,20 +14,27 @@ import org.springframework.stereotype.Component
 @Component
 class CreateTx(
     private val audienceKeyManager: AudienceKeyManager,
-    private val getAccount: GetAccount
+    private val getAccount: GetAccount,
 ) : AbstractUseCase<CreateTxRequest, TxBody>() {
     override suspend fun execute(args: CreateTxRequest): TxBody {
         val utils = ProvenanceUtils()
 
         val account = getAccount.execute(args.account)
-        val additionalAudiences = args.permissions?.audiences?.map { it.getAddress(!args.account.isTestNet) }?.toMutableSet() ?: mutableSetOf()
+        val additionalAudiences: MutableSet<String> = mutableSetOf()
+
+        args.permissions?.audiences?.forEach {
+            additionalAudiences.add(it)
+        }
 
         if (args.permissions?.permissionDart == true) {
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART).getAddress(!args.account.isTestNet))
         }
 
         if (args.permissions?.permissionPortfolioManager == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(!args.account.isTestNet))
+            additionalAudiences.add(
+                audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER)
+                    .getAddress(!args.account.isTestNet)
+            )
         }
 
         return utils.createScopeTx(
