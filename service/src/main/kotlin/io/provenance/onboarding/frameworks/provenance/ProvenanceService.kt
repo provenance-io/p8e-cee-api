@@ -41,26 +41,26 @@ class ProvenanceService : Provenance {
     private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? {
-        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-        return when (tx) {
-            is SingleTx -> {
-                when (val error = tx.getErrorResult()) {
-                    null -> {
-                        log.info("Building the tx.")
-                        val messages = tx.value.messages.map { Any.pack(it, "") }
+    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            return when (tx) {
+                is SingleTx -> {
+                    when (val error = tx.getErrorResult()) {
+                        null -> {
+                            log.info("Building the tx.")
+                            val messages = tx.value.messages.map { Any.pack(it, "") }
 
-                        TxOuterClass.TxBody.newBuilder()
-                            .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
-                            .addAllMessages(messages)
-                            .build()
+                            TxOuterClass.TxBody.newBuilder()
+                                .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
+                                .addAllMessages(messages)
+                                .build()
+                        }
+                        else -> throw ContractTxException(error.result.errorMessage)
                     }
-                    else -> throw ContractTxException(error.result.errorMessage)
                 }
+                is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
             }
-            is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
         }
-    }
 
     override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
         val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
@@ -81,6 +81,7 @@ class ProvenanceService : Provenance {
             gasAdjustment = config.gasAdjustment,
             mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
         )
+        pbClient.close()
 
         if (result.isError()) {
             cachedOffset.getAndDecrement(account.sequence)
@@ -107,17 +108,19 @@ class ProvenanceService : Provenance {
             gasAdjustment = 1.5
         ).txResponse
 
+        pbClient.close()
+
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
     }
 
-    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse {
-        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-        return pbClient.metadataClient.scope(
-            ScopeRequest.newBuilder()
-                .setScopeId(scopeUuid.toString())
-                .setIncludeRecords(true)
-                .setIncludeSessions(true)
-                .build()
-        )
-    }
+    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            pbClient.metadataClient.scope(
+                ScopeRequest.newBuilder()
+                    .setScopeId(scopeUuid.toString())
+                    .setIncludeRecords(true)
+                    .setIncludeSessions(true)
+                    .build()
+            )
+        }
 }
