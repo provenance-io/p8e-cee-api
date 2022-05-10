@@ -25,7 +25,7 @@ jobs:
               with:
                   java-version: 11
             - name: Build with Gradle
-              run: ./gradlew clean build --refresh-dependencies :generateVersionFile githubRelease
+              run: ./gradlew :generateVersionFile githubRelease
               if: ${{ github.ref_name == 'main' }}
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
