@@ -26,11 +26,6 @@ subprojects {
         plugin("signing")
     }
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
-
     repositories {
         fun figureNexusUsername() = findProperty("nexusUser")?.toString() ?: System.getenv("NEXUS_USER")
         fun figureNexusPassword() = findProperty("nexusPass")?.toString() ?: System.getenv("NEXUS_PASS")
