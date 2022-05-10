@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class CreateTx(
     private val audienceKeyManager: AudienceKeyManager,
-    private val getAccount: GetAccount,
+    private val getAccount: GetAccount
 ) : AbstractUseCase<CreateTxRequest, TxBody>() {
     override suspend fun execute(args: CreateTxRequest): TxBody {
         val utils = ProvenanceUtils()

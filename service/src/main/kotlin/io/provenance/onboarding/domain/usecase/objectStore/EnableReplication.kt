@@ -16,7 +16,7 @@ class EnableReplication(
     private val objectStoreConfig: ObjectStoreConfig,
 ) : AbstractUseCase<EnableReplicationRequest, Unit>() {
 
-    val log = KotlinLogging.logger { }
+    private val log = KotlinLogging.logger { }
 
     override suspend fun execute(args: EnableReplicationRequest) {
         val osClientReplicatingFrom = OsClient(URI.create(args.sourceObjectStoreAddress), objectStoreConfig.timeoutMs)
