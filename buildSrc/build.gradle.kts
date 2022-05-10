@@ -3,7 +3,6 @@
 // used for the kotlin-dsl
 buildscript {
   repositories {
-    mavenLocal()
     mavenCentral()
   }
 }
@@ -14,6 +13,5 @@ plugins {
 
 // For everything else
 repositories {
-  mavenLocal()
   mavenCentral()
 }
