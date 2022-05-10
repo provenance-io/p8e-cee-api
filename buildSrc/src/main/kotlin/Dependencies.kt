@@ -13,7 +13,7 @@ object Versions {
     const val StreamData = Master
 
     const val Kotlin = "1.5.31"
-    const val KotlinCoroutines = "1.5.2"
+    const val KotlinCoroutines = "1.6.0"
     const val Protobuf = "3.18.1"
     const val SpringBoot = "2.5.6"
     const val KotlinLogging = "2.0.11"
@@ -26,6 +26,7 @@ object Versions {
     const val Mockk = "1.12.0"
     const val Kotest = "5.2.+"
     const val KotestExtensionsArrow = "1.2.+"
+    const val KotestCoroutines = "1.6.1"
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"

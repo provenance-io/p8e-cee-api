@@ -8,6 +8,7 @@ import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRespo
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
+import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.objectstore.util.base64Decode
 import org.springframework.stereotype.Component
@@ -28,7 +29,11 @@ class StoreAsset(
     override suspend fun execute(args: StoreAssetRequest): StoreAssetResponse {
         val originator = getOriginator.execute(args.account.originatorUuid)
         val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
-        val additionalAudiences = args.permissions?.audiences?.toMutableSet() ?: mutableSetOf()
+        val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
+
+        args.permissions?.audiences?.forEach {
+            additionalAudiences.add(it.toJavaPublicKey())
+        }
 
         if (args.permissions?.permissionDart == true) {
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART))
