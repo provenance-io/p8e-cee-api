@@ -4,7 +4,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.ObjectStoreConfig
 
 data class RejectContractRequest(
-    val account: AccountInfo,
+    val account: AccountInfo = AccountInfo(),
     val client: ObjectStoreConfig,
     val rejection: ByteArray,
 )

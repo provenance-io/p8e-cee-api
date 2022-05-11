@@ -7,7 +7,7 @@ import java.util.UUID
 
 data class CreateClientRequest(
     val uuid: UUID,
-    val account: AccountInfo,
+    val account: AccountInfo = AccountInfo(),
     val client: ObjectStoreConfig,
     val affiliates: List<Participant> = emptyList(),
 )

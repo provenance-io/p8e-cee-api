@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class SnapshotAssetRequest(
     val uuid: UUID,
-    val account: AccountInfo,
+    val account: AccountInfo = AccountInfo(),
     val hash: String,
     val objectStoreAddress: String,
     val permissions: PermissionInfo?,
