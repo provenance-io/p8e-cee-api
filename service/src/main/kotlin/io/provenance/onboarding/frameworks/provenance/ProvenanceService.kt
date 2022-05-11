@@ -11,17 +11,15 @@ import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
-import io.provenance.hdwallet.wallet.Account
 import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.provenance.Provenance
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTxException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight
 import io.provenance.onboarding.frameworks.provenance.extensions.getErrorResult
 import io.provenance.onboarding.frameworks.provenance.extensions.isError
-import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.sdk.SignedResult
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
@@ -41,26 +39,26 @@ class ProvenanceService : Provenance {
     private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? {
-        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-        return when (tx) {
-            is SingleTx -> {
-                when (val error = tx.getErrorResult()) {
-                    null -> {
-                        log.info("Building the tx.")
-                        val messages = tx.value.messages.map { Any.pack(it, "") }
+    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            return when (tx) {
+                is SingleTx -> {
+                    when (val error = tx.getErrorResult()) {
+                        null -> {
+                            log.info("Building the tx.")
+                            val messages = tx.value.messages.map { Any.pack(it, "") }
 
-                        TxOuterClass.TxBody.newBuilder()
-                            .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
-                            .addAllMessages(messages)
-                            .build()
+                            TxOuterClass.TxBody.newBuilder()
+                                .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
+                                .addAllMessages(messages)
+                                .build()
+                        }
+                        else -> throw ContractTxException(error.result.errorMessage)
                     }
-                    else -> throw ContractTxException(error.result.errorMessage)
                 }
+                is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
             }
-            is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
         }
-    }
 
     override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
         val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
@@ -81,6 +79,7 @@ class ProvenanceService : Provenance {
             gasAdjustment = config.gasAdjustment,
             mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
         )
+        pbClient.close()
 
         if (result.isError()) {
             cachedOffset.getAndDecrement(account.sequence)
@@ -90,9 +89,8 @@ class ProvenanceService : Provenance {
         return result.txResponse
     }
 
-    override fun onboard(chainId: String, nodeEndpoint: String, account: Account, storeTxBody: TxBody): TxResponse {
+    override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse {
         val pbClient = PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-        val utility = ProvenanceUtils()
 
         val txBody = TxOuterClass.TxBody.newBuilder().also {
             storeTxBody.base64.forEach { tx ->
@@ -102,22 +100,24 @@ class ProvenanceService : Provenance {
 
         val response = pbClient.estimateAndBroadcastTx(
             txBody = txBody,
-            signers = listOf(BaseReqSigner(utility.getSigner(account))),
+            signers = listOf(BaseReqSigner(signer)),
             mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_SYNC,
             gasAdjustment = 1.5
         ).txResponse
 
+        pbClient.close()
+
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
     }
 
-    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse {
-        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-        return pbClient.metadataClient.scope(
-            ScopeRequest.newBuilder()
-                .setScopeId(scopeUuid.toString())
-                .setIncludeRecords(true)
-                .setIncludeSessions(true)
-                .build()
-        )
-    }
+    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            pbClient.metadataClient.scope(
+                ScopeRequest.newBuilder()
+                    .setScopeId(scopeUuid.toString())
+                    .setIncludeRecords(true)
+                    .setIncludeSessions(true)
+                    .build()
+            )
+        }
 }

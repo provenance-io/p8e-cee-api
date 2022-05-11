@@ -1,4 +1,4 @@
-package io.provenance.onboarding.frameworks.web.external.cee
+package io.provenance.onboarding.frameworks.web.internal.cee
 
 import io.provenance.onboarding.domain.usecase.cee.approve.ApproveContractExecution
 import io.provenance.onboarding.domain.usecase.cee.approve.models.ApproveContractRequestWrapper
@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
 
 @Component
-class CeeHandler(
+class InternalCeeHandler(
     private val executeContract: ExecuteContract,
     private val approveContractExecution: ApproveContractExecution,
     private val rejectContractExecution: RejectContractExecution,

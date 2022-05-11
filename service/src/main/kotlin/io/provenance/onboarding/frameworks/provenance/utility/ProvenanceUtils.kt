@@ -7,7 +7,10 @@ import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.Signer
 import io.provenance.hdwallet.bip39.MnemonicWords
+import io.provenance.hdwallet.common.hashing.sha256
+import io.provenance.hdwallet.ec.extensions.toECPrivateKey
 import io.provenance.hdwallet.hrp.Hrp
+import io.provenance.hdwallet.signer.BCECSigner
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.hdwallet.wallet.Wallet
 import io.provenance.metadata.v1.DefinitionType
@@ -25,13 +28,17 @@ import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.RecordOutput
 import io.provenance.metadata.v1.ResultStatus
 import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.frameworks.provenance.extensions.toAny
 import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
 import io.provenance.onboarding.frameworks.provenance.extensions.toJson
 import io.provenance.onboarding.frameworks.provenance.extensions.toTxBody
+import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.util.UUID
 
 class ProvenanceUtils {
@@ -257,6 +264,22 @@ class ProvenanceUtils {
                     .build()
 
             override fun sign(data: ByteArray): ByteArray = account.sign(data)
+        }
+    }
+
+    fun getSigner(publicKey: PublicKey, privateKey: PrivateKey, isMainnet: Boolean): Signer {
+        return object : Signer {
+            override fun address(): String = publicKey.getAddress(isMainnet)
+
+            override fun pubKey(): Keys.PubKey =
+                Keys.PubKey.newBuilder()
+                    .setKey((publicKey as BCECPublicKey).q.getEncoded(true).toByteString())
+                    .build()
+
+            override fun sign(data: ByteArray): ByteArray =
+                BCECSigner().sign(privateKey.toECPrivateKey(), data.sha256())
+                    .encodeAsBTC()
+                    .toByteArray()
         }
     }
 

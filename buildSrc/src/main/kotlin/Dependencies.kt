@@ -36,11 +36,12 @@ object Versions {
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
     const val KeyAccessLib = "0.2.15"
-    const val LoanPackage = "0.1.9"
+    const val LoanPackage = "0.1.13"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
     const val Reflections = "0.9.10"
     const val NexusPublishing = "1.1.0"
+    const val BouncyCastle = "1.70"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -135,7 +136,7 @@ object Dependencies {
     object Jackson {
         val Databind = DependencySpec(
             "com.fasterxml.jackson.core:jackson-databind",
-            "2.12.+"
+            "2.12.6.1"
         )
         val Datatype = DependencySpec(
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
@@ -189,6 +190,9 @@ object Dependencies {
     }
 
     val Reflections = DependencySpec("org.reflections:reflections", Versions.Reflections)
+
+    val BouncyCastleProvider = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
+    val BouncyCastle = DependencySpec("org.bouncycastle:bcpkix-jdk15on", Versions.BouncyCastle)
 }
 
 data class PluginSpec(

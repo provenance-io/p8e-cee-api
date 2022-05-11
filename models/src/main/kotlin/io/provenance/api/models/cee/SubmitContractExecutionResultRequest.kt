@@ -4,7 +4,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.ProvenanceConfig
 
 data class SubmitContractExecutionResultRequest(
-    val account: AccountInfo,
+    val account: AccountInfo = AccountInfo(),
     val provenance: ProvenanceConfig,
     val envelope: ByteArray,
     val state: ByteArray,

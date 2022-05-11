@@ -26,13 +26,7 @@ subprojects {
         plugin("signing")
     }
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
-
     repositories {
-        mavenLocal()
         mavenCentral()
     }
 
@@ -128,7 +122,6 @@ allprojects {
     version = semVersion
 
     repositories {
-        mavenLocal()
         mavenCentral()
     }
 }

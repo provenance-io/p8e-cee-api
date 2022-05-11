@@ -58,6 +58,8 @@ dependencies {
         Dependencies.Grpc.Protobuf,
         Dependencies.Grpc.Stub,
         Dependencies.Reflections,
+        Dependencies.BouncyCastle,
+        Dependencies.BouncyCastleProvider,
 
     ).forEach { dep ->
         dep.implementation(this)

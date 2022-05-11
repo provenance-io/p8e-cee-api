@@ -14,11 +14,11 @@ import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.Session
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
 import java.lang.IllegalArgumentException
 import java.util.UUID
 import kotlin.reflect.full.isSubclassOf
-import mu.KotlinLogging
-import org.springframework.stereotype.Component
 
 @Component
 class P8eContractService : ContractService {

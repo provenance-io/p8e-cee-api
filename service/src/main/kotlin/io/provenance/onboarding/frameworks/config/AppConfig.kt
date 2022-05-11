@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary
         ObjectStoreConfig::class,
         VaultProperties::class,
         ServiceKeysProperties::class,
+        ProvenanceProperties::class
     ]
 )
 class AppConfig {
