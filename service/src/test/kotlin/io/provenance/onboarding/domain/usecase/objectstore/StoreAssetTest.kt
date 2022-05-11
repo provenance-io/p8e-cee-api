@@ -9,12 +9,13 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.Originator
 import io.provenance.onboarding.domain.objectStore.ObjectStore
-import io.provenance.onboarding.domain.usecase.common.model.PermissionInfo
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.objectStore.StoreAsset
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest
+import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequestWrapper
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
@@ -26,12 +27,13 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import java.security.PublicKey
 
 const val ADD_ASSET_OBJECT_STORE_ADDRESS = "grpc://localhost:5005"
-const val ADD_ASSET_AUDIENCE_PUBLIC_KEY = "0A41046C57E9E25101D5E553AE003E2F79025E389B51495607C796B4E95C0A94001FBC24D84CD0780819612529B803E8AD0A397F474C965D957D33DD64E642B756FBC4"
-val ORIGINATOR_UUID = "f9d765c9-3542-47f1-817c-a5348d8dde83".toUuid()
+const val ADD_ASSET_AUDIENCE_PUBLIC_KEY =
+    "0A41046C57E9E25101D5E553AE003E2F79025E389B51495607C796B4E95C0A94001FBC24D84CD0780819612529B803E8AD0A397F474C965D957D33DD64E642B756FBC4"
 val ASSET_ID = "20141790-6de2-4d11-b3ad-9a1e16a8b38e".toUuid()
 val ASSET = "am9l"
+val REQUEST_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 
-val ACCOUNT_INFO = AccountInfo(ORIGINATOR_UUID)
+val ACCOUNT_INFO = AccountInfo()
 
 class StoreAssetTest : FunSpec({
 
@@ -85,16 +87,19 @@ class StoreAssetTest : FunSpec({
 
         // Execute enable replication code
         val response = storeAsset.execute(
-            StoreAssetRequest(
-                ACCOUNT_INFO,
-                ADD_ASSET_OBJECT_STORE_ADDRESS,
-                PermissionInfo(
-                    setOf(ADD_ASSET_AUDIENCE_PUBLIC_KEY),
-                    permissionDart = true,
-                    permissionPortfolioManager = true
-                ),
-                ASSET_ID,
-                ASSET
+            StoreAssetRequestWrapper(
+                REQUEST_UUID,
+                StoreAssetRequest(
+                    ACCOUNT_INFO,
+                    ADD_ASSET_OBJECT_STORE_ADDRESS,
+                    PermissionInfo(
+                        setOf(ADD_ASSET_AUDIENCE_PUBLIC_KEY),
+                        permissionDart = true,
+                        permissionPortfolioManager = true
+                    ),
+                    ASSET_ID,
+                    ASSET
+                )
             )
         )
 
@@ -123,12 +128,15 @@ class StoreAssetTest : FunSpec({
         // Execute enable replication code
         shouldThrow<IllegalStateException> {
             storeAsset.execute(
-                StoreAssetRequest(
-                    ACCOUNT_INFO,
-                    ADD_ASSET_OBJECT_STORE_ADDRESS,
-                    PermissionInfo(emptySet()),
-                    ASSET_ID,
-                    ASSET
+                StoreAssetRequestWrapper(
+                    REQUEST_UUID,
+                    StoreAssetRequest(
+                        ACCOUNT_INFO,
+                        ADD_ASSET_OBJECT_STORE_ADDRESS,
+                        PermissionInfo(emptySet()),
+                        ASSET_ID,
+                        ASSET
+                    )
                 )
             )
         }
