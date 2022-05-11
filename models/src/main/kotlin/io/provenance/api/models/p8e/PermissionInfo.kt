@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.common.model
+package io.provenance.api.models.p8e
 
 import java.security.PublicKey
 

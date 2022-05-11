@@ -27,24 +27,6 @@ subprojects {
     }
 
     repositories {
-        fun figureNexusUsername() = findProperty("nexusUser")?.toString() ?: System.getenv("NEXUS_USER")
-        fun figureNexusPassword() = findProperty("nexusPass")?.toString() ?: System.getenv("NEXUS_PASS")
-
-        maven {
-            url = uri("https://nexus.figure.com/repository/mirror")
-            credentials {
-                username = figureNexusUsername()
-                password = figureNexusPassword()
-            }
-        }
-        maven {
-            url = uri("https://nexus.figure.com/repository/figure")
-            credentials {
-                username = figureNexusUsername()
-                password = figureNexusPassword()
-            }
-        }
-
         mavenCentral()
     }
 
@@ -140,7 +122,6 @@ allprojects {
     version = semVersion
 
     repositories {
-        mavenLocal()
         mavenCentral()
     }
 }

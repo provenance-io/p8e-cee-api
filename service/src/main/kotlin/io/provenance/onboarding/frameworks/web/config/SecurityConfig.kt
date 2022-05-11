@@ -18,7 +18,7 @@ class SecurityConfig {
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http.authorizeExchange {
-            it.pathMatchers("${Routes.MANAGE_BASE}/**", "${Routes.EXTERNAL_BASE}/**").permitAll()
+            it.pathMatchers("${Routes.MANAGE_BASE}/**", "${Routes.EXTERNAL_BASE}/**", "${Routes.INTERNAL_BASE}/**").permitAll()
         }
             .csrf().disable()
         return http.build()

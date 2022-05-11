@@ -2,7 +2,6 @@ package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
 import io.provenance.api.models.cee.ContractExecutionResponse
-import io.provenance.api.models.cee.ExecuteContractRequest
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
@@ -12,6 +11,7 @@ import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
+import io.provenance.onboarding.domain.usecase.cee.execute.model.ExecuteContractRequestWrapper
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.frameworks.provenance.SingleTx
@@ -35,26 +35,26 @@ class ExecuteContract(
     private val contractParser: ContractParser,
     private val createClient: CreateClient,
     private val getOriginator: GetOriginator,
-) : AbstractUseCase<ExecuteContractRequest, Any>() {
+) : AbstractUseCase<ExecuteContractRequestWrapper, Any>() {
 
-    override suspend fun execute(args: ExecuteContractRequest): ContractExecutionResponse {
-        val signer = getSigner.execute(args.config.account)
-        val client = createClient.execute(CreateClientRequest(args.config.account, args.config.client, args.participants))
-        val contract = contractService.getContract(args.config.contract.contractName)
-        val records = getRecords(args.records, contract)
+    override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
+        val signer = getSigner.execute(args.uuid)
+        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, args.request.participants))
+        val contract = contractService.getContract(args.request.config.contract.contractName)
+        val records = getRecords(args.request.records, contract)
 
-        val participants = args.participants.associate {
-            it.partyType to getOriginator.execute(it.originatorUuid)
+        val participants = args.request.participants.associate {
+            it.partyType to getOriginator.execute(it.uuid)
         }
 
-        val scope = provenanceService.getScope(args.config.provenanceConfig, args.config.contract.scopeUuid)
+        val scope = provenanceService.getScope(args.request.config.provenanceConfig, args.request.config.contract.scopeUuid)
         val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
-        val session = contractService.setupContract(client, contract, records, args.config.contract.scopeUuid, args.config.contract.sessionUuid, participants, scopeToUse, args.config.contract.scopeSpecificationName)
+        val session = contractService.setupContract(client, contract, records, args.request.config.contract.scopeUuid, args.request.config.contract.sessionUuid, participants, scopeToUse, args.request.config.contract.scopeSpecificationName)
 
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {
-                provenanceService.buildContractTx(args.config.provenanceConfig, SingleTx(result))?.let {
-                    provenanceService.executeTransaction(args.config.provenanceConfig, it, signer).let { pbResponse ->
+                provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result))?.let {
+                    provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
                         ContractExecutionResponse(false, null, TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString()))
                     }
                 } ?: throw IllegalStateException("Failed to build contract for execution output.")

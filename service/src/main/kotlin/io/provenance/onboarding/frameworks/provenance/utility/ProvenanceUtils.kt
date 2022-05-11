@@ -28,7 +28,7 @@ import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.RecordOutput
 import io.provenance.metadata.v1.ResultStatus
 import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.frameworks.provenance.extensions.toAny
 import io.provenance.onboarding.frameworks.provenance.extensions.toBase64String
 import io.provenance.onboarding.frameworks.provenance.extensions.toJson

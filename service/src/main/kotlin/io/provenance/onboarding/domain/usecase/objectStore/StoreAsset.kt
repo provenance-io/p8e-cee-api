@@ -3,7 +3,7 @@ package io.provenance.onboarding.domain.usecase.objectStore
 import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest
+import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequestWrapper
 import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
@@ -24,27 +24,27 @@ class StoreAsset(
     private val objectStoreConfig: ObjectStoreConfig,
     private val audienceKeyManager: AudienceKeyManager,
     private val getOriginator: GetOriginator,
-) : AbstractUseCase<StoreAssetRequest, StoreAssetResponse>() {
-    override suspend fun execute(args: StoreAssetRequest): StoreAssetResponse {
-        val originator = getOriginator.execute(args.account.originatorUuid)
-        val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
-        val additionalAudiences = args.permissions?.audiences?.toMutableSet() ?: mutableSetOf()
+) : AbstractUseCase<StoreAssetRequestWrapper, StoreAssetResponse>() {
+    override suspend fun execute(args: StoreAssetRequestWrapper): StoreAssetResponse {
+        val originator = getOriginator.execute(args.uuid)
+        val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
+        val additionalAudiences = args.request.permissions?.audiences?.toMutableSet() ?: mutableSetOf()
 
-        if (args.permissions?.permissionDart == true) {
+        if (args.request.permissions?.permissionDart == true) {
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART))
         }
 
-        if (args.permissions?.permissionPortfolioManager == true) {
+        if (args.request.permissions?.permissionPortfolioManager == true) {
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER))
         }
 
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
-            ?: throw IllegalStateException("Public key was not present for originator: ${args.account.originatorUuid}")
+            ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 
         val asset = AssetOuterClassBuilders.Asset {
-            idBuilder.value = args.assetId.toString()
+            idBuilder.value = args.request.assetId.toString()
             type = FileNFT.ASSET_TYPE
-            putKv(FileNFT.KEY_BYTES, args.asset.base64Decode().toProtoAny())
+            putKv(FileNFT.KEY_BYTES, args.request.asset.base64Decode().toProtoAny())
         }
 
         return objectStore.storeAsset(osClient, asset, publicKey, additionalAudiences)

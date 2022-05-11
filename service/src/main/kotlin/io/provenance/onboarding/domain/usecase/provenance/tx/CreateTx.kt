@@ -2,9 +2,10 @@ package io.provenance.onboarding.domain.usecase.provenance.tx
 
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
-import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequest
+import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
+import io.provenance.onboarding.frameworks.config.ProvenanceProperties
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
 import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
@@ -14,29 +15,30 @@ import org.springframework.stereotype.Component
 @Component
 class CreateTx(
     private val audienceKeyManager: AudienceKeyManager,
-    private val getSigner: GetSigner
-) : AbstractUseCase<CreateTxRequest, TxBody>() {
-    override suspend fun execute(args: CreateTxRequest): TxBody {
+    private val getSigner: GetSigner,
+    private val provenanceProperties: ProvenanceProperties,
+) : AbstractUseCase<CreateTxRequestWrapper, TxBody>() {
+    override suspend fun execute(args: CreateTxRequestWrapper): TxBody {
         val utils = ProvenanceUtils()
 
-        val account = getSigner.execute(args.account)
-        val additionalAudiences = args.permissions?.audiences?.map { it.getAddress(!args.account.isTestNet) }?.toMutableSet() ?: mutableSetOf()
+        val account = getSigner.execute(args.uuid)
+        val additionalAudiences = args.request.permissions?.audiences?.map { it.getAddress(provenanceProperties.mainnet) }?.toMutableSet() ?: mutableSetOf()
 
-        if (args.permissions?.permissionDart == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART).getAddress(!args.account.isTestNet))
+        if (args.request.permissions?.permissionDart == true) {
+            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART).getAddress(provenanceProperties.mainnet))
         }
 
-        if (args.permissions?.permissionPortfolioManager == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(!args.account.isTestNet))
+        if (args.request.permissions?.permissionPortfolioManager == true) {
+            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(provenanceProperties.mainnet))
         }
 
         return utils.createScopeTx(
             ScopeConfig(
-                args.scopeId,
-                args.contractSpecId,
-                args.scopeSpecId,
+                args.request.scopeId,
+                args.request.contractSpecId,
+                args.request.scopeSpecId,
             ),
-            args.contractInput,
+            args.request.contractInput,
             account.address(),
             additionalAudiences
         )

@@ -4,6 +4,7 @@ import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
+import io.provenance.onboarding.frameworks.config.ProvenanceProperties
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Affiliate
@@ -19,10 +20,11 @@ import java.util.concurrent.TimeUnit
 
 @Component
 class CreateClient(
-    private val getOriginator: GetOriginator
+    private val getOriginator: GetOriginator,
+    private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
-        val originator = getOriginator.execute(args.account.originatorUuid)
+        val originator = getOriginator.execute(args.uuid)
         val affiliate = Affiliate(
             signingKeyRef = DirectKeyRef(KeyPair(originator.signingPublicKey() as PublicKey, originator.signingPrivateKey() as PrivateKey)),
             encryptionKeyRef = DirectKeyRef(KeyPair(originator.encryptionPublicKey() as PublicKey, originator.encryptionPrivateKey() as PrivateKey)),
@@ -31,11 +33,11 @@ class CreateClient(
 
         val sharedClient = SharedClient(
             ClientConfig(
-                mainNet = !args.account.isTestNet,
+                mainNet = provenanceProperties.mainnet,
                 cacheJarSizeInBytes = 4L * 1024 * 1024, // ~ 4 MB,
                 cacheRecordSizeInBytes = 0L,
                 cacheSpecSizeInBytes = 0L,
-                disableContractLogs = !args.account.isTestNet,
+                disableContractLogs = provenanceProperties.mainnet,
                 osConcurrencySize = 6,
                 osGrpcUrl = URI(args.client.objectStoreUrl),
                 osChannelCustomizeFn = { channelBuilder ->
@@ -47,7 +49,7 @@ class CreateClient(
             )
         ).also { client ->
             args.affiliates.forEach {
-                val keys = getOriginator.execute(it.originatorUuid).keys
+                val keys = getOriginator.execute(it.uuid).keys
                 client.affiliateRepository.addAffiliate(keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
             }
         }
