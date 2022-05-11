@@ -17,9 +17,15 @@ dependencies {
         Dependencies.P8eScope.ContractBase,
         Dependencies.Provenance.AssetModel,
         Dependencies.Kotlin.CoroutinesReactor,
+        Dependencies.Jackson.Databind,
     ).forEach { dep ->
         dep.implementation(this)
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 publishing {

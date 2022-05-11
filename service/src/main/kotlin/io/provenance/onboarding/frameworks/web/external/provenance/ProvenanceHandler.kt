@@ -3,7 +3,11 @@ package io.provenance.onboarding.frameworks.web.external.provenance
 import io.provenance.onboarding.domain.usecase.provenance.tx.CreateTx
 import io.provenance.onboarding.domain.usecase.provenance.tx.CreateTxOnboardAsset
 import io.provenance.onboarding.domain.usecase.provenance.tx.ExecuteTx
+import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxOnboardAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
+import io.provenance.onboarding.domain.usecase.provenance.tx.model.ExecuteTxRequestWrapper
 import io.provenance.onboarding.frameworks.web.misc.foldToServerResponse
+import io.provenance.onboarding.frameworks.web.misc.getUser
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -16,14 +20,14 @@ class ProvenanceHandler(
     private val createTxAndOnboardAsset: CreateTxOnboardAsset
 ) {
     suspend fun createTxAndOnboard(req: ServerRequest): ServerResponse = runCatching {
-        createTxAndOnboardAsset.execute(req.awaitBody())
+        createTxAndOnboardAsset.execute(CreateTxOnboardAssetRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
-        createTx.execute(req.awaitBody())
+        createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
-        executeTx.execute(req.awaitBody())
+        executeTx.execute(ExecuteTxRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 }

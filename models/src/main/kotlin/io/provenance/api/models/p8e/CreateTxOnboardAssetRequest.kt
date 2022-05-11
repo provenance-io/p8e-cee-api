@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.provenance.tx.model
+package io.provenance.api.models.p8e
 
 data class CreateTxOnboardAssetRequest(
     val chainId: String,

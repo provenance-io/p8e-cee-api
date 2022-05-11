@@ -11,6 +11,7 @@ RUN gradle clean build --no-daemon > /dev/null 2>&1 || true
 
 # Copy all files
 COPY service /app/service/
+COPY models /app/models/
 COPY buildSrc /app/buildSrc/
 COPY .git /app/.git/
 COPY detekt.yml /app/
