@@ -4,9 +4,8 @@ import io.provenance.api.models.cee.SubmitContractExecutionResultRequest
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.onboarding.domain.provenance.Provenance
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
+import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.frameworks.provenance.SingleTx
-import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
 import io.provenance.scope.sdk.extensions.mergeInto
@@ -15,12 +14,10 @@ import org.springframework.stereotype.Component
 @Component
 class SubmitContractExecutionResult(
     private val provenanceService: Provenance,
-    private val getAccount: GetAccount,
+    private val getSigner: GetSigner,
 ) : AbstractUseCase<SubmitContractExecutionResultRequest, TxResponse>() {
     override suspend fun execute(args: SubmitContractExecutionResultRequest): TxResponse {
-        val utils = ProvenanceUtils()
-        val account = getAccount.execute(args.account)
-        val signer = utils.getSigner(account)
+        val signer = getSigner.execute(args.account)
 
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.envelope).build()
         val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(args.state).build()

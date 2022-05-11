@@ -40,6 +40,7 @@ object Versions {
     const val ProvenanceProto = "1.8.0"
     const val Reflections = "0.9.10"
     const val NexusPublishing = "1.1.0"
+    const val BouncyCastle = "1.70"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -188,6 +189,9 @@ object Dependencies {
     }
 
     val Reflections = DependencySpec("org.reflections:reflections", Versions.Reflections)
+
+    val BouncyCastleProvider = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
+    val BouncyCastle = DependencySpec("org.bouncycastle:bcpkix-jdk15on", Versions.BouncyCastle)
 }
 
 data class PluginSpec(

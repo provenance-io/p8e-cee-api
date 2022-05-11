@@ -13,9 +13,8 @@ import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.CreateClient
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
-import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
+import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.frameworks.provenance.SingleTx
-import io.provenance.onboarding.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.sdk.FragmentResult
@@ -32,16 +31,14 @@ private val log = KotlinLogging.logger { }
 class ExecuteContract(
     private val contractService: ContractService,
     private val provenanceService: Provenance,
-    private val getAccount: GetAccount,
+    private val getSigner: GetSigner,
     private val contractParser: ContractParser,
     private val createClient: CreateClient,
     private val getOriginator: GetOriginator,
 ) : AbstractUseCase<ExecuteContractRequest, Any>() {
 
     override suspend fun execute(args: ExecuteContractRequest): ContractExecutionResponse {
-        val utils = ProvenanceUtils()
-        val account = getAccount.execute(args.config.account)
-        val signer = utils.getSigner(account)
+        val signer = getSigner.execute(args.config.account)
         val client = createClient.execute(CreateClientRequest(args.config.account, args.config.client, args.participants))
         val contract = contractService.getContract(args.config.contract.contractName)
         val records = getRecords(args.records, contract)

@@ -3,7 +3,7 @@ package io.provenance.onboarding.domain.usecase.provenance.tx
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.model.ScopeConfig
 import io.provenance.onboarding.domain.usecase.common.model.TxBody
-import io.provenance.onboarding.domain.usecase.provenance.account.GetAccount
+import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequest
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component
 @Component
 class CreateTx(
     private val audienceKeyManager: AudienceKeyManager,
-    private val getAccount: GetAccount
+    private val getSigner: GetSigner
 ) : AbstractUseCase<CreateTxRequest, TxBody>() {
     override suspend fun execute(args: CreateTxRequest): TxBody {
         val utils = ProvenanceUtils()
 
-        val account = getAccount.execute(args.account)
+        val account = getSigner.execute(args.account)
         val additionalAudiences = args.permissions?.audiences?.map { it.getAddress(!args.account.isTestNet) }?.toMutableSet() ?: mutableSetOf()
 
         if (args.permissions?.permissionDart == true) {
@@ -37,7 +37,7 @@ class CreateTx(
                 args.scopeSpecId,
             ),
             args.contractInput,
-            account.address.value,
+            account.address(),
             additionalAudiences
         )
     }
