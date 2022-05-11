@@ -135,7 +135,7 @@ object Dependencies {
     object Jackson {
         val Databind = DependencySpec(
             "com.fasterxml.jackson.core:jackson-databind",
-            "2.12.+"
+            "2.12.6.1"
         )
         val Datatype = DependencySpec(
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
