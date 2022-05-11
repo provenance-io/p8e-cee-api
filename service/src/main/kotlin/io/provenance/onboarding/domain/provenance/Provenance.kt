@@ -6,7 +6,7 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeResponse
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.frameworks.provenance.ProvenanceTx
 import java.util.UUID
 

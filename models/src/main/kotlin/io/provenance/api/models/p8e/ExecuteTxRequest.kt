@@ -1,7 +1,6 @@
-package io.provenance.onboarding.domain.usecase.provenance.tx.model
+package io.provenance.api.models.p8e
 
 import io.provenance.api.models.account.AccountInfo
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
 
 data class ExecuteTxRequest(
     val account: AccountInfo,

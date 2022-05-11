@@ -14,7 +14,7 @@ import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.onboarding.domain.provenance.Provenance
-import io.provenance.onboarding.domain.usecase.common.model.TxBody
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.onboarding.frameworks.provenance.exceptions.ContractTxException
 import io.provenance.onboarding.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.onboarding.frameworks.provenance.extensions.getCurrentHeight

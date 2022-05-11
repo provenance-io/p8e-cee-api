@@ -7,6 +7,6 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 data class ExecuteContractConfig(
     val contract: ContractConfig,
     val client: ObjectStoreConfig,
-    val account: AccountInfo,
+    val account: AccountInfo = AccountInfo(),
     val provenanceConfig: ProvenanceConfig,
 )
