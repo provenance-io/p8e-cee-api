@@ -22,7 +22,11 @@ class CreateTx(
         val utils = ProvenanceUtils()
 
         val account = getSigner.execute(args.uuid)
-        val additionalAudiences = args.request.permissions?.audiences?.map { it.getAddress(provenanceProperties.mainnet) }?.toMutableSet() ?: mutableSetOf()
+        val additionalAudiences: MutableSet<String> = mutableSetOf()
+
+        args.request.permissions?.audiences?.forEach {
+            additionalAudiences.add(it)
+        }
 
         if (args.request.permissions?.permissionDart == true) {
             additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART).getAddress(provenanceProperties.mainnet))
