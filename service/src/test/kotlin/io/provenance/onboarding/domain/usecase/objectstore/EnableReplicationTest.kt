@@ -9,8 +9,8 @@ import io.mockk.mockkClass
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.provenance.objectstore.proto.PublicKeys
-import io.provenance.onboarding.domain.usecase.objectStore.EnableReplication
-import io.provenance.onboarding.domain.usecase.objectStore.model.EnableReplicationRequest
+import io.provenance.onboarding.domain.usecase.objectStore.replication.EnableReplication
+import io.provenance.onboarding.domain.usecase.objectStore.replication.models.EnableReplicationRequest
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient

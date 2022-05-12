@@ -16,6 +16,7 @@ dependencies {
         Dependencies.P8eScope.ContractProto,
         Dependencies.P8eScope.ContractBase,
         Dependencies.Provenance.AssetModel,
+        Dependencies.P8eScope.OsClient,
         Dependencies.Kotlin.CoroutinesReactor,
         Dependencies.Jackson.Databind,
     ).forEach { dep ->

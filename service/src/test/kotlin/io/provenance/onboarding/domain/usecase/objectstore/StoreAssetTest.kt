@@ -13,10 +13,10 @@ import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.Originator
 import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
-import io.provenance.onboarding.domain.usecase.objectStore.StoreAsset
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequest
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequestWrapper
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetResponse
+import io.provenance.onboarding.domain.usecase.objectStore.store.StoreAsset
+import io.provenance.api.models.eos.StoreAssetRequest
+import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
+import io.provenance.api.models.eos.StoreAssetResponse
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience

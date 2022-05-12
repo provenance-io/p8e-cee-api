@@ -42,6 +42,7 @@ object Versions {
     const val Reflections = "0.9.10"
     const val NexusPublishing = "1.1.0"
     const val BouncyCastle = "1.70"
+    const val OpenApi = "1.5.13"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -59,6 +60,10 @@ object Plugins { // please keep this sorted in sections
 }
 
 object Dependencies {
+    object OpenApi {
+        val WebFluxSupport = DependencySpec("org.springdoc:springdoc-openapi-webflux-ui", Versions.OpenApi)
+        val KotlinSupport = DependencySpec("org.springdoc:springdoc-openapi-kotlin", Versions.OpenApi)
+    }
     // Kotlin
     object Kotlin {
         val AllOpen = DependencySpec("org.jetbrains.kotlin:kotlin-allopen", Versions.Kotlin)

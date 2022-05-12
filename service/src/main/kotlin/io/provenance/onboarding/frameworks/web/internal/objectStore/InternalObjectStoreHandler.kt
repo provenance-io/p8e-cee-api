@@ -1,7 +1,7 @@
 package io.provenance.onboarding.frameworks.web.internal.objectStore
 
-import io.provenance.onboarding.domain.usecase.objectStore.StoreAsset
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.objectStore.store.StoreAsset
+import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.onboarding.frameworks.web.misc.foldToServerResponse
 import io.provenance.onboarding.frameworks.web.misc.getUser
 import org.springframework.stereotype.Component

@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.objectStore.model
+package io.provenance.onboarding.domain.usecase.objectStore.replication.models
 
 data class EnableReplicationRequest(
     val sourceObjectStoreAddress: String,

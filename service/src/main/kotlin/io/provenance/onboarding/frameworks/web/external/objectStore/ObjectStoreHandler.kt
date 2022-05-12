@@ -1,10 +1,12 @@
 package io.provenance.onboarding.frameworks.web.external.objectStore
 
-import io.provenance.onboarding.domain.usecase.objectStore.EnableReplication
-import io.provenance.onboarding.domain.usecase.objectStore.GetAsset
-import io.provenance.onboarding.domain.usecase.objectStore.SnapshotAsset
-import io.provenance.onboarding.domain.usecase.objectStore.StoreAsset
-import io.provenance.onboarding.domain.usecase.objectStore.model.StoreAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.objectStore.replication.EnableReplication
+import io.provenance.onboarding.domain.usecase.objectStore.get.GetAsset
+import io.provenance.onboarding.domain.usecase.objectStore.get.models.GetAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.objectStore.snapshot.SnapshotAsset
+import io.provenance.onboarding.domain.usecase.objectStore.snapshot.models.SnapshotAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.objectStore.store.StoreAsset
+import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.onboarding.frameworks.web.misc.foldToServerResponse
 import io.provenance.onboarding.frameworks.web.misc.getUser
 import org.springframework.stereotype.Component
@@ -24,11 +26,11 @@ class ObjectStoreHandler(
     }.foldToServerResponse()
 
     suspend fun snapshot(req: ServerRequest): ServerResponse = runCatching {
-        snapshotAsset.execute(req.awaitBody())
+        snapshotAsset.execute(SnapshotAssetRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun getAsset(req: ServerRequest): ServerResponse = runCatching {
-        getAsset.execute(req.awaitBody())
+        getAsset.execute(GetAssetRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun enableReplication(req: ServerRequest): ServerResponse = runCatching {
