@@ -17,6 +17,7 @@ import io.provenance.scope.sdk.Session
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.lang.IllegalArgumentException
+import java.security.PublicKey
 import java.util.UUID
 import kotlin.reflect.full.isSubclassOf
 
@@ -37,6 +38,7 @@ class P8eContractService : ContractService {
         participants: Map<Specifications.PartyType, Originator>?,
         scope: ScopeResponse?,
         scopeSpecification: String,
+        audiences: Set<PublicKey>
     ): Session =
         when (scope) {
             null -> {
@@ -49,7 +51,7 @@ class P8eContractService : ContractService {
                 client
                     .newSession(contractClass, scopeSpec)
                     .setScopeUuid(scopeUuid)
-                    .configureSession(records, sessionUuid, participants)
+                    .configureSession(records, sessionUuid, participants, audiences)
                     .also { session ->
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
                     }
@@ -57,7 +59,7 @@ class P8eContractService : ContractService {
             else ->
                 client
                     .newSession(contractClass, scope)
-                    .configureSession(records, sessionUuid, participants)
+                    .configureSession(records, sessionUuid, participants, audiences)
                     .also { session ->
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
                     }
@@ -83,7 +85,7 @@ class P8eContractService : ContractService {
             }
         )
 
-    private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>?): Session =
+    private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>?, audiences: Set<PublicKey>): Session =
         this.setSessionUuid(sessionUuid ?: UUID.randomUUID())
             .also { records.forEach { record -> it.addProposedRecord(record.key, record.value) } }
             .also {
@@ -95,5 +97,6 @@ class P8eContractService : ContractService {
                     )
                 }
             }
+            .also { it.addDataAccessKeys(audiences) }
             .build()
 }

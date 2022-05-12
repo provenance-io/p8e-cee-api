@@ -1,7 +1,7 @@
-package io.provenance.onboarding.domain.usecase.objectStore
+package io.provenance.onboarding.domain.usecase.objectStore.replication
 
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
-import io.provenance.onboarding.domain.usecase.objectStore.model.EnableReplicationRequest
+import io.provenance.onboarding.domain.usecase.objectStore.replication.models.EnableReplicationRequest
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient

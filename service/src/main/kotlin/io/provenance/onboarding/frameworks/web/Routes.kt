@@ -9,4 +9,5 @@ object Routes {
     const val SECURE_BASE_V1 = "$SECURE_BASE/v1"
     const val EXTERNAL_BASE_V1 = "$EXTERNAL_BASE/v1"
     const val INTERNAL_BASE_V1 = "$INTERNAL_BASE/v1"
+    const val DOCS_BASE = "$CONTEXT/secure/docs"
 }

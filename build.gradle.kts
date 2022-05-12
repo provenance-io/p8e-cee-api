@@ -27,6 +27,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
@@ -122,6 +123,7 @@ allprojects {
     version = semVersion
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 }
