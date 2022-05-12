@@ -60,6 +60,8 @@ dependencies {
         Dependencies.Reflections,
         Dependencies.BouncyCastle,
         Dependencies.BouncyCastleProvider,
+        Dependencies.OpenApi.WebFluxSupport,
+        Dependencies.OpenApi.KotlinSupport,
 
     ).forEach { dep ->
         dep.implementation(this)

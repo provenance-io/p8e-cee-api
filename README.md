@@ -63,6 +63,13 @@ Then, run the service - either via an Intellij run configuration or via the comm
 ./gradlew bootRun
 ```
 
+## Swagger Documentation
+
+once the service is running, try out some local calls using Swagger!
+
+http://localhost:8080/p8e-cee-api/secure/docs/api.html
+
+
 ## Publishing p8e Contracts Locally
 
 As a convenience, you can publish contracts from another repository without leaving this project in the command line.
