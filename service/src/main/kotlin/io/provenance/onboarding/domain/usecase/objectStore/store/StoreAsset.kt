@@ -5,6 +5,7 @@ import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.core.KeyType
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
@@ -32,7 +33,14 @@ class StoreAsset(
         val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
 
         args.request.permissions?.audiences?.forEach {
-            additionalAudiences.add(it.toJavaPublicKey())
+            it.uuid?.let { uuid ->
+                val entity = getOriginator.execute(uuid)
+                additionalAudiences.add(entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
+            } ?: apply {
+                it.keys?.let { kp ->
+                    additionalAudiences.add(kp.encryptionKey.toJavaPublicKey())
+                } ?: throw IllegalStateException("Audience specified does not include entity uuid or key pair.")
+            }
         }
 
         if (args.request.permissions?.permissionDart == true) {

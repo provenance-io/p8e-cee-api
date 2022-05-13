@@ -45,10 +45,10 @@ class ExecuteContract(
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(args.uuid)
-        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, args.request.participants))
+        val audiences = audienceKeyManager.hydrateKeys(args.request.permissions)
+        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, audiences))
         val contract = contractService.getContract(args.request.config.contract.contractName)
         val records = getRecords(args.request.records, contract)
-        val audiences = getAudiences(args.request.permissions)
 
         val participants = args.request.participants.associate {
             it.partyType to getOriginator.execute(it.uuid)
@@ -56,7 +56,7 @@ class ExecuteContract(
 
         val scope = provenanceService.getScope(args.request.config.provenanceConfig, args.request.config.contract.scopeUuid)
         val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
-        val session = contractService.setupContract(client, contract, records, args.request.config.contract.scopeUuid, args.request.config.contract.sessionUuid, participants, scopeToUse, args.request.config.contract.scopeSpecificationName, audiences)
+        val session = contractService.setupContract(client, contract, records, args.request.config.contract.scopeUuid, args.request.config.contract.sessionUuid, participants, scopeToUse, args.request.config.contract.scopeSpecificationName, audiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
 
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {
@@ -73,24 +73,6 @@ class ExecuteContract(
             }
             else -> throw IllegalStateException("Contract execution result was not of an expected type.")
         }
-    }
-
-    private fun getAudiences(permissions: PermissionInfo?): Set<PublicKey> {
-        val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
-
-        permissions?.audiences?.forEach {
-            additionalAudiences.add(it.toJavaPublicKey())
-        }
-
-        if (permissions?.permissionDart == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART))
-        }
-
-        if (permissions?.permissionPortfolioManager == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER))
-        }
-
-        return additionalAudiences
     }
 
     @Suppress("TooGenericExceptionCaught")

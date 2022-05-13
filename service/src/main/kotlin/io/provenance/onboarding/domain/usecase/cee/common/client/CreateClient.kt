@@ -5,6 +5,7 @@ import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
+import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Affiliate
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
 @Component
 class CreateClient(
     private val getOriginator: GetOriginator,
-    private val provenanceProperties: ProvenanceProperties,
+    private val provenanceProperties: ProvenanceProperties
 ) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
         val originator = getOriginator.execute(args.uuid)
@@ -48,9 +49,8 @@ class CreateClient(
                 }
             )
         ).also { client ->
-            args.affiliates.forEach {
-                val keys = getOriginator.execute(it.uuid).keys
-                client.affiliateRepository.addAffiliate(keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(), keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
+            args.affiliates.forEach { kp ->
+                client.affiliateRepository.addAffiliate(kp.signingKey.toJavaPublicKey(), kp.encryptionKey.toJavaPublicKey())
             }
         }
 

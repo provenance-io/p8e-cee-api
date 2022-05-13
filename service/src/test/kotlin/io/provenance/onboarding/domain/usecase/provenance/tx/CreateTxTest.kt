@@ -7,10 +7,13 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.Audience
+import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.CreateTxRequest
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.grpc.Signer
 import io.provenance.core.Originator
+import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
@@ -38,6 +41,7 @@ val REQUEST_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 
 class CreateTxTest : FunSpec({
     val mockAudienceKeyManager = mockk<AudienceKeyManager>()
+    val mockGetOriginator = mockk<GetOriginator>()
     val mockOriginator = mockk<Originator>()
     val mockSigner = mockk<Signer>()
     val mockGetSigner = mockk<GetSigner>()
@@ -47,7 +51,8 @@ class CreateTxTest : FunSpec({
     val createTx = CreateTx(
         mockAudienceKeyManager,
         mockGetSigner,
-        mockProvenanceProperties
+        mockProvenanceProperties,
+        mockGetOriginator
     )
 
     beforeTest {
@@ -84,7 +89,7 @@ class CreateTxTest : FunSpec({
                 CreateTxRequest(
                     ACCOUNT_INFO,
                     PermissionInfo(
-                        setOf(ADD_ASSET_AUDIENCE_PUBLIC_KEY),
+                        setOf(Audience(null, AudienceKeyPair(ADD_ASSET_AUDIENCE_PUBLIC_KEY, ADD_ASSET_AUDIENCE_PUBLIC_KEY))),
                         permissionDart = true,
                         permissionPortfolioManager = true
                     ),

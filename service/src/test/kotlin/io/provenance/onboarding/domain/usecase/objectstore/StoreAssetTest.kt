@@ -17,6 +17,8 @@ import io.provenance.onboarding.domain.usecase.objectStore.store.StoreAsset
 import io.provenance.api.models.eos.StoreAssetRequest
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.api.models.p8e.Audience
+import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
@@ -93,7 +95,7 @@ class StoreAssetTest : FunSpec({
                     ACCOUNT_INFO,
                     ADD_ASSET_OBJECT_STORE_ADDRESS,
                     PermissionInfo(
-                        setOf(ADD_ASSET_AUDIENCE_PUBLIC_KEY),
+                        setOf(Audience(null, AudienceKeyPair(ADD_ASSET_AUDIENCE_PUBLIC_KEY, ADD_ASSET_AUDIENCE_PUBLIC_KEY))),
                         permissionDart = true,
                         permissionPortfolioManager = true
                     ),
