@@ -87,8 +87,8 @@ class ObjectStoreService(
 
     override fun storeAsset(
         client: OsClient,
-        asset: Asset,
+        message: Message,
         publicKey: PublicKey,
         additionalAudiences: Set<PublicKey>
-    ): StoreAssetResponse = encryptAndStore(client, asset, publicKey, additionalAudiences).toModel()
+    ): StoreAssetResponse = encryptAndStore(client, message, publicKey, additionalAudiences).toModel()
 }

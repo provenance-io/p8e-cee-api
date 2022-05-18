@@ -1,9 +1,9 @@
 package io.provenance.onboarding.frameworks.web.external.objectStore
 
-import io.provenance.api.models.eos.GetAssetRequest
+import io.provenance.api.models.eos.GetProtoRequest
 import io.provenance.api.models.eos.SnapshotAssetRequest
 import io.provenance.onboarding.domain.usecase.objectStore.replication.models.EnableReplicationRequest
-import io.provenance.api.models.eos.StoreAssetRequest
+import io.provenance.api.models.eos.StoreProtoRequest
 import io.provenance.api.models.eos.StoreAssetResponse
 import io.provenance.onboarding.frameworks.web.Routes
 import io.provenance.onboarding.frameworks.web.logging.logExchange
@@ -47,7 +47,7 @@ class ObjectStoreApi {
                 ],
                 requestBody = RequestBody(
                     required = true,
-                    content = [Content(schema = Schema(implementation = StoreAssetRequest::class))]
+                    content = [Content(schema = Schema(implementation = StoreProtoRequest::class))]
                 ),
                 responses = [
                     ApiResponse(
@@ -105,7 +105,7 @@ class ObjectStoreApi {
                 ],
                 requestBody = RequestBody(
                     required = true,
-                    content = [Content(schema = Schema(implementation = GetAssetRequest::class))]
+                    content = [Content(schema = Schema(implementation = GetProtoRequest::class))]
                 ),
                 responses = [
                     ApiResponse(
@@ -141,9 +141,10 @@ class ObjectStoreApi {
         logExchange(log)
         Routes.EXTERNAL_BASE_V1.nest {
             "/eos".nest {
-                POST("", handler::store)
-                POST("/snapshot", handler::snapshot)
-                GET("", handler::getAsset)
+                POST("/file", handler::storeFile)
+                POST("", handler::storeProto)
+                GET("/file", handler::getFile)
+                GET("", handler::getProto)
             }
             POST("/config/replication/enable", handler::enableReplication)
         }

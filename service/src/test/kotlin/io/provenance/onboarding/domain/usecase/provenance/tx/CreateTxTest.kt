@@ -13,12 +13,10 @@ import io.provenance.api.models.p8e.CreateTxRequest
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.grpc.Signer
 import io.provenance.core.Originator
-import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
+import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
-import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
-import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
@@ -40,8 +38,7 @@ val ACCOUNT_INFO = AccountInfo()
 val REQUEST_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 
 class CreateTxTest : FunSpec({
-    val mockAudienceKeyManager = mockk<AudienceKeyManager>()
-    val mockGetOriginator = mockk<GetOriginator>()
+    val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<Originator>()
     val mockSigner = mockk<Signer>()
     val mockGetSigner = mockk<GetSigner>()
@@ -49,10 +46,9 @@ class CreateTxTest : FunSpec({
     val mockProvenanceProperties = mockk<ProvenanceProperties>()
 
     val createTx = CreateTx(
-        mockAudienceKeyManager,
+        mockEntityManager,
         mockGetSigner,
         mockProvenanceProperties,
-        mockGetOriginator
     )
 
     beforeTest {
@@ -63,14 +59,6 @@ class CreateTxTest : FunSpec({
         every {
             mockProvenanceProperties.mainnet
         } returns !IS_TEST_NET
-
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.DART).getAddress(!IS_TEST_NET)
-        } returns DART_AUDIENCE_PUBLIC_KEY_STR
-
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(!IS_TEST_NET)
-        } returns PORTFOLIO_MANAGER_AUDIENCE_PUBLICKEY_STR
 
         every { mockSigner.address() } returns MOCK_SIGNER_ADDRESS
     }

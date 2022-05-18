@@ -2,7 +2,7 @@ package io.provenance.onboarding.domain.usecase.cee.common.client
 
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
-import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
+import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
@@ -19,11 +19,12 @@ import java.util.concurrent.TimeUnit
 
 @Component
 class CreateClient(
-    private val getOriginator: GetOriginator,
-    private val provenanceProperties: ProvenanceProperties
+    private val getOriginator: EntityManager,
+    private val provenanceProperties: ProvenanceProperties,
+    private val entityManager: EntityManager,
 ) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
-        val originator = getOriginator.execute(args.uuid)
+        val originator = entityManager.getEntity(args.uuid)
         val affiliate = Affiliate(
             signingKeyRef = DirectKeyRef(KeyPair(originator.signingPublicKey() as PublicKey, originator.signingPrivateKey() as PrivateKey)),
             encryptionKeyRef = DirectKeyRef(KeyPair(originator.encryptionPublicKey() as PublicKey, originator.encryptionPrivateKey() as PrivateKey)),

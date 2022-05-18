@@ -12,16 +12,14 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.Originator
 import io.provenance.onboarding.domain.objectStore.ObjectStore
-import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
-import io.provenance.onboarding.domain.usecase.objectStore.store.StoreAsset
-import io.provenance.api.models.eos.StoreAssetRequest
-import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
+import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
+import io.provenance.onboarding.domain.usecase.objectStore.store.StoreProto
+import io.provenance.api.models.eos.StoreProtoRequest
+import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.models.eos.StoreAssetResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
-import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
-import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,39 +39,29 @@ class StoreAssetTest : FunSpec({
 
     val mockObjectStoreConfig = mockk<ObjectStoreConfig>()
     val mockObjectStore = mockk<ObjectStore>()
-    val mockAudienceKeyManager = mockk<AudienceKeyManager>()
-    val mockGetOriginator = mockk<GetOriginator>()
+    val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<Originator>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
     val mockDartAudiencePublicKey = mockk<PublicKey>()
     val mockPortfolioManagerAudiencePublicKey = mockk<PublicKey>()
 
-    val storeAsset = StoreAsset(
+    val storeAsset = StoreProto(
         mockObjectStore,
         mockObjectStoreConfig,
-        mockAudienceKeyManager,
-        mockGetOriginator
+        mockEntityManager
     )
 
     beforeTest {
         every { mockObjectStoreConfig.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
 
-        coEvery { mockGetOriginator.execute(any()) } returns mockOriginator
+        coEvery { mockEntityManager.getEntity(any()) } returns mockOriginator
 
         mockkStatic(String::toJavaPublicKey)
 
         every {
             ADD_ASSET_AUDIENCE_PUBLIC_KEY.toJavaPublicKey()
         } returns mockAddAssetAudiencePublicKey
-
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.DART)
-        } returns mockDartAudiencePublicKey
-
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER)
-        } returns mockPortfolioManagerAudiencePublicKey
     }
 
     afterTest {
@@ -89,9 +77,9 @@ class StoreAssetTest : FunSpec({
 
         // Execute enable replication code
         val response = storeAsset.execute(
-            StoreAssetRequestWrapper(
+            StoreProtoRequestWrapper(
                 REQUEST_UUID,
-                StoreAssetRequest(
+                StoreProtoRequest(
                     ACCOUNT_INFO,
                     ADD_ASSET_OBJECT_STORE_ADDRESS,
                     PermissionInfo(
@@ -130,9 +118,9 @@ class StoreAssetTest : FunSpec({
         // Execute enable replication code
         shouldThrow<IllegalStateException> {
             storeAsset.execute(
-                StoreAssetRequestWrapper(
+                StoreProtoRequestWrapper(
                     REQUEST_UUID,
-                    StoreAssetRequest(
+                    StoreProtoRequest(
                         ACCOUNT_INFO,
                         ADD_ASSET_OBJECT_STORE_ADDRESS,
                         PermissionInfo(emptySet()),
