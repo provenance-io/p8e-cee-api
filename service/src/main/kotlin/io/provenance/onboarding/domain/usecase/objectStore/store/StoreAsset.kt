@@ -5,7 +5,6 @@ import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.api.models.eos.StoreAssetResponse
-import io.provenance.core.KeyType
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience

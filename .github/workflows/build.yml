@@ -33,7 +33,7 @@ jobs:
           java-version: '11'
 
       - name: Linting
-        run: ./gradlew clean ktlintCheck --parallel
+        run: ./gradlew clean ktlint --parallel
 
   build:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Gradle Build
-        run: ./gradlew build -i --parallel
+        run: ./gradlew build -i --parallel -x ktlint
 
       - name: Upload Test Results
         if: always()
@@ -56,7 +56,7 @@ jobs:
         with:
             name: Test Results
             path: |
-                build/test-results/**/*.xml
+                **/build/test-results/**/*.xml
 
   event_file:
     name: "Event File"
