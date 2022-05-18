@@ -77,17 +77,17 @@ dependencies {
         Dependencies.SpringMockk,
         Dependencies.SpringBoot.StarterTest,
         Dependencies.Kotest,
+        Dependencies.JUnit5,
         Dependencies.KotestAssertions,
         Dependencies.KotestAssertionsArrow,
+        Dependencies.KotestProperty,
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter")
-    }
+    useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
     }

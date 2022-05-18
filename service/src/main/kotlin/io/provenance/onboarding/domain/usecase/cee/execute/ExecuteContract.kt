@@ -2,7 +2,6 @@ package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
 import io.provenance.api.models.cee.ContractExecutionResponse
-import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
@@ -16,14 +15,12 @@ import io.provenance.onboarding.domain.usecase.cee.execute.model.ExecuteContract
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
-import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
-import java.security.PublicKey
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.Base64

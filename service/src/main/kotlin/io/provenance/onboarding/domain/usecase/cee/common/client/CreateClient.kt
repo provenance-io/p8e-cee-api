@@ -1,11 +1,9 @@
 package io.provenance.onboarding.domain.usecase.cee.common.client
 
-import io.provenance.core.KeyType
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.onboarding.domain.usecase.common.originator.GetOriginator
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
-import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Affiliate

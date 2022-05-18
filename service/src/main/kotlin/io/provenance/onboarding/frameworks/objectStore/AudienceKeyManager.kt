@@ -1,7 +1,6 @@
 package io.provenance.onboarding.frameworks.objectStore
 
 import com.google.common.io.BaseEncoding
-import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.KeyType
@@ -16,7 +15,6 @@ class AudienceKeyManager(
     private val serviceKeys: ServiceKeysProperties,
     private val getOriginator: GetOriginator,
 ) {
-    // TODO: These keys belong in vault
     // This simple map of default audience members could be extended into:
     // 1) a mutable map where each new audience member is stored in memory after the first use to reduce calls to decode/convert string to key on subsequent use
     // 2) a service that fetches audience keys from an external storage location much like the OriginatorManager
