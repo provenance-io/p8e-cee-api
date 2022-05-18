@@ -35,7 +35,7 @@ class StoreAsset(
         args.request.permissions?.audiences?.forEach {
             it.uuid?.let { uuid ->
                 val entity = getOriginator.execute(uuid)
-                additionalAudiences.add(entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey())
+                additionalAudiences.add(entity.encryptionPublicKey() as PublicKey)
             } ?: apply {
                 it.keys?.let { kp ->
                     additionalAudiences.add(kp.encryptionKey.toJavaPublicKey())

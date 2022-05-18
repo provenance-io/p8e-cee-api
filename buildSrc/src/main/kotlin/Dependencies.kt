@@ -25,7 +25,6 @@ object Versions {
     const val Hamkrest = "1.8.0.1"
     const val Mockk = "1.12.0"
     const val Kotest = "5.2.+"
-    const val KotestPlugin = "5.2.+"
     const val KotestExtensionsArrow = "1.2.+"
     const val KotestCoroutines = "1.6.1"
     const val KotlinFaker = "1.7.1"
@@ -44,7 +43,6 @@ object Versions {
     const val NexusPublishing = "1.1.0"
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
-    const val JUnit5 = "1.6.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -59,7 +57,6 @@ object Plugins { // please keep this sorted in sections
     val SpringBoot = PluginSpec("org.springframework.boot", Versions.SpringBoot)
     val SpringDependencyManagement = PluginSpec("io.spring.dependency-management", "1.0.11.RELEASE")
     val NexusPublishing = PluginSpec("io.github.gradle-nexus.publish-plugin", Versions.NexusPublishing)
-    val Kotest = PluginSpec("io.kotest", Versions.Kotest)
 }
 
 object Dependencies {
@@ -193,7 +190,6 @@ object Dependencies {
     val Redisson = DependencySpec("org.redisson:redisson", Versions.Redisson)
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", Versions.SpringMockk)
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker", Versions.KotlinFaker)
-    val JUnit5 = DependencySpec("org.jetbrains.kotlin:kotlin-test-junit5", )
     object Swagger {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }
