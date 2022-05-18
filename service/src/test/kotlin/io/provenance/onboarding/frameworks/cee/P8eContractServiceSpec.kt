@@ -1,6 +1,7 @@
 package io.provenance.onboarding.frameworks.cee
 
 import com.google.protobuf.Message
+import io.kotest.core.annotation.Ignored
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -12,12 +13,11 @@ import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.Session
 import io.provenance.scope.util.toUuid
-import org.junit.jupiter.api.Disabled
 
 val SCOPE_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 val SESSION_UUID = "22141790-6de2-4d11-b3ad-9a1e16a8b3bb".toUuid()
 
-@Disabled
+@Ignored
 class P8eContractServiceTest : FunSpec({
 
     val p8eContractService = P8eContractService()
