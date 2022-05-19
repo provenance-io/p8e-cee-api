@@ -36,7 +36,7 @@ object Versions {
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
     const val KeyAccessLib = "0.2.15"
-    const val LoanPackage = "0.1.13"
+    const val LoanPackage = "0.1.14"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
     const val Reflections = "0.9.10"
@@ -185,11 +185,11 @@ object Dependencies {
     val Kotest = DependencySpec("io.kotest:kotest-runner-junit5-jvm", Versions.Kotest)
     val KotestAssertions = DependencySpec("io.kotest:kotest-assertions-core-jvm", Versions.Kotest)
     val KotestAssertionsArrow = DependencySpec("io.kotest.extensions:kotest-assertions-arrow", Versions.KotestExtensionsArrow)
+    val KotestProperty = DependencySpec("io.kotest:kotest-property", Versions.Kotest)
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", Versions.Hamkrest)
     val Redisson = DependencySpec("org.redisson:redisson", Versions.Redisson)
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", Versions.SpringMockk)
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker", Versions.KotlinFaker)
-
     object Swagger {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }
