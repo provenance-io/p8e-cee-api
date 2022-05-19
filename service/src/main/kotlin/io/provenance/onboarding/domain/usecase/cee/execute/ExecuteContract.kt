@@ -2,6 +2,7 @@ package io.provenance.onboarding.domain.usecase.cee.execute
 
 import com.google.protobuf.Message
 import io.provenance.api.models.cee.ContractExecutionResponse
+import io.provenance.api.models.cee.ParserConfig
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
@@ -43,7 +44,7 @@ class ExecuteContract(
         val audiences = entityManager.hydrateKeys(args.request.permissions)
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, audiences))
         val contract = contractService.getContract(args.request.config.contract.contractName)
-        val records = getRecords(args.request.records, contract, args.request.config.contract.messageParser)
+        val records = getRecords(args.request.records, contract, args.request.config.contract.parserConfig)
 
         val participants = args.request.participants.associate {
             it.partyType to entityManager.getEntity(it.uuid)
@@ -89,7 +90,7 @@ class ExecuteContract(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    private fun getRecords(records: Map<String, Any>, contract: Class<out P8eContract>, parserName: String?): Map<String, Message> {
+    private fun getRecords(records: Map<String, Any>, contract: Class<out P8eContract>, parserConfig: ParserConfig?): Map<String, Message> {
         val contractRecords = mutableMapOf<String, Message>()
 
         try {
@@ -99,12 +100,12 @@ class ExecuteContract(
                         val parameterClass = Class.forName(param.type.toClassNameString())
                         records.getOrDefault(input.name, null)?.let {
 
-                            val record = when (val parser = parserName?.let { name -> contractParser.getParser(name) }) {
+                            val record = when (val parser = parserConfig?.name?.let { name -> contractParser.getParser(name) }) {
                                 null -> {
                                     contractParser.parseInput(it, parameterClass)
                                 }
                                 else -> {
-                                    parser.parse(it, parameterClass)
+                                    parser.parse(it, parameterClass, parserConfig.descriptors)
                                 }
                             }
 

@@ -23,7 +23,6 @@ import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import java.security.PublicKey
 import tech.figure.asset.v1beta1.Asset
 

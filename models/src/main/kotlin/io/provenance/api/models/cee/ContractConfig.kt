@@ -7,5 +7,5 @@ data class ContractConfig(
     val scopeUuid: UUID,
     val sessionUuid: UUID?,
     val scopeSpecificationName: String,
-    val messageParser: String?,
+    val parserConfig: ParserConfig?,
 )

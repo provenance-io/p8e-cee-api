@@ -1,6 +1,5 @@
 package io.provenance.onboarding.frameworks.web.external.objectStore
 
-import io.provenance.api.models.eos.GetFileRequest
 import io.provenance.onboarding.domain.usecase.objectStore.get.GetFile
 import io.provenance.onboarding.domain.usecase.objectStore.replication.EnableReplication
 import io.provenance.onboarding.domain.usecase.objectStore.get.GetProto
@@ -12,7 +11,6 @@ import io.provenance.onboarding.domain.usecase.objectStore.store.models.StorePro
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.onboarding.frameworks.web.misc.foldToServerResponse
 import io.provenance.onboarding.frameworks.web.misc.getUser
-import io.provenance.scope.util.toUuid
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
