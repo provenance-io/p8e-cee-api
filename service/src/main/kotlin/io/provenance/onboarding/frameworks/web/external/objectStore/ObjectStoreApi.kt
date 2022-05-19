@@ -59,7 +59,7 @@ class ObjectStoreApi {
             )
         ),
         RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/eos/snapshot",
+            path = "${Routes.EXTERNAL_BASE_V1}/eos/file",
             method = arrayOf(RequestMethod.POST),
             produces = ["application/json"],
             operation = Operation(

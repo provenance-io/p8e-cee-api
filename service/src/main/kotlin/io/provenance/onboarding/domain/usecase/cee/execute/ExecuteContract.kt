@@ -19,6 +19,7 @@ import io.provenance.onboarding.frameworks.objectStore.AudienceKeyManager
 import io.provenance.onboarding.frameworks.objectStore.DefaultAudience
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.annotations.Input
+import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.FragmentResult

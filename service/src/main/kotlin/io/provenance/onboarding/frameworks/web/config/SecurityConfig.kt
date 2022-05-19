@@ -20,7 +20,16 @@ class SecurityConfig {
         http.authorizeExchange {
             it.pathMatchers("${Routes.MANAGE_BASE}/**", "${Routes.EXTERNAL_BASE}/**", "${Routes.INTERNAL_BASE}/**", "${Routes.DOCS_BASE}/**").permitAll()
         }
+
+        return http.httpBasic().disable()
+            .formLogin().disable()
+            .logout().disable()
             .csrf().disable()
-        return http.build()
+            .headers().frameOptions().disable()
+            .cache().disable()
+            .and()
+            .authorizeExchange()
+            .pathMatchers("/").permitAll()
+            .and().build()
     }
 }
