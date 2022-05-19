@@ -198,6 +198,10 @@ object Dependencies {
 
     val BouncyCastleProvider = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
     val BouncyCastle = DependencySpec("org.bouncycastle:bcpkix-jdk15on", Versions.BouncyCastle)
+
+    object TestContainers {
+        val Core = DependencySpec("org.testcontainers:testcontainers", Versions.TestContainerCore)
+    }
 }
 
 data class PluginSpec(
