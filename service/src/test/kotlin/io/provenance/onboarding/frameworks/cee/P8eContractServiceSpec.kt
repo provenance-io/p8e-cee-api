@@ -17,11 +17,22 @@ import io.provenance.scope.util.toUuid
 val SCOPE_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 val SESSION_UUID = "22141790-6de2-4d11-b3ad-9a1e16a8b3bb".toUuid()
 
-@Ignored
+/*
+There were intermittent failures on the mockk verify line starting with:
+      every { mockSessionBuilder.setSessionUuid(SESSION_UUID)
+
+The errors reported was:
+    Missing mocked calls inside everyMissing mocked calls inside every { ... } block: make sure the object inside the block is a mock
+
+It appears that separating the mockk<Session.Builder>() and the mockk<Session>() has prevented the intermittent failure.
+If this intermittent error resurfaces, we can mark this test as @Ignored and either solve this issue or find an alternate solution.
+ */
 class P8eContractServiceTest : FunSpec({
 
+    val mockSessionBuilder = mockk<Session.Builder>()
     val p8eContractService = P8eContractService()
     val mockClient = mockk<Client>()
+    val mockSession = mockk<Session>()
 
     beforeTest {
     }
@@ -37,8 +48,6 @@ class P8eContractServiceTest : FunSpec({
         val records: Map<String, Message> = emptyMap()
         val contract = p8eContractService.getContract(TestP8eContract::class.qualifiedName!!)
 
-        val mockSessionBuilder = mockk<Session.Builder>()
-        val mockSession = mockk<Session>()
         every {
             mockClient.newSession(
                 contract,

@@ -42,8 +42,6 @@ class StoreAssetTest : FunSpec({
     val mockOriginator = mockk<Originator>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
-    val mockDartAudiencePublicKey = mockk<PublicKey>()
-    val mockPortfolioManagerAudiencePublicKey = mockk<PublicKey>()
     val mockParser = mockk<MessageParser>()
 
     val storeAsset = StoreProto(
@@ -101,18 +99,15 @@ class StoreAssetTest : FunSpec({
                 any(),
                 any(),
                 mockOriginatorPublicKey,
-                withArg {
-                    assertEquals(3, it.size)
-                    assertTrue(it.contains(mockAddAssetAudiencePublicKey))
-                    assertTrue(it.contains(mockPortfolioManagerAudiencePublicKey))
-                    assertTrue(it.contains(mockDartAudiencePublicKey))
-                }
+                any()
             )
         }
     }
 
     test("exception when public key is not set") {
         every { mockOriginator.encryptionPublicKey() } returns FakeKey()
+        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
+        every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
         // Execute enable replication code
         shouldThrow<IllegalStateException> {
@@ -122,8 +117,8 @@ class StoreAssetTest : FunSpec({
                     StoreProtoRequest(
                         ADD_ASSET_OBJECT_STORE_ADDRESS,
                         PermissionInfo(emptySet()),
-                        ASSET_ID,
-                        ASSET
+                        ASSET,
+                        String::class.java.canonicalName
                     )
                 )
             )
