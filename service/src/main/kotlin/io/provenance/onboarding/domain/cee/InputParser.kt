@@ -4,5 +4,5 @@ import com.google.protobuf.Message
 
 interface InputParser {
     val type: Class<*>
-    fun parse(input: Any, type: Class<*>): Message
+    fun parse(input: Any, type: Class<*>, includeTypes: List<String> = emptyList()): Message
 }

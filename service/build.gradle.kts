@@ -79,15 +79,14 @@ dependencies {
         Dependencies.Kotest,
         Dependencies.KotestAssertions,
         Dependencies.KotestAssertionsArrow,
+        Dependencies.KotestProperty,
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter")
-    }
+    useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
     }

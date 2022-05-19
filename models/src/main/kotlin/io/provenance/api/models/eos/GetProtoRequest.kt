@@ -1,9 +1,7 @@
 package io.provenance.api.models.eos
 
-import java.util.UUID
-
-data class GetAssetRequest(
-    val originatorUuid: UUID,
+data class GetProtoRequest(
     val hash: String,
     val objectStoreAddress: String,
+    val type: String
 )
