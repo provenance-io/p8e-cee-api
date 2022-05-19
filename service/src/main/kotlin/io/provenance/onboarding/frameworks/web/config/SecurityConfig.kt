@@ -19,17 +19,8 @@ class SecurityConfig {
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http.authorizeExchange {
             it.pathMatchers("${Routes.MANAGE_BASE}/**", "${Routes.EXTERNAL_BASE}/**", "${Routes.INTERNAL_BASE}/**", "${Routes.DOCS_BASE}/**").permitAll()
-        }
+        }.csrf().disable()
 
-        return http.httpBasic().disable()
-            .formLogin().disable()
-            .logout().disable()
-            .csrf().disable()
-            .headers().frameOptions().disable()
-            .cache().disable()
-            .and()
-            .authorizeExchange()
-            .pathMatchers("/").permitAll()
-            .and().build()
+        return http.build()
     }
 }
