@@ -27,6 +27,7 @@ The errors reported was:
 It appears that separating the mockk<Session.Builder>() and the mockk<Session>() has prevented the intermittent failure.
 If this intermittent error resurfaces, we can mark this test as @Ignored and either solve this issue or find an alternate solution.
  */
+@Ignored
 class P8eContractServiceTest : FunSpec({
 
     val mockSessionBuilder = mockk<Session.Builder>()
