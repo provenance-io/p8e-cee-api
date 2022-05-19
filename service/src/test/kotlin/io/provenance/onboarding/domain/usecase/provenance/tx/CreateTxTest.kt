@@ -17,7 +17,6 @@ import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.onboarding.frameworks.config.ProvenanceProperties
-import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -69,6 +68,7 @@ class CreateTxTest : FunSpec({
 
     test("happy path") {
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
+        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
 
         // Execute enable replication code
         val response = createTx.execute(

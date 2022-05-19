@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit
 
 @Component
 class CreateClient(
-    private val getOriginator: EntityManager,
     private val provenanceProperties: ProvenanceProperties,
     private val entityManager: EntityManager,
 ) : AbstractUseCase<CreateClientRequest, Client>() {

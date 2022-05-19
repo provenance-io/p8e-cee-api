@@ -4,7 +4,6 @@ import com.google.protobuf.Message
 import io.provenance.api.models.eos.StoreAssetResponse
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.objectstore.client.OsClient
-import tech.figure.asset.v1beta1.Asset
 import java.security.PrivateKey
 import java.security.PublicKey
 

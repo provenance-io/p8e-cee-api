@@ -8,7 +8,6 @@ import io.provenance.onboarding.frameworks.config.ProvenanceProperties
 import io.provenance.onboarding.frameworks.config.VaultProperties
 import io.provenance.plugins.vault.VaultPlugin
 import io.provenance.plugins.vault.VaultSpec
-import io.provenance.scope.encryption.util.getAddress
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import java.io.File

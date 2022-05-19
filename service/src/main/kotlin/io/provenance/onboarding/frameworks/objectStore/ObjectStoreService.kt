@@ -14,7 +14,6 @@ import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.objectstore.client.OsClient
 import org.springframework.stereotype.Component
-import tech.figure.asset.v1beta1.Asset
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.concurrent.TimeUnit

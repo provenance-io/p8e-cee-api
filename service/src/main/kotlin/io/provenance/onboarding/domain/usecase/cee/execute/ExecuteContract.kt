@@ -43,7 +43,7 @@ class ExecuteContract(
         val audiences = entityManager.hydrateKeys(args.request.permissions)
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, audiences))
         val contract = contractService.getContract(args.request.config.contract.contractName)
-        val records = getRecords(args.request.records, contract)
+        val records = getRecords(args.request.records, contract, args.request.config.contract.messageParser)
 
         val participants = args.request.participants.associate {
             it.partyType to entityManager.getEntity(it.uuid)
@@ -89,7 +89,7 @@ class ExecuteContract(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    private fun getRecords(records: Map<String, Any>, contract: Class<out P8eContract>): Map<String, Message> {
+    private fun getRecords(records: Map<String, Any>, contract: Class<out P8eContract>, parserName: String?): Map<String, Message> {
         val contractRecords = mutableMapOf<String, Message>()
 
         try {
@@ -98,7 +98,16 @@ class ExecuteContract(
                     (param.annotations.firstOrNull { it is Input } as? Input)?.let { input ->
                         val parameterClass = Class.forName(param.type.toClassNameString())
                         records.getOrDefault(input.name, null)?.let {
-                            val record = contractParser.parseInput(it, parameterClass)
+
+                            val record = when (val parser = parserName?.let { name -> contractParser.getParser(name) }) {
+                                null -> {
+                                    contractParser.parseInput(it, parameterClass)
+                                }
+                                else -> {
+                                    parser.parse(it, parameterClass)
+                                }
+                            }
+
                             contractRecords[input.name] = record
                         }
                     }

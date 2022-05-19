@@ -15,7 +15,6 @@ import io.provenance.scope.objectstore.client.OsClient
 import java.net.URI
 import java.security.PublicKey
 import java.util.UUID
-import mu.KotlinLogging
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
@@ -24,14 +23,12 @@ import tech.figure.asset.v1beta1.AssetOuterClassBuilders
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
 
-private val log = KotlinLogging.logger { }
-
 @Component
 class StoreFile(
     private val objectStore: ObjectStore,
     private val objectStoreConfig: ObjectStoreConfig,
     private val entityManager: EntityManager,
-): AbstractUseCase<StoreFileRequestWrapper, StoreAssetResponse>() {
+) : AbstractUseCase<StoreFileRequestWrapper, StoreAssetResponse>() {
     override suspend fun execute(args: StoreFileRequestWrapper): StoreAssetResponse {
         val originator = entityManager.getEntity(args.uuid)
         var additionalAudiences = emptySet<AudienceKeyPair>()
@@ -60,5 +57,4 @@ class StoreFile(
     private inline fun <reified T> Map<String, Part>.getAsType(key: String): T =
         T::class.java.cast(get(key))
             ?: throw IllegalArgumentException("Failed to retrieve and cast provided argument.")
-
 }

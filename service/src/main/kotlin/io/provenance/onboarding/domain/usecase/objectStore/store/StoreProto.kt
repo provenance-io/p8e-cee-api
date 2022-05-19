@@ -26,7 +26,7 @@ class StoreProto(
         val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
         val additionalAudiences = entityManager.hydrateKeys(args.request.permissions)
 
-        val asset = parser.parse(args.request.document, Class.forName(args.request.type))
+        val asset = parser.parse(args.request.message, Class.forName(args.request.type))
 
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
