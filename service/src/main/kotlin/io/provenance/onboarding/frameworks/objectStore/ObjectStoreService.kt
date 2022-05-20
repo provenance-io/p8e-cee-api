@@ -3,7 +3,7 @@ package io.provenance.onboarding.frameworks.objectStore
 import com.google.protobuf.Message
 import io.provenance.objectstore.proto.Objects
 import io.provenance.onboarding.domain.objectStore.ObjectStore
-import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.api.models.eos.StoreProtoResponse
 import io.provenance.api.models.eos.toModel
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.frameworks.provenance.extensions.getEncryptedPayload
@@ -84,10 +84,10 @@ class ObjectStoreService(
         return res.getDecryptedPayload(DirectKeyRef(publicKey, privateKey)).readAllBytes()
     }
 
-    override fun storeAsset(
+    override fun storeMessage(
         client: OsClient,
         message: Message,
         publicKey: PublicKey,
         additionalAudiences: Set<PublicKey>
-    ): StoreAssetResponse = encryptAndStore(client, message, publicKey, additionalAudiences).toModel()
+    ): StoreProtoResponse = encryptAndStore(client, message, publicKey, additionalAudiences).toModel()
 }

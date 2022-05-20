@@ -16,7 +16,10 @@ class InternalObjectStoreApi {
         logExchange(log)
         Routes.INTERNAL_BASE_V1.nest {
             "/eos".nest {
-                POST("", handler::store)
+                POST("", handler::storeProto)
+                GET("", handler::getProto)
+                POST("/file", handler::storeFile)
+                GET("/file", handler::getFile)
             }
         }
     }

@@ -4,7 +4,7 @@ import io.provenance.onboarding.domain.objectStore.ObjectStore
 import io.provenance.onboarding.domain.usecase.AbstractUseCase
 import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
-import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.api.models.eos.StoreProtoResponse
 import io.provenance.onboarding.frameworks.cee.parsers.MessageParser
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.encryption.util.toJavaPublicKey
@@ -20,8 +20,8 @@ class StoreProto(
     private val objectStoreConfig: ObjectStoreConfig,
     private val entityManager: EntityManager,
     private val parser: MessageParser
-) : AbstractUseCase<StoreProtoRequestWrapper, StoreAssetResponse>() {
-    override suspend fun execute(args: StoreProtoRequestWrapper): StoreAssetResponse {
+) : AbstractUseCase<StoreProtoRequestWrapper, StoreProtoResponse>() {
+    override suspend fun execute(args: StoreProtoRequestWrapper): StoreProtoResponse {
         val originator = entityManager.getEntity(args.uuid)
         val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
         val additionalAudiences = entityManager.hydrateKeys(args.request.permissions)
@@ -31,6 +31,6 @@ class StoreProto(
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 
-        return objectStore.storeAsset(osClient, asset, publicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
+        return objectStore.storeMessage(osClient, asset, publicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
     }
 }
