@@ -17,7 +17,6 @@ import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.provenance.account.GetSigner
 import io.provenance.onboarding.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.annotations.Input
-import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.FragmentResult

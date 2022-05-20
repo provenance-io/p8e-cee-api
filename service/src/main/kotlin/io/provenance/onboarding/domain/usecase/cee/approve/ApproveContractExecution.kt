@@ -25,7 +25,7 @@ class ApproveContractExecution(
 
         when (val result = client.execute(envelope)) {
             is FragmentResult -> {
-               client.approveScopeUpdate(result.envelopeState, args.request.expiration).let {
+                client.approveScopeUpdate(result.envelopeState, args.request.expiration).let {
                     val signer = getSigner.execute(args.uuid)
                     val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
                     provenance.executeTransaction(args.request.provenanceConfig, txBody, signer).also { broadcast ->
