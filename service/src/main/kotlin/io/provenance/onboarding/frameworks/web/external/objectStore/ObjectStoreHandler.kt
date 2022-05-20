@@ -1,5 +1,7 @@
 package io.provenance.onboarding.frameworks.web.external.objectStore
 
+import io.provenance.api.models.eos.GetFileRequest
+import io.provenance.api.models.eos.GetProtoRequest
 import io.provenance.onboarding.domain.usecase.objectStore.get.GetFile
 import io.provenance.onboarding.domain.usecase.objectStore.replication.EnableReplication
 import io.provenance.onboarding.domain.usecase.objectStore.get.GetProto
@@ -34,11 +36,11 @@ class ObjectStoreHandler(
     }.foldToServerResponse()
 
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
-        getProto.execute(GetAssetRequestWrapper(req.getUser(), req.awaitBody()))
+        getProto.execute(GetAssetRequestWrapper(req.getUser(), GetProtoRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), req.queryParam("type").get())))
     }.foldToServerResponse()
 
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
-        getFile.execute(GetFileRequestWrapper(req.getUser(), req.awaitBody()))
+        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get())))
     }.foldToServerResponse()
 
     suspend fun enableReplication(req: ServerRequest): ServerResponse = runCatching {

@@ -81,7 +81,7 @@ class P8eContractService : ContractService {
         }.fold(
             onSuccess = { result -> result },
             onFailure = { throwable ->
-                throw ContractExecutionException("Contract execution failed.", throwable)
+                throw ContractExecutionException("Contract execution failed: ${throwable.message}", throwable)
             }
         )
 

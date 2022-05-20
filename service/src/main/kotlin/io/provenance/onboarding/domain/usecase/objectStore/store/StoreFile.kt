@@ -1,7 +1,7 @@
 package io.provenance.onboarding.domain.usecase.objectStore.store
 
 import com.google.gson.Gson
-import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.api.models.eos.StoreProtoResponse
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.onboarding.domain.objectStore.ObjectStore
@@ -28,8 +28,8 @@ class StoreFile(
     private val objectStore: ObjectStore,
     private val objectStoreConfig: ObjectStoreConfig,
     private val entityManager: EntityManager,
-) : AbstractUseCase<StoreFileRequestWrapper, StoreAssetResponse>() {
-    override suspend fun execute(args: StoreFileRequestWrapper): StoreAssetResponse {
+) : AbstractUseCase<StoreFileRequestWrapper, StoreProtoResponse>() {
+    override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse {
         val originator = entityManager.getEntity(args.uuid)
         var additionalAudiences = emptySet<AudienceKeyPair>()
         val osClient = OsClient(URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()), objectStoreConfig.timeoutMs)
@@ -51,7 +51,7 @@ class StoreFile(
             putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
         }
 
-        return objectStore.storeAsset(osClient, asset, originator.encryptionPublicKey() as PublicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
+        return objectStore.storeMessage(osClient, asset, originator.encryptionPublicKey() as PublicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
     }
 
     private inline fun <reified T> Map<String, Part>.getAsType(key: String): T =

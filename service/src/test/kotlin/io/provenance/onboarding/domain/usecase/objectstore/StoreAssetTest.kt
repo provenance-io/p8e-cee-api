@@ -15,7 +15,7 @@ import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.models.eos.StoreProtoRequest
 import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
-import io.provenance.api.models.eos.StoreAssetResponse
+import io.provenance.api.models.eos.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.onboarding.frameworks.cee.parsers.MessageParser
@@ -67,9 +67,9 @@ class StoreAssetTest : FunSpec({
     }
 
     test("happy path") {
-        val storeAssetResponse = StoreAssetResponse("HASH", "URI", "BUCKET", "NAME")
+        val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
-        every { mockObjectStore.storeAsset(any(), any(), any(), any()) } returns storeAssetResponse
+        every { mockObjectStore.storeMessage(any(), any(), any(), any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
@@ -94,7 +94,7 @@ class StoreAssetTest : FunSpec({
         assertEquals(response, storeAssetResponse)
 
         verify {
-            mockObjectStore.storeAsset(
+            mockObjectStore.storeMessage(
                 any(),
                 any(),
                 mockOriginatorPublicKey,
