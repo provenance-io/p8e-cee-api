@@ -27,6 +27,7 @@ object Versions {
     const val Kotest = "5.2.+"
     const val KotestExtensionsArrow = "1.2.+"
     const val KotestCoroutines = "1.6.1"
+    const val KotestSpring = "1.1.1"
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
@@ -43,6 +44,7 @@ object Versions {
     const val NexusPublishing = "1.1.0"
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
+    const val TestContainer = "1.3.3"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -185,6 +187,7 @@ object Dependencies {
     val Kotest = DependencySpec("io.kotest:kotest-runner-junit5-jvm", Versions.Kotest)
     val KotestAssertions = DependencySpec("io.kotest:kotest-assertions-core-jvm", Versions.Kotest)
     val KotestAssertionsArrow = DependencySpec("io.kotest.extensions:kotest-assertions-arrow", Versions.KotestExtensionsArrow)
+    val KotestSpring = DependencySpec("io.kotest.extensions:kotest-extensions-spring", Versions.KotestSpring)
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", Versions.Hamkrest)
     val Redisson = DependencySpec("org.redisson:redisson", Versions.Redisson)
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", Versions.SpringMockk)
@@ -200,7 +203,7 @@ object Dependencies {
     val BouncyCastle = DependencySpec("org.bouncycastle:bcpkix-jdk15on", Versions.BouncyCastle)
 
     object TestContainers {
-        val Core = DependencySpec("org.testcontainers:testcontainers", Versions.TestContainerCore)
+        val Core = DependencySpec("io.kotest.extensions:kotest-extensions-testcontainers", Versions.TestContainer)
     }
 }
 

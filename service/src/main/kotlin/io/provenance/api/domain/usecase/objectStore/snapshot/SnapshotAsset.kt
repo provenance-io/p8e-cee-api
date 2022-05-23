@@ -2,7 +2,7 @@ package io.provenance.api.domain.usecase.objectStore.snapshot
 
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.domain.usecase.common.originator.GetOriginator
+import io.provenance.api.domain.usecase.common.originator.GetEntity
 import io.provenance.api.domain.usecase.objectStore.store.StoreAsset
 import io.provenance.api.domain.usecase.objectStore.snapshot.models.SnapshotAssetRequestWrapper
 import io.provenance.api.models.eos.StoreAssetRequest
@@ -22,13 +22,13 @@ import java.util.UUID
 @Component
 class SnapshotAsset(
     private val objectStore: ObjectStore,
-    private val getOriginator: GetOriginator,
+    private val getEntity: GetEntity,
     private val objectStoreConfig: ObjectStoreConfig,
     private val storeAsset: StoreAsset
 ) : AbstractUseCase<SnapshotAssetRequestWrapper, StoreAssetResponse>() {
     override suspend fun execute(args: SnapshotAssetRequestWrapper): StoreAssetResponse {
 
-        val originator = getOriginator.execute(args.uuid)
+        val originator = getEntity.execute(args.uuid)
         val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
         val publicKey = (originator.signingPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")

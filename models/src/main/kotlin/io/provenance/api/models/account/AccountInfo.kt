@@ -6,4 +6,5 @@ data class AccountInfo(
     val keyRingIndex: Int = 0,
     val keyIndex: Int = 0,
     val partyType: Specifications.PartyType = Specifications.PartyType.OWNER,
+    val keyManagementConfig: KeyManagementConfig? = null,
 )

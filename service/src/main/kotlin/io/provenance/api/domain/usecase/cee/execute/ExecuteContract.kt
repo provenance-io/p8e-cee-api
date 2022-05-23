@@ -13,7 +13,7 @@ import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.cee.execute.model.ExecuteContractRequestWrapper
-import io.provenance.api.domain.usecase.common.originator.GetOriginator
+import io.provenance.api.domain.usecase.common.originator.GetEntity
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.frameworks.objectStore.AudienceKeyManager
 import io.provenance.api.frameworks.objectStore.DefaultAudience
@@ -39,7 +39,7 @@ class ExecuteContract(
     private val getSigner: GetSigner,
     private val contractParser: ContractParser,
     private val createClient: CreateClient,
-    private val getOriginator: GetOriginator,
+    private val getEntity: GetEntity,
     private val audienceKeyManager: AudienceKeyManager,
 ) : AbstractUseCase<ExecuteContractRequestWrapper, Any>() {
 
@@ -51,7 +51,7 @@ class ExecuteContract(
         val audiences = getAudiences(args.request.permissions)
 
         val participants = args.request.participants.associate {
-            it.partyType to getOriginator.execute(it.uuid)
+            it.partyType to getEntity.execute(it.uuid)
         }
 
         val scope = provenanceService.getScope(args.request.config.provenanceConfig, args.request.config.contract.scopeUuid)

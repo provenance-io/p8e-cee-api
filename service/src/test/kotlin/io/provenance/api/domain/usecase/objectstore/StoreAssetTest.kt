@@ -12,7 +12,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.Originator
 import io.provenance.api.domain.objectStore.ObjectStore
-import io.provenance.api.domain.usecase.common.originator.GetOriginator
+import io.provenance.api.domain.usecase.common.originator.GetEntity
 import io.provenance.api.domain.usecase.objectStore.store.StoreAsset
 import io.provenance.api.models.eos.StoreAssetRequest
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
@@ -40,7 +40,7 @@ class StoreAssetTest : FunSpec({
     val mockObjectStoreConfig = mockk<ObjectStoreConfig>()
     val mockObjectStore = mockk<ObjectStore>()
     val mockAudienceKeyManager = mockk<AudienceKeyManager>()
-    val mockGetOriginator = mockk<GetOriginator>()
+    val mockGetEntity = mockk<GetEntity>()
     val mockOriginator = mockk<Originator>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
@@ -51,13 +51,13 @@ class StoreAssetTest : FunSpec({
         mockObjectStore,
         mockObjectStoreConfig,
         mockAudienceKeyManager,
-        mockGetOriginator
+        mockGetEntity
     )
 
     beforeTest {
         every { mockObjectStoreConfig.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
 
-        coEvery { mockGetOriginator.execute(any()) } returns mockOriginator
+        coEvery { mockGetEntity.execute(any()) } returns mockOriginator
 
         mockkStatic(String::toJavaPublicKey)
 

@@ -79,6 +79,8 @@ dependencies {
         Dependencies.Kotest,
         Dependencies.KotestAssertions,
         Dependencies.KotestAssertionsArrow,
+        Dependencies.KotestSpring,
+        Dependencies.TestContainers.Core,
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }

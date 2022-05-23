@@ -1,0 +1,75 @@
+version: '3.5'
+
+services:
+
+    postgres-cee:
+        image: postgres:13-alpine
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=password1
+        networks:
+            - p8e-network
+        ports:
+            - "9992:5432"
+        volumes:
+            - postgres-cee:/var/lib/postgresql/data
+            - ./db-init:/docker-entrypoint-initdb.d/
+        healthcheck:
+            test: [ CMD-SHELL, pg_isready -U postgres ]
+            interval: 5s
+            timeout: 10s
+            retries: 5
+        command: postgres
+
+    object-store:
+        image: ghcr.io/provenance-io/object-store:0.7.0
+        depends_on:
+            - postgres-cee
+        env_file:
+            - object-store.env
+        networks:
+            - p8e-network
+        ports:
+            - "9993:8080"
+        volumes:
+            - ./object-store-1:/mnt/data
+
+    provenance:
+        image: provenanceio/provenance:v1.8.0-rc9
+        command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
+        networks:
+            - p8e-network
+        ports:
+            - "1317:1317"
+            - "9090:9090"
+            - "26657:26657"
+        volumes:
+            - ./prov-init:/home/provenance_seed:ro
+            - provenance:/home/provenance
+
+    vault:
+        image: vault:latest
+        networks:
+            - p8e-network
+        ports:
+            - "8200:8200"
+        restart: always
+        volumes:
+            - ./volumes/logs:/vault/logs
+            - ./volumes/file:/vault/file
+            - ./volumes/config:/vault/config
+        cap_add:
+            - IPC_LOCK
+        entrypoint: vault server -config=/vault/config/vault.json
+
+volumes:
+    postgres-cee:
+    provenance:
+    object-store:
+
+networks:
+  p8e-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.10.0/24

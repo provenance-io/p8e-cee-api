@@ -2,7 +2,7 @@ package io.provenance.api.domain.usecase.objectStore.store
 
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.domain.usecase.common.originator.GetOriginator
+import io.provenance.api.domain.usecase.common.originator.GetEntity
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
 import io.provenance.api.models.eos.StoreAssetResponse
 import io.provenance.api.frameworks.config.ObjectStoreConfig
@@ -24,10 +24,10 @@ class StoreAsset(
     private val objectStore: ObjectStore,
     private val objectStoreConfig: ObjectStoreConfig,
     private val audienceKeyManager: AudienceKeyManager,
-    private val getOriginator: GetOriginator,
+    private val getEntity: GetEntity,
 ) : AbstractUseCase<StoreAssetRequestWrapper, StoreAssetResponse>() {
     override suspend fun execute(args: StoreAssetRequestWrapper): StoreAssetResponse {
-        val originator = getOriginator.execute(args.uuid)
+        val originator = getEntity.execute(args.uuid)
         val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
         val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
 
