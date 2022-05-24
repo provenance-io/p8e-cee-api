@@ -11,12 +11,12 @@ import io.provenance.core.Originator
 import io.provenance.core.OriginatorManager
 import io.provenance.core.Plugin
 import io.provenance.onboarding.domain.usecase.common.originator.DefaultAudience
-import io.provenance.plugins.vault.VaultPlugin
 import io.provenance.plugins.vault.VaultSpec
+import java.io.File
+import java.nio.file.Files.exists
+import java.nio.file.Path
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
-import java.io.File
-import java.util.UUID
 import kotlin.reflect.full.createInstance
 
 @Component
@@ -79,12 +79,10 @@ class EntityManager(
         val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
         manager.register(plugin)
 
-        val tokenPath = if (System.getenv("ENVIRONMENT").isNullOrBlank()) {
-            log.info("Retrieving token from ${System.getProperty("user.home") + config.tokenPath}")
-            File(System.getProperty("user.home")).resolve(config.tokenPath)
-        } else {
-            log.info("Retrieving token from ${config.tokenPath} on environment: ${config.tokenPath}}")
+        val tokenPath = if (File(config.tokenPath).exists()) {
             File(config.tokenPath)
+        } else {
+            File(System.getProperty("user.home")).resolve(config.tokenPath)
         }
 
         tokenMap[config] = tokenPath.readText(Charsets.UTF_8)

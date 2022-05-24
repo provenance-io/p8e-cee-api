@@ -8,7 +8,7 @@ services:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password1
         networks:
-            - p8e-network
+            - p8e-network-test
         ports:
             - "9992:5432"
         volumes:
@@ -28,17 +28,17 @@ services:
         env_file:
             - object-store.env
         networks:
-            - p8e-network
+            - p8e-network-test
         ports:
             - "9993:8080"
         volumes:
-            - ./object-store-1:/mnt/data
+            - ./object-store:/mnt/data
 
     provenance:
         image: provenanceio/provenance:v1.8.0-rc9
         command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
         networks:
-            - p8e-network
+            - p8e-network-test
         ports:
             - "1317:1317"
             - "9090:9090"
@@ -50,7 +50,7 @@ services:
     vault:
         image: vault:latest
         networks:
-            - p8e-network
+            - p8e-network-test
         ports:
             - "8200:8200"
         restart: always
@@ -68,7 +68,7 @@ volumes:
     object-store:
 
 networks:
-  p8e-network:
+  p8e-network-test:
     ipam:
       driver: default
       config:
