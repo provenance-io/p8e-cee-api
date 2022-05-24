@@ -14,8 +14,9 @@ done < vault/keys.output
 
 # export root token
 export ROOT_TOKEN=$(cat vault/init.output | grep '^Initial' | rev | cut -d ' ' -f 1 | rev)
-export VAULT_TOKEN=$ROOT_TOKEN
-export ENVIRONMENT=test
+echo $ROOT_TOKEN > vault/token.output
+#export VAULT_TOKEN=$ROOT_TOKEN
+
 
 # unseal vault
 #  0 - unsealed
@@ -39,7 +40,5 @@ printf "\nLogged in!\n"
 
 printf "\nEnabling KV store..\n\n"
 vault secrets enable -version=2 -path=$SECRET_PATH kv
-printf "\nView/edit secret at %s/ui/vault/secrets/%s/list\n" "${VAULT_ADDR}" "${SECRET_PATH}"
-printf "Log in using token: %s\n" "$(cat ~/.vault-token)"
 
 exit 0;

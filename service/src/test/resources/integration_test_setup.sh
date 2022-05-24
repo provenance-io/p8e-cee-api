@@ -21,4 +21,3 @@ sh vault/add-secret.sh 'http://127.0.0.1:8200' 'kv2_originations' deadbeef-face-
 0A2100AF41AAD44E6D0A1DF587491D01C11DB4E0F1BBDDE33F19CB2C4ADDDBE7FC82C4 \
 0A2100AF41AAD44E6D0A1DF587491D01C11DB4E0F1BBDDE33F19CB2C4ADDDBE7FC82C4 \
 "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
-

@@ -4,21 +4,34 @@ import io.provenance.api.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.integration.base.IntegrationTestBase
 import io.provenance.api.models.eos.StoreProtoRequest
+import io.provenance.scope.util.toUuid
 import java.util.UUID
+import tech.figure.asset.v1beta1.Asset
+import tech.figure.proto.util.toProtoUUID
 
 class ObjectStoreSpec(
     private val storeProto: StoreProto
 ) : IntegrationTestBase({
 
+    val entities = listOf(
+        "deadbeef-face-479b-860c-facefaceface".toUuid(),
+        "deadbeef-face-2222-860c-facefaceface".toUuid()
+    )
+
+
     "Object Store" should {
         "Store Object and Return Hash" {
             storeProto.execute(
                 StoreProtoRequestWrapper(
-                    UUID.randomUUID(),
+                    entities.first(),
                     StoreProtoRequest(
-                        objectStoreAddress =  "",
-                        message = "",
-                        type = ""
+                        objectStoreAddress = "grpc://localhost:9993",
+                        message = Asset.newBuilder()
+                            .setDescription("arvo")
+                            .setType("tea")
+                            .setId(UUID.randomUUID().toProtoUUID())
+                            .build(),
+                        type = Asset.getDescriptor().toString()
                     )
                 )
             )
