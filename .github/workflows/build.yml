@@ -47,6 +47,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - name: Setup Container
+        command: 'brew tap hashicorp/tap \
+                  brew install hashicorp/tap/vault'
+
       - name: Gradle Build
         run: ./gradlew build -i --parallel -x ktlint
 
