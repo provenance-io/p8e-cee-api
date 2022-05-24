@@ -2,7 +2,9 @@ package io.provenance.api.domain.usecase.provenance.account
 
 import io.provenance.client.grpc.Signer
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.domain.usecase.common.originator.GetEntity
+import io.provenance.api.domain.usecase.common.originator.EntityManager
+import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
+import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.utility.ProvenanceUtils
 import org.springframework.stereotype.Component
@@ -12,13 +14,13 @@ import java.util.UUID
 
 @Component
 class GetSigner(
-    private val getEntity: GetEntity,
+    private val entityManager: EntityManager,
     private val provenanceProperties: ProvenanceProperties,
-) : AbstractUseCase<UUID, Signer>() {
-    override suspend fun execute(args: UUID): Signer {
+) : AbstractUseCase<GetSignerRequest, Signer>() {
+    override suspend fun execute(args: GetSignerRequest): Signer {
         val utils = ProvenanceUtils()
 
-        val originator = getEntity.execute(args)
+        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.account.keyManagementConfig))
 
         return originator.signingPublicKey().let { public ->
             originator.signingPrivateKey().let { private ->

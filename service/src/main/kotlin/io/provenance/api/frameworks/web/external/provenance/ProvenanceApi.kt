@@ -1,6 +1,5 @@
 package io.provenance.api.frameworks.web.external.provenance
 
-import io.provenance.api.models.p8e.CreateTxOnboardAssetRequest
 import io.provenance.api.models.p8e.CreateTxRequest
 import io.provenance.api.models.p8e.ExecuteTxRequest
 import io.provenance.api.models.p8e.TxBody
@@ -29,35 +28,6 @@ private val log = KotlinLogging.logger {}
 class ProvenanceApi {
     @Bean
     @RouterOperations(
-        RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/onboard",
-            method = arrayOf(RequestMethod.POST),
-            produces = ["application/json"],
-            operation = Operation(
-                tags = ["Provenance"],
-                operationId = "onboard",
-                method = "POST",
-                parameters = [
-                    Parameter(
-                        name = "x-uuid",
-                        required = true,
-                        `in` = ParameterIn.HEADER,
-                        schema = Schema(implementation = UUID::class),
-                    ),
-                ],
-                requestBody = RequestBody(
-                    required = true,
-                    content = [Content(schema = Schema(implementation = CreateTxOnboardAssetRequest::class))]
-                ),
-                responses = [
-                    ApiResponse(
-                        responseCode = "200",
-                        description = "successful operation",
-                        content = [Content(schema = Schema(implementation = TxResponse::class))]
-                    )
-                ]
-            )
-        ),
         RouterOperation(
             path = "${Routes.EXTERNAL_BASE_V1}/p8e/tx/generate",
             method = arrayOf(RequestMethod.POST),
@@ -120,7 +90,6 @@ class ProvenanceApi {
     fun externalProvenanceApiV1(handler: ProvenanceHandler) = coRouter {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/p8e".nest {
-            POST("/onboard", handler::createTxAndOnboard)
             POST("/tx/generate", handler::generateTx)
             POST("/tx/execute", handler::executeTx)
         }

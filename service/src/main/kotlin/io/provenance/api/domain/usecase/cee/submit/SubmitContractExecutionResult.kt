@@ -5,6 +5,7 @@ import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
+import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.SingleTx
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
@@ -17,7 +18,7 @@ class SubmitContractExecutionResult(
     private val getSigner: GetSigner,
 ) : AbstractUseCase<SubmitContractExecutionResultRequestWrapper, TxResponse>() {
     override suspend fun execute(args: SubmitContractExecutionResultRequestWrapper): TxResponse {
-        val signer = getSigner.execute(args.uuid)
+        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.envelope).build()
         val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(args.request.state).build()

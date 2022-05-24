@@ -16,6 +16,7 @@ dependencyManagement {
 dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
     implementation(project(":models"))
+    testImplementation(project(":models"))
 
     listOf(
         Dependencies.Kotlin.AllOpen,
@@ -79,6 +80,7 @@ dependencies {
         Dependencies.Kotest,
         Dependencies.KotestAssertions,
         Dependencies.KotestAssertionsArrow,
+        Dependencies.KotestProperty,
         Dependencies.KotestSpring,
         Dependencies.TestContainers.Core,
     ).forEach { testDep ->
@@ -87,9 +89,7 @@ dependencies {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter")
-    }
+    useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
     }

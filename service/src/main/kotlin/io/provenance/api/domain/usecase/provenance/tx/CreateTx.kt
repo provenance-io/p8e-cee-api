@@ -2,39 +2,28 @@ package io.provenance.api.domain.usecase.provenance.tx
 
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.common.model.ScopeConfig
+import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
+import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
-import io.provenance.api.frameworks.objectStore.AudienceKeyManager
-import io.provenance.api.frameworks.objectStore.DefaultAudience
 import io.provenance.api.frameworks.provenance.utility.ProvenanceUtils
 import io.provenance.scope.encryption.util.getAddress
+import io.provenance.scope.encryption.util.toJavaPublicKey
 import org.springframework.stereotype.Component
 
 @Component
 class CreateTx(
-    private val audienceKeyManager: AudienceKeyManager,
+    private val entityManager: EntityManager,
     private val getSigner: GetSigner,
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<CreateTxRequestWrapper, TxBody>() {
     override suspend fun execute(args: CreateTxRequestWrapper): TxBody {
         val utils = ProvenanceUtils()
 
-        val account = getSigner.execute(args.uuid)
-        val additionalAudiences: MutableSet<String> = mutableSetOf()
-
-        args.request.permissions?.audiences?.forEach {
-            additionalAudiences.add(it)
-        }
-
-        if (args.request.permissions?.permissionDart == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.DART).getAddress(provenanceProperties.mainnet))
-        }
-
-        if (args.request.permissions?.permissionPortfolioManager == true) {
-            additionalAudiences.add(audienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(provenanceProperties.mainnet))
-        }
+        val account = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
+        val additionalAudiences = entityManager.hydrateKeys(args.request.permissions)
 
         return utils.createScopeTx(
             ScopeConfig(
@@ -44,7 +33,7 @@ class CreateTx(
             ),
             args.request.contractInput,
             account.address(),
-            additionalAudiences
+            additionalAudiences.map { it.signingKey.toJavaPublicKey().getAddress(provenanceProperties.mainnet) }.toSet()
         )
     }
 }

@@ -1,25 +1,30 @@
 package io.provenance.api.integration.objectstore
 
-import io.provenance.api.domain.usecase.objectStore.store.StoreAsset
-import io.provenance.api.domain.usecase.objectStore.store.models.StoreAssetRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.store.StoreProto
+import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.integration.base.IntegrationTestBase
-import io.provenance.api.models.account.AccountInfo
-import io.provenance.api.models.eos.StoreAssetRequest
+import io.provenance.api.models.eos.StoreProtoRequest
 import java.util.UUID
 
 class ObjectStoreSpec(
-    private val storeAsset: StoreAsset
+    private val storeProto: StoreProto
 ) : IntegrationTestBase({
 
     "Object Store" should {
         "Store Object and Return Hash" {
-            storeAsset.execute(StoreAssetRequestWrapper(UUID.randomUUID(),
-                StoreAssetRequest(objectStoreAddress = "grpc://localhost:5001", assetId = UUID.randomUUID(), asset = "hi", permissions = null, account = AccountInfo())))
+            storeProto.execute(
+                StoreProtoRequestWrapper(
+                    UUID.randomUUID(),
+                    StoreProtoRequest(
+                        objectStoreAddress =  "",
+                        message = "",
+                        type = ""
+                    )
+                )
+            )
         }
     }
 })
-
-
 
 
 //    val p8eNetwork = Network.newNetwork()
@@ -60,7 +65,6 @@ class ObjectStoreSpec(
 //        dependsOn(postgresTestContainer)
 //        withNetwork(p8eNetwork)
 //    }
-
 
 
 /*

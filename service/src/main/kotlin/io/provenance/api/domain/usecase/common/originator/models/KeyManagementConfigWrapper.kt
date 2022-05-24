@@ -5,5 +5,5 @@ import java.util.UUID
 
 data class KeyManagementConfigWrapper(
     val uuid: UUID,
-    val config: KeyManagementConfig
+    val config: KeyManagementConfig?
 )

@@ -8,6 +8,7 @@ import io.provenance.api.domain.usecase.cee.approve.models.ApproveContractReques
 import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
+import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
 import org.springframework.stereotype.Component
@@ -25,7 +26,7 @@ class ApproveContractExecution(
         when (val result = client.execute(envelope)) {
             is FragmentResult -> {
                 val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.request.expiration).let {
-                    val signer = getSigner.execute(args.uuid)
+                    val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
                     val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
                     val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
 

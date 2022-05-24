@@ -13,4 +13,7 @@ class ContractParserService(
     override fun parseInput(input: Any, type: Class<*>): Message =
         parsers.firstOrNull { type.kotlin.isSubclassOf(it.type.kotlin) }?.parse(input, type)
             ?: throw IllegalStateException("Failed to find parser for contract input.")
+
+    override fun getParser(name: String): InputParser? =
+        parsers.firstOrNull { it.javaClass.name == name }
 }

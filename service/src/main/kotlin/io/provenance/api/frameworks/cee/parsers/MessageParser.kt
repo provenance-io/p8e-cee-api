@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class MessageParser : InputParser {
     override val type: Class<*> = Message::class.java
 
-    override fun parse(input: Any, type: Class<*>): Message = ObjectMapper()
+    override fun parse(input: Any, type: Class<*>, includeTypes: List<String>): Message = ObjectMapper()
         .registerModule(ProtobufModule())
         .registerModule(JavaTimeModule())
         .readValue(input.toPrettyJson(), type) as Message

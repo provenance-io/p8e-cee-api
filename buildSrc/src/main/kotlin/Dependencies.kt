@@ -188,11 +188,11 @@ object Dependencies {
     val KotestAssertions = DependencySpec("io.kotest:kotest-assertions-core-jvm", Versions.Kotest)
     val KotestAssertionsArrow = DependencySpec("io.kotest.extensions:kotest-assertions-arrow", Versions.KotestExtensionsArrow)
     val KotestSpring = DependencySpec("io.kotest.extensions:kotest-extensions-spring", Versions.KotestSpring)
+    val KotestProperty = DependencySpec("io.kotest:kotest-property", Versions.Kotest)
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", Versions.Hamkrest)
     val Redisson = DependencySpec("org.redisson:redisson", Versions.Redisson)
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", Versions.SpringMockk)
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker", Versions.KotlinFaker)
-
     object Swagger {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }

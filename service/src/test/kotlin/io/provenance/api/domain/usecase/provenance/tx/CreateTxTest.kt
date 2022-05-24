@@ -6,7 +6,10 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.Audience
+import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.CreateTxRequest
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.grpc.Signer
@@ -14,9 +17,6 @@ import io.provenance.core.Originator
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
-import io.provenance.api.frameworks.objectStore.AudienceKeyManager
-import io.provenance.api.frameworks.objectStore.DefaultAudience
-import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -37,7 +37,7 @@ val ACCOUNT_INFO = AccountInfo()
 val REQUEST_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 
 class CreateTxTest : FunSpec({
-    val mockAudienceKeyManager = mockk<AudienceKeyManager>()
+    val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<Originator>()
     val mockSigner = mockk<Signer>()
     val mockGetSigner = mockk<GetSigner>()
@@ -45,9 +45,9 @@ class CreateTxTest : FunSpec({
     val mockProvenanceProperties = mockk<ProvenanceProperties>()
 
     val createTx = CreateTx(
-        mockAudienceKeyManager,
+        mockEntityManager,
         mockGetSigner,
-        mockProvenanceProperties
+        mockProvenanceProperties,
     )
 
     beforeTest {
@@ -59,14 +59,6 @@ class CreateTxTest : FunSpec({
             mockProvenanceProperties.mainnet
         } returns !IS_TEST_NET
 
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.DART).getAddress(!IS_TEST_NET)
-        } returns DART_AUDIENCE_PUBLIC_KEY_STR
-
-        every {
-            mockAudienceKeyManager.get(DefaultAudience.PORTFOLIO_MANAGER).getAddress(!IS_TEST_NET)
-        } returns PORTFOLIO_MANAGER_AUDIENCE_PUBLICKEY_STR
-
         every { mockSigner.address() } returns MOCK_SIGNER_ADDRESS
     }
 
@@ -76,6 +68,7 @@ class CreateTxTest : FunSpec({
 
     test("happy path") {
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
+        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
 
         // Execute enable replication code
         val response = createTx.execute(
@@ -84,7 +77,7 @@ class CreateTxTest : FunSpec({
                 CreateTxRequest(
                     ACCOUNT_INFO,
                     PermissionInfo(
-                        setOf(ADD_ASSET_AUDIENCE_PUBLIC_KEY),
+                        setOf(Audience(null, AudienceKeyPair(ADD_ASSET_AUDIENCE_PUBLIC_KEY, ADD_ASSET_AUDIENCE_PUBLIC_KEY))),
                         permissionDart = true,
                         permissionPortfolioManager = true
                     ),
