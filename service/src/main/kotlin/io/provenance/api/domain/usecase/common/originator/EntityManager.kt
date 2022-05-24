@@ -13,8 +13,6 @@ import io.provenance.core.Plugin
 import io.provenance.onboarding.domain.usecase.common.originator.DefaultAudience
 import io.provenance.plugins.vault.VaultSpec
 import java.io.File
-import java.nio.file.Files.exists
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.createInstance
 

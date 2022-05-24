@@ -50,7 +50,7 @@ jobs:
 
       - name: Setup Container
         run: |-
-            brew tap hashicorp/tap 
+            brew tap hashicorp/tap
             brew install hashicorp/tap/vault
 
       - name: Gradle Build

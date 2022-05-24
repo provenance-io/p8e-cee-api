@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.DockerComposeContainer
+import org.testcontainers.containers.wait.strategy.Wait
 
 @ActiveProfiles("development")
 @SpringBootTest
@@ -32,7 +33,7 @@ open class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) 
 
             process.waitFor(20, TimeUnit.SECONDS)
             if (process.exitValue() != 0) {
-                throw IllegalStateException("Test setup is not in expected state!")
+                throw IllegalStateException("Integration test environment did NOT setup successfully!")
             }
         }
 
@@ -47,7 +48,9 @@ open class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) 
     companion object {
         class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)
 
-        internal val instance: KDockerComposeContainer by lazy { defineDockerCompose() }
+        internal val instance: KDockerComposeContainer by lazy {
+            defineDockerCompose()
+        }
         private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }

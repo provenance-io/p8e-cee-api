@@ -1,5 +1,6 @@
 #!/bin/bash
-
+sleep 10
+docker ps
 sh vault/config.sh
 sleep 2
 
