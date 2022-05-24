@@ -2,24 +2,14 @@ package io.provenance.onboarding.frameworks.provenance.utility
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.google.protobuf.ByteString
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.Signer
-import io.provenance.hdwallet.bip39.MnemonicWords
 import io.provenance.hdwallet.common.hashing.sha256
 import io.provenance.hdwallet.ec.extensions.toECPrivateKey
-import io.provenance.hdwallet.hrp.Hrp
 import io.provenance.hdwallet.signer.BCECSigner
-import io.provenance.hdwallet.wallet.Account
-import io.provenance.hdwallet.wallet.Wallet
-import io.provenance.metadata.v1.DefinitionType
-import io.provenance.metadata.v1.InputSpecification
-import io.provenance.metadata.v1.MsgWriteContractSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteRecordRequest
-import io.provenance.metadata.v1.MsgWriteRecordSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteScopeRequest
-import io.provenance.metadata.v1.MsgWriteScopeSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteSessionRequest
 import io.provenance.metadata.v1.Party
 import io.provenance.metadata.v1.PartyType
@@ -50,13 +40,9 @@ class ProvenanceUtils {
     )
 
     companion object {
-        // Contract specification
-        const val ContractSpecClassName = "tech.figure.asset.OnboardAsset"
-        const val ContractSpecSourceHash = "AB43F752EBE5DC3E52EA2A9242136C35CD5C73C6E4EFCD44A70C32F8E43DC26F" // sha356(ContractSpecClassName)
 
         // Record specification
         const val RecordSpecName = "Asset"
-        const val RecordSpecTypeName = "tech.figure.asset.v1beta1.Asset"
         val RecordSpecInputs = listOf(
             RecordInputSpec(
                 name = "AssetHash",
@@ -72,7 +58,7 @@ class ProvenanceUtils {
     }
 
     // Create a metadata TX message for a new scope onboard
-    fun buildNewScopeMetadataTransaction(
+    private fun buildNewScopeMetadataTransaction(
         config: ScopeConfig,
         scopeHash: String,
         owner: String,
@@ -191,82 +177,6 @@ class ProvenanceUtils {
         )
     }
 
-    fun buildAssetSpecificationMetadataTransaction(
-        config: ScopeConfig,
-        owner: String
-    ): TxOuterClass.TxBody {
-        return listOf(
-
-            // write-contract-specification
-            MsgWriteContractSpecificationRequest.newBuilder().apply {
-                specificationBuilder
-                    .setSpecificationId(MetadataAddress.forContractSpecification(config.contractSpecId).bytes.toByteString())
-                    .setClassName(ContractSpecClassName)
-                    .setHash(ContractSpecSourceHash)
-                    .addAllOwnerAddresses(listOf(owner))
-                    .addAllPartiesInvolved(
-                        listOf(
-                            PartyType.PARTY_TYPE_OWNER
-                        )
-                    )
-            }.addAllSigners(listOf(owner)).build().toAny(),
-
-            // write-scope-specification
-            MsgWriteScopeSpecificationRequest.newBuilder().apply {
-                specificationBuilder
-                    .setSpecificationId(MetadataAddress.forScopeSpecification(config.scopeSpecId).bytes.toByteString())
-                    .addAllContractSpecIds(
-                        listOf(
-                            MetadataAddress.forContractSpecification(config.contractSpecId).bytes.toByteString()
-                        )
-                    )
-                    .addAllOwnerAddresses(listOf(owner))
-                    .addAllPartiesInvolved(
-                        listOf(
-                            PartyType.PARTY_TYPE_OWNER
-                        )
-                    )
-            }.addAllSigners(listOf(owner)).build().toAny(),
-
-            // write-record-specification
-            MsgWriteRecordSpecificationRequest.newBuilder().apply {
-                specificationBuilder
-                    .setName(RecordSpecName)
-                    .setTypeName(RecordSpecTypeName)
-                    .setSpecificationId(MetadataAddress.forRecordSpecification(config.contractSpecId, RecordSpecName).bytes.toByteString())
-                    .setResultType(DefinitionType.DEFINITION_TYPE_RECORD)
-                    .addAllResponsibleParties(
-                        listOf(
-                            PartyType.PARTY_TYPE_OWNER
-                        )
-                    )
-                    .addAllInputs(
-                        RecordSpecInputs.map {
-                            InputSpecification.newBuilder().apply {
-                                name = it.name
-                                typeName = it.typeName
-                                hash = it.hash
-                            }.build()
-                        }
-                    )
-            }.addAllSigners(listOf(owner)).build().toAny(),
-        ).toTxBody()
-    }
-
-    fun getSigner(account: Account): Signer {
-
-        return object : Signer {
-            override fun address(): String = account.address.value
-            override fun pubKey(): Keys.PubKey =
-                Keys.PubKey
-                    .newBuilder()
-                    .setKey(ByteString.copyFrom(account.keyPair.publicKey.compressed()))
-                    .build()
-
-            override fun sign(data: ByteArray): ByteArray = account.sign(data)
-        }
-    }
-
     fun getSigner(publicKey: PublicKey, privateKey: PrivateKey, isMainnet: Boolean): Signer {
         return object : Signer {
             override fun address(): String = publicKey.getAddress(isMainnet)
@@ -282,19 +192,4 @@ class ProvenanceUtils {
                     .toByteArray()
         }
     }
-
-    fun getAccount(keyMnemonic: String, isTestNet: Boolean, keyRingIndex: Int, keyIndex: Int) =
-        Wallet.fromMnemonic(
-            hrp = Hrp.ProvenanceBlockchain.testnet,
-            passphrase = "",
-            mnemonicWords = MnemonicWords.of(keyMnemonic),
-            testnet = isTestNet
-        ).let { wallet ->
-            when (isTestNet) {
-                true -> "m/44'/1'/0'/$keyRingIndex/$keyIndex'"
-                false -> "m/505'/1'/0'/$keyRingIndex/$keyIndex"
-            }.let { path ->
-                wallet[path]
-            }
-        }
 }
