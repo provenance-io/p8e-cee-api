@@ -9,7 +9,9 @@ import io.provenance.api.util.toPrettyJson
 import org.springframework.stereotype.Component
 
 @Component
-class JsonMessageParser : InputParser {
+class JsonMessageParser(
+    override val default: Boolean = false
+) : InputParser {
     override val type: Class<*> = Message::class.java
 
     override fun parse(input: Any, type: Class<*>, includeTypes: List<String>): Message {

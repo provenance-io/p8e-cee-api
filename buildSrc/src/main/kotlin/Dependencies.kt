@@ -36,7 +36,7 @@ object Versions {
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
-    const val KeyAccessLib = "0.2.15"
+    const val KeyAccessLib = "0.2.17"
     const val LoanPackage = "0.1.14"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.8.0"
