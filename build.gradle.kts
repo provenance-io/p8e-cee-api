@@ -37,7 +37,7 @@ subprojects {
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xjsr305=strict",
-                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
             )
             jvmTarget = "11"
             allWarningsAsErrors = true

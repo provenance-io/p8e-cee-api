@@ -37,7 +37,7 @@ class ExecuteContract(
     private val contractParser: ContractParser,
     private val createClient: CreateClient,
     private val entityManager: EntityManager,
-) : AbstractUseCase<ExecuteContractRequestWrapper, Any>() {
+) : AbstractUseCase<ExecuteContractRequestWrapper, ContractExecutionResponse>() {
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(args.uuid)
