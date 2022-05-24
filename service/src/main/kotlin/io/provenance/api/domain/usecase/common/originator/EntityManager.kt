@@ -14,7 +14,6 @@ import io.provenance.onboarding.domain.usecase.common.originator.DefaultAudience
 import io.provenance.plugins.vault.VaultSpec
 import java.io.File
 import java.nio.file.Files.exists
-import java.nio.file.Path
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.createInstance
@@ -24,7 +23,6 @@ class EntityManager(
     private val vaultProperties: VaultProperties,
     private val provenanceProperties: ProvenanceProperties,
 ) {
-    private val log = KotlinLogging.logger { }
     private var manager: OriginatorManager = OriginatorManager()
     private var tokenMap = mutableMapOf<KeyManagementConfig, String>()
 
@@ -70,6 +68,7 @@ class EntityManager(
         return additionalAudiences
     }
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun fetchToken(config: KeyManagementConfig): String {
 
         if (tokenMap.containsKey(config)) {

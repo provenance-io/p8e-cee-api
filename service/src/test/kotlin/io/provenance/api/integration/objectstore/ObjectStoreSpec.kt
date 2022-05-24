@@ -26,7 +26,6 @@ class ObjectStoreSpec(
         "deadbeef-face-2222-860c-facefaceface".toUuid()
     )
 
-
     "Object Store" should {
         "Store Object and Return Hash" {
             val assetToStore = Asset.newBuilder()

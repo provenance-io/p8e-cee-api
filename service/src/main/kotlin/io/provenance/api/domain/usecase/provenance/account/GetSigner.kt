@@ -10,7 +10,6 @@ import io.provenance.api.frameworks.provenance.utility.ProvenanceUtils
 import org.springframework.stereotype.Component
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.util.UUID
 
 @Component
 class GetSigner(
