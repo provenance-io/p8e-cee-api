@@ -1,8 +1,11 @@
 #!/bin/bash
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
 sleep 10
 docker ps
-sh vault/config.sh
-sleep 2
+#sh vault/config.sh
+#sleep 2
 
 sh vault/init-and-unseal.sh 'http://127.0.0.1:8200' 'kv2_originations'
 sleep 2
