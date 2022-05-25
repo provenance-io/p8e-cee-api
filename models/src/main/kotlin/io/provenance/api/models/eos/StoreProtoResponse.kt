@@ -10,4 +10,4 @@ data class StoreProtoResponse(
     val name: String
 )
 
-fun Objects.ObjectResponse.toModel() = StoreProtoResponse(Base64.getEncoder().encodeToString(hash.toByteArray()), uri, bucket, name)
+fun Objects.ObjectResponse.toModel() = StoreProtoResponse(Base64.getUrlEncoder().encodeToString(hash.toByteArray()), uri, bucket, name)
