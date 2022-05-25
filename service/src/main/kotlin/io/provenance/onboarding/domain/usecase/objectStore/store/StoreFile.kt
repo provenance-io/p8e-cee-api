@@ -14,7 +14,6 @@ import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import java.net.URI
 import java.security.PublicKey
-import java.util.UUID
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
@@ -33,6 +32,9 @@ class StoreFile(
         val originator = entityManager.getEntity(args.uuid)
         var additionalAudiences = emptySet<AudienceKeyPair>()
         val osClient = OsClient(URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()), objectStoreConfig.timeoutMs)
+        if (!args.request.containsKey("id") || args.request.getAsType<FormFieldPart>("id").value().isEmpty()) {
+            throw IllegalArgumentException("Request must provide the 'id' field for the file")
+        }
         val file = args.request.getAsType<FilePart>("file")
 
         args.request["permissions"]?.let {
@@ -41,9 +43,9 @@ class StoreFile(
         }
 
         val asset = AssetOuterClassBuilders.Asset {
-            idBuilder.value = UUID.randomUUID().toString()
+            idBuilder.value = args.request.getAsType<FormFieldPart>("id").value()
             type = FileNFT.ASSET_TYPE
-            description = file.name()
+            description = file.filename()
 
             putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
             putKv(FileNFT.KEY_BYTES, file.awaitAllBytes().toProtoAny())
