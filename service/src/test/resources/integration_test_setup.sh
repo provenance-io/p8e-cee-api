@@ -6,8 +6,7 @@ sleep 10
 docker ps
 #sh vault/config.sh
 #sleep 2
-
-sh vault/init-and-unseal.sh  'kv2_originations'
+echo "root" | tee vault/token.output
 printf "\nEnabling KV store..\n\n"
 vault secrets enable -version=2 -path='kv2_originations' kv
 sleep 2
