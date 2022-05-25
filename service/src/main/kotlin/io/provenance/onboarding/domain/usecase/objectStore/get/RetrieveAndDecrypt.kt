@@ -6,13 +6,12 @@ import io.provenance.onboarding.domain.usecase.common.originator.EntityManager
 import io.provenance.onboarding.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
 import io.provenance.onboarding.frameworks.config.ObjectStoreConfig
 import io.provenance.scope.objectstore.client.OsClient
-import io.provenance.scope.objectstore.util.base64Decode
 import java.lang.IllegalStateException
 import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.Base64
 
 @Component
 class RetrieveAndDecrypt(
