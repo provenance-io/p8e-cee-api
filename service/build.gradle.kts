@@ -16,6 +16,7 @@ dependencyManagement {
 dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
     implementation(project(":models"))
+    testImplementation(project(":models"))
 
     listOf(
         Dependencies.Kotlin.AllOpen,
@@ -80,6 +81,8 @@ dependencies {
         Dependencies.KotestAssertions,
         Dependencies.KotestAssertionsArrow,
         Dependencies.KotestProperty,
+        Dependencies.KotestSpring,
+        Dependencies.TestContainers.Core,
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }

@@ -6,9 +6,9 @@
     </appender>
     <logger name="org.apache.kafka" level="INFO"/>
     <logger name="org.apache.kafka.common.metrics" level="WARN"/>
-    <logger name="com.figure.onboarding.domain.usecase" level="DEBUG"/>
-    <logger name="com.figure.onboarding.frameworks.web" level="DEBUG"/>
-    <logger name="com.figure.onboarding.frameworks.data" level="DEBUG"/>
+    <logger name="io.provenance.domain.usecase" level="DEBUG"/>
+    <logger name="io.provenance.frameworks.web" level="DEBUG"/>
+    <logger name="io.provenance.frameworks.data" level="DEBUG"/>
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
