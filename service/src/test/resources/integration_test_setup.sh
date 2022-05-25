@@ -2,12 +2,8 @@
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=root
 
-sleep 10
-docker ps
-#sh vault/config.sh
-#sleep 2
+sleep 5
 echo "root" | tee vault/token.output
-printf "\nEnabling KV store..\n\n"
 vault secrets enable -version=2 -path='kv2_originations' kv
 sleep 2
 sh vault/add-secret.sh 'http://127.0.0.1:8200' 'kv2_originations' deadbeef-face-479b-860c-facefaceface \
