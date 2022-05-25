@@ -10,11 +10,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.testcontainers.containers.ContainerState
 import org.testcontainers.containers.DockerComposeContainer
 
 @ActiveProfiles("development")
 @SpringBootTest
-open class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
+class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
 
     override fun extensions(): List<Extension> = listOf(SpringExtension)
 
@@ -50,6 +51,9 @@ open class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) 
         internal val instance: KDockerComposeContainer by lazy {
             defineDockerCompose()
         }
+
+        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
+        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
         private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }

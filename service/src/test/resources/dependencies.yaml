@@ -25,8 +25,23 @@ services:
         image: ghcr.io/provenance-io/object-store:0.7.0
         depends_on:
             - postgres-cee
-        env_file:
-            - object-store.env
+        environment:
+            - OS_URL=0.0.0.0
+            - OS_PORT=8080
+            - URI_HOST=localhost:8080
+            - REPLICATION_ENABLED=true
+            - DB_HOST=postgres-cee
+            - DB_PORT=5432
+            - DB_USER=postgres
+            - DB_PASS=password1
+            - DB_PASSWORD=password1
+            - DB_NAME=object-store
+            - DB_SCHEMA=public
+            - DB_CONNECTION_POOL_SIZE=10
+            - TRACE_HEADER=x-trace-header
+            - STORAGE_TYPE=file_system
+            - STORAGE_BASE_PATH=/mnt/data
+            - RUST_LOG=warn,object_store=debug
         networks:
             - p8e-network-test
         ports:

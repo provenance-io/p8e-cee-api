@@ -1,7 +1,8 @@
 #!/bin/bash
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=root
-
+docker ps
+echo "Setting up vault"
 sleep 5
 echo "root" | tee vault/token.output
 vault secrets enable -version=2 -path='kv2_originations' kv

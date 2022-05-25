@@ -38,7 +38,7 @@ class ObjectStoreSpec(
                 StoreProtoRequestWrapper(
                     entities.first(),
                     StoreProtoRequest(
-                        objectStoreAddress = "grpc://localhost:9993",
+                        objectStoreAddress = "grpc://${objectStoreContainer.host}:${objectStoreContainer.boundPortNumbers.single()}",
                         message = assetToStore,
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
@@ -56,11 +56,11 @@ class ObjectStoreSpec(
                     entities.first(),
                     GetProtoRequest(
                         response.hash,
-                        "grpc://localhost:9993",
+                        "grpc://${objectStoreContainer.host}:${objectStoreContainer.boundPortNumbers.single()}",
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
-                                "http://localhost:8200/v1/kv2_originations/data/originators",
+                                "http://${vaultContainer.host}:${vaultContainer.boundPortNumbers.single()}/v1/kv2_originations/data/originators",
                                 "src/test/resources/vault/token.output"
                             )
                         )
