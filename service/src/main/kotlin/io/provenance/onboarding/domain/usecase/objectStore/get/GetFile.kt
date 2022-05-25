@@ -17,7 +17,7 @@ class GetFile(
     private val retrieveAndDecrypt: RetrieveAndDecrypt,
 ) : AbstractUseCase<GetFileRequestWrapper, HttpEntity<ByteArray>>() {
     override suspend fun execute(args: GetFileRequestWrapper): HttpEntity<ByteArray> {
-        Asset.parseFrom(retrieveAndDecrypt.execute(RetrieveAndDecryptRequest(args.uuid, args.request.objectStoreAddress, args.request.hash.replace(' ', '+'))))
+        Asset.parseFrom(retrieveAndDecrypt.execute(RetrieveAndDecryptRequest(args.uuid, args.request.objectStoreAddress, args.request.hash)))
             .takeIf { it.isSet() && it.type == FileNFT.ASSET_TYPE }
             ?.let {
                 val fileName = it.getKvOrThrow(FileNFT.KEY_FILENAME).unpack(StringValue::class.java).value
