@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.containers.ContainerState
 import org.testcontainers.containers.DockerComposeContainer
 
 @ActiveProfiles("development")
@@ -52,8 +51,13 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
             defineDockerCompose()
         }
 
-        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
-        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
+        // Ideally these should be replaced with the container states commented out below. For whatever reason when running on terminal, the containers
+        // could not be found. related github issue: https://github.com/testcontainers/testcontainers-java/issues/4281
+        val objectStoreAddress = "grpc://localhost:9993"
+        val vaultAddress = "http://localhost:8200/v1/kv2_originations/data/originators"
+
+//        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
+//        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
         private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }
