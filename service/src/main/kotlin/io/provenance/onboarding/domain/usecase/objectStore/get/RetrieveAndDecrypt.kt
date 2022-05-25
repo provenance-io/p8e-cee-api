@@ -12,6 +12,7 @@ import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class RetrieveAndDecrypt(
@@ -28,6 +29,6 @@ class RetrieveAndDecrypt(
         val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
 
-        return objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)
+        return objectStore.retrieveAndDecrypt(osClient, Base64.getUrlDecoder().decode(args.hash), publicKey, privateKey)
     }
 }
