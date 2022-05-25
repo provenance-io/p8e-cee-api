@@ -20,7 +20,7 @@ class EntityManager(
 ) {
     private val log = KotlinLogging.logger { }
     private var manager: OriginatorManager = OriginatorManager()
-    private var token: String
+    private lateinit var token: String
 
     init {
         manager.register(VaultPlugin())
