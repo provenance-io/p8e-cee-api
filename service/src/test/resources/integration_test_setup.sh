@@ -7,7 +7,9 @@ docker ps
 #sh vault/config.sh
 #sleep 2
 
-sh vault/init-and-unseal.sh 'http://127.0.0.1:8200' 'kv2_originations'
+sh vault/init-and-unseal.sh  'kv2_originations'
+printf "\nEnabling KV store..\n\n"
+vault secrets enable -version=2 -path='kv2_originations' kv
 sleep 2
 sh vault/add-secret.sh 'http://127.0.0.1:8200' 'kv2_originations' deadbeef-face-479b-860c-facefaceface \
 0A4104C51E49E4F0ABA2FD5B8CF99445D6D6C385164DBC8F35E7374CAC241D4155ADC48EF9B199F799DC865EC24AF54376CF5DD29A1287F1FD3410709A62F5DDE49349 \
