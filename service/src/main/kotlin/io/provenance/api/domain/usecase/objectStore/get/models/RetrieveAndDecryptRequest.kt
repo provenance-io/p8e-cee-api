@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.objectStore.get.models
+package io.provenance.api.domain.usecase.objectStore.get.models
 
 import io.provenance.api.models.account.KeyManagementConfig
 import java.util.UUID

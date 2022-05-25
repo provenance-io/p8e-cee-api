@@ -5,8 +5,8 @@ import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
 import io.provenance.api.models.eos.StoreProtoRequest
 import io.provenance.api.models.eos.StoreProtoResponse
-import io.provenance.onboarding.domain.usecase.objectStore.store.models.SwaggerGetFileResponse
-import io.provenance.onboarding.domain.usecase.objectStore.store.models.SwaggerStoreFileRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerGetFileResponse
+import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerStoreFileRequestWrapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

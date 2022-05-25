@@ -12,7 +12,7 @@ import io.provenance.api.frameworks.config.ObjectStoreConfig
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.util.awaitAllBytes
-import io.provenance.onboarding.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import java.net.URI

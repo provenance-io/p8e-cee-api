@@ -4,7 +4,7 @@ import com.google.protobuf.Message
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.objectStore.get.models.GetProtoRequestWrapper
 import io.provenance.api.util.toPrettyJson
-import io.provenance.onboarding.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
+import io.provenance.api.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
 import org.springframework.stereotype.Component
 
 @Component

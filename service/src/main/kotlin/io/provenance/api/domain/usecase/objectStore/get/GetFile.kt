@@ -4,9 +4,9 @@ import com.google.protobuf.BytesValue
 import com.google.protobuf.StringValue
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.client.protobuf.extensions.isSet
-import io.provenance.onboarding.domain.extensions.toByteResponse
-import io.provenance.onboarding.domain.usecase.objectStore.get.models.GetFileRequestWrapper
-import io.provenance.onboarding.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
+import io.provenance.api.domain.extensions.toByteResponse
+import io.provenance.api.domain.usecase.objectStore.get.models.GetFileRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
 import org.springframework.stereotype.Component
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.FileNFT

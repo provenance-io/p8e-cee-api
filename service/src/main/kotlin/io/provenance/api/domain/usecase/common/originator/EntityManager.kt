@@ -10,7 +10,6 @@ import io.provenance.core.KeyType
 import io.provenance.core.Originator
 import io.provenance.core.OriginatorManager
 import io.provenance.core.Plugin
-import io.provenance.onboarding.domain.usecase.common.originator.DefaultAudience
 import io.provenance.plugins.vault.VaultSpec
 import java.io.File
 import org.springframework.stereotype.Component

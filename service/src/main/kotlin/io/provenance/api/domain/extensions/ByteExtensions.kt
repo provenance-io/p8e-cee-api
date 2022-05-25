@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.extensions
+package io.provenance.api.domain.extensions
 
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpEntity

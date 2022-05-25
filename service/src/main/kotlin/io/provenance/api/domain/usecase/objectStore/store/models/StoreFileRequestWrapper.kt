@@ -1,4 +1,4 @@
-package io.provenance.onboarding.domain.usecase.objectStore.store.models
+package io.provenance.api.domain.usecase.objectStore.store.models
 
 import java.util.UUID
 import org.springframework.http.HttpEntity

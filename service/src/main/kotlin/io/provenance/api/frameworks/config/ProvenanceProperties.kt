@@ -1,6 +1,6 @@
 package io.provenance.api.frameworks.config
 
-import io.provenance.onboarding.domain.usecase.common.originator.DefaultAudience
+import io.provenance.api.domain.usecase.common.originator.DefaultAudience
 import java.util.UUID
 import javax.validation.constraints.NotNull
 import org.springframework.boot.context.properties.ConfigurationProperties

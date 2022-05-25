@@ -11,7 +11,6 @@ import kotlinx.coroutines.withContext
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.DockerComposeContainer
-import org.testcontainers.containers.wait.strategy.Wait
 
 @ActiveProfiles("development")
 @SpringBootTest

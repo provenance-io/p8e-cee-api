@@ -23,18 +23,17 @@ class ApproveContractExecution(
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.envelope).build()
 
-        when (val result = client.execute(envelope)) {
-            is FragmentResult -> {
-                val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.request.expiration).let {
-                    val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
-                    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
-                    val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
+        val result = client.execute(envelope)
+        if (result is FragmentResult) {
+            val approvalTxHash = client.approveScopeUpdate(result.envelopeState, args.request.expiration).let {
+                val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
+                val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
+                val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
 
-                    broadcast.txhash
-                }
-
-                client.respondWithApproval(result.envelopeState, approvalTxHash)
+                broadcast.txhash
             }
+
+            client.respondWithApproval(result.envelopeState, approvalTxHash)
         }
     }
 }

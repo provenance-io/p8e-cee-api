@@ -1,4 +1,4 @@
-package io.provenance.onboarding.frameworks.cee
+package io.provenance.api.frameworks.cee
 
 import com.google.protobuf.Message
 import io.kotest.core.annotation.Ignored
@@ -7,7 +7,6 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.provenance.api.frameworks.cee.P8eContractService
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.contract.spec.P8eScopeSpecification
 import io.provenance.scope.encryption.util.toJavaPublicKey
