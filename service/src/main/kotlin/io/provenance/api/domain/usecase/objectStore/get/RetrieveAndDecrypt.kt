@@ -7,12 +7,12 @@ import io.provenance.api.domain.usecase.common.originator.models.KeyManagementCo
 import io.provenance.api.frameworks.config.ObjectStoreConfig
 import io.provenance.onboarding.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
 import io.provenance.scope.objectstore.client.OsClient
-import io.provenance.scope.objectstore.util.base64Decode
 import java.lang.IllegalStateException
 import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
 import org.springframework.stereotype.Component
+import java.util.Base64
 
 @Component
 class RetrieveAndDecrypt(
@@ -29,6 +29,6 @@ class RetrieveAndDecrypt(
         val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
 
-        return objectStore.retrieveAndDecrypt(osClient, args.hash.base64Decode(), publicKey, privateKey)
+        return objectStore.retrieveAndDecrypt(osClient, Base64.getUrlDecoder().decode(args.hash), publicKey, privateKey)
     }
 }
