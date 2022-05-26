@@ -4,6 +4,7 @@ import io.provenance.api.domain.usecase.common.originator.models.KeyManagementCo
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.config.VaultProperties
 import io.provenance.api.models.account.KeyManagementConfig
+import io.provenance.api.models.account.Participant
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.KeyType
@@ -12,6 +13,7 @@ import io.provenance.core.OriginatorManager
 import io.provenance.core.Plugin
 import io.provenance.plugins.vault.VaultSpec
 import java.io.File
+import java.util.UUID
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.createInstance
 
@@ -34,24 +36,31 @@ class EntityManager(
         return manager.get(args.uuid, VaultSpec(args.uuid, "${config.address}/${args.uuid}", token))
     }
 
-    fun hydrateKeys(permissions: PermissionInfo?, keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
+    fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
 
+        val additionalAudiences: MutableSet<AudienceKeyPair> = mutableSetOf()
         val config = keyManagementConfig ?: KeyManagementConfig(
             vaultProperties.address,
             vaultProperties.tokenPath,
         )
 
-        val additionalAudiences: MutableSet<AudienceKeyPair> = mutableSetOf()
+        fun getEntityKeys(uuid: UUID) {
+            val originator = getEntity(KeyManagementConfigWrapper(uuid, config))
+            additionalAudiences.add(
+                AudienceKeyPair(
+                    originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
+                    originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
+                )
+            )
+        }
+
+        participants.forEach { participant ->
+            getEntityKeys(participant.uuid)
+        }
 
         permissions?.audiences?.forEach {
             it.uuid?.let { entity ->
-                val originator = getEntity(KeyManagementConfigWrapper(entity, config))
-                additionalAudiences.add(
-                    AudienceKeyPair(
-                        originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
-                        originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
-                    )
-                )
+                getEntityKeys(entity)
             } ?: apply {
                 it.keys?.let { keys ->
                     additionalAudiences.add(keys)

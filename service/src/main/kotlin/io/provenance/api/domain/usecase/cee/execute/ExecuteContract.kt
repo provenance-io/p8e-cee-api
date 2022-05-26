@@ -43,7 +43,7 @@ class ExecuteContract(
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        val audiences = entityManager.hydrateKeys(args.request.permissions)
+        val audiences = entityManager.hydrateKeys(args.request.permissions, args.request.participants)
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, audiences))
         val contract = contractService.getContract(args.request.config.contract.contractName)
         val records = getRecords(args.request.records, contract, args.request.config.contract.parserConfig)
