@@ -17,9 +17,12 @@ import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
+import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.SingleTx
+import io.provenance.metadata.v1.MsgAddScopeDataAccessRequest
 import io.provenance.scope.contract.annotations.Input
 import io.provenance.scope.contract.spec.P8eContract
+import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
@@ -39,11 +42,12 @@ class ExecuteContract(
     private val contractParser: ContractParser,
     private val createClient: CreateClient,
     private val entityManager: EntityManager,
+    private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<ExecuteContractRequestWrapper, ContractExecutionResponse>() {
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        val audiences = entityManager.hydrateKeys(args.request.permissions)
+        val audiences = entityManager.hydrateKeys(args.request.permissions, args.request.participants)
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.config.account, args.request.config.client, audiences))
         val contract = contractService.getContract(args.request.config.contract.contractName)
         val records = getRecords(args.request.records, contract, args.request.config.contract.parserConfig)
