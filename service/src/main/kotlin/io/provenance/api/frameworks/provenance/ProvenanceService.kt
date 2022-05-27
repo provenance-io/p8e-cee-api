@@ -5,6 +5,8 @@ import com.google.protobuf.Any
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
+import io.grpc.Metadata
+import io.grpc.stub.MetadataUtils
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.grpc.BaseReqSigner
@@ -110,8 +112,16 @@ class ProvenanceService : Provenance {
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
     }
 
-    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID): ScopeResponse =
+    override fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long?): ScopeResponse =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+
+            height?.also {
+                val meta = Metadata()
+                meta.put(Metadata.Key.of("x-cosmos-block-height", Metadata.ASCII_STRING_MARSHALLER), height.toString())
+                val interceptor = MetadataUtils.newAttachHeadersInterceptor(meta)
+                pbClient.metadataClient.withInterceptors(interceptor)
+            }
+
             pbClient.metadataClient.scope(
                 ScopeRequest.newBuilder()
                     .setScopeId(scopeUuid.toString())

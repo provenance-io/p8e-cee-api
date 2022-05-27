@@ -1,5 +1,7 @@
 package io.provenance.api.frameworks.web.external.provenance
 
+import io.provenance.api.domain.usecase.provenance.query.QueryScope
+import io.provenance.api.domain.usecase.provenance.query.models.QueryScopeRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.CreateTx
 import io.provenance.api.domain.usecase.provenance.tx.ExecuteTx
 import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
@@ -14,7 +16,8 @@ import org.springframework.web.reactive.function.server.awaitBody
 @Component
 class ProvenanceHandler(
     private val executeTx: ExecuteTx,
-    private val createTx: CreateTx
+    private val createTx: CreateTx,
+    private val queryScope: QueryScope
 ) {
     suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
         createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
@@ -22,5 +25,9 @@ class ProvenanceHandler(
 
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
         executeTx.execute(ExecuteTxRequestWrapper(req.getUser(), req.awaitBody()))
+    }.foldToServerResponse()
+
+    suspend fun queryScope(req: ServerRequest): ServerResponse = runCatching {
+        queryScope.execute(QueryScopeRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 }

@@ -15,9 +15,6 @@ done
 shift "$(($OPTIND -1))"
 
 function up {
-  #config vault
-  sh service/docker/vault/config.sh
-
   docker-compose -p p8e-contract-execution-environment -f service/docker/dependencies.yaml up --build -d
 
   sleep 2

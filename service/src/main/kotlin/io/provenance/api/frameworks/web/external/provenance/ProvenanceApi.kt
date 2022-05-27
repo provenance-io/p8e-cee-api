@@ -92,6 +92,7 @@ class ProvenanceApi {
         "${Routes.EXTERNAL_BASE_V1}/p8e".nest {
             POST("/tx/generate", handler::generateTx)
             POST("/tx/execute", handler::executeTx)
+            GET("/query", handler::queryScope)
         }
     }
 }

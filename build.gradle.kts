@@ -27,6 +27,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
@@ -37,7 +38,8 @@ subprojects {
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xjsr305=strict",
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-Xskip-prerelease-check"
             )
             jvmTarget = "11"
             allWarningsAsErrors = true
@@ -122,6 +124,7 @@ allprojects {
     version = semVersion
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 }
