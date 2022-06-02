@@ -37,7 +37,7 @@ jobs:
           java-version: '11'
 
       - name: Linting
-        run: ./gradlew clean ktlint --parallel
+        run: ./gradlew clean ktlint detekt --parallel --refresh-dependencies
 
   build:
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
             brew install hashicorp/tap/vault
 
       - name: Gradle Build
-        run: ./gradlew build -i --parallel -x ktlint
+        run: ./gradlew clean build -i --refresh-dependencies --parallel -x ktlint -x detekt
 
       - name: Upload Test Results
         if: always()
