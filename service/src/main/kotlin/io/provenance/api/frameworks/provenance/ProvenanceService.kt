@@ -6,34 +6,47 @@ import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
 import io.grpc.Metadata
+import io.grpc.Metadata.ASCII_STRING_MARSHALLER
+import io.grpc.stub.AbstractStub
 import io.grpc.stub.MetadataUtils
+import io.provenance.api.domain.provenance.Provenance
+import io.provenance.api.frameworks.provenance.exceptions.ContractTxException
+import io.provenance.api.frameworks.provenance.extensions.getBaseAccount
+import io.provenance.api.frameworks.provenance.extensions.getCurrentHeight
+import io.provenance.api.frameworks.provenance.extensions.getErrorResult
+import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.api.models.p8e.ProvenanceConfig
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
+import io.provenance.api.models.p8e.contracts.SmartContractConfig
+import io.provenance.classification.asset.client.client.base.ACClient
+import io.provenance.classification.asset.client.client.base.BroadcastOptions
+import io.provenance.classification.asset.client.client.base.ContractIdentifier
+import io.provenance.classification.asset.client.domain.execute.OnboardAssetExecute
+import io.provenance.classification.asset.client.domain.execute.VerifyAssetExecute
+import io.provenance.classification.asset.util.objects.ACObjectMapperUtil
 import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
-import io.provenance.api.domain.provenance.Provenance
-import io.provenance.api.models.p8e.TxBody
-import io.provenance.api.frameworks.provenance.exceptions.ContractTxException
-import io.provenance.api.frameworks.provenance.extensions.getBaseAccount
-import io.provenance.api.frameworks.provenance.extensions.getCurrentHeight
-import io.provenance.api.frameworks.provenance.extensions.getErrorResult
-import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.scope.sdk.SignedResult
-import mu.KotlinLogging
-import org.springframework.stereotype.Component
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
 
 class ProvenanceTxException(message: String) : Exception(message)
 
 sealed class ProvenanceTx
 class SingleTx(val value: SignedResult) : ProvenanceTx()
 class BatchTx(val value: Collection<SignedResult>) : ProvenanceTx()
+
+object ProvenanceConst {
+    const val BLOCK_HEIGHT = "x-cosmos-block-height"
+}
 
 @Component
 class ProvenanceService : Provenance {
@@ -112,22 +125,74 @@ class ProvenanceService : Provenance {
         return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
     }
 
+    @Suppress("DEPRECATION")
     override fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long?): ScopeResponse =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-
-            height?.also {
-                val meta = Metadata()
-                meta.put(Metadata.Key.of("x-cosmos-block-height", Metadata.ASCII_STRING_MARSHALLER), height.toString())
-                val interceptor = MetadataUtils.newAttachHeadersInterceptor(meta)
-                pbClient.metadataClient.withInterceptors(interceptor)
-            }
-
             pbClient.metadataClient.scope(
                 ScopeRequest.newBuilder()
                     .setScopeId(scopeUuid.toString())
                     .setIncludeRecords(true)
                     .setIncludeSessions(true)
+                    .also {
+                        height?.let { pbClient.metadataClient.addBlockHeight(it.toString()) }
+                    }
                     .build()
             )
         }
+
+    override fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
+            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
+            val account = getBaseAccount(it, signer.address())
+            val assetClassificationClient = ACClient.getDefault(
+                contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
+                pbClient = it,
+                objectMapper = ACObjectMapperUtil.getObjectMapper()
+            )
+
+            val broadcast = assetClassificationClient.onboardAsset(
+                onboardAssetRequest, signer,
+                options = BroadcastOptions(
+                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
+                    baseAccount = account
+                )
+            ).txResponse
+
+            return TxResponse(broadcast.txhash, broadcast.gasWanted.toString(), broadcast.gasUsed.toString(), broadcast.height.toString())
+        }
+
+    override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
+            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
+            val account = getBaseAccount(it, signer.address())
+            val assetClassificationClient = ACClient.getDefault(
+                contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
+                pbClient = it,
+                objectMapper = ACObjectMapperUtil.getObjectMapper()
+            )
+
+            val broadcast = assetClassificationClient.verifyAsset(
+                verifyAssetRequest, signer,
+                options = BroadcastOptions(
+                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
+                    baseAccount = account
+                )
+            ).txResponse
+
+            return TxResponse(broadcast.txhash, broadcast.gasWanted.toString(), broadcast.gasUsed.toString(), broadcast.height.toString())
+        }
+}
+
+@Suppress("DEPRECATION")
+fun <S : AbstractStub<S>> S.addBlockHeight(blockHeight: String): S = this.also {
+    val metadata = Metadata().also {
+        it.put(
+            Metadata.Key.of(ProvenanceConst.BLOCK_HEIGHT, ASCII_STRING_MARSHALLER),
+            blockHeight,
+        )
+    }
+
+    MetadataUtils.attachHeaders(this, metadata)
 }

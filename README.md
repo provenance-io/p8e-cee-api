@@ -33,6 +33,11 @@ brew install docker
 brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
+If you plan on running smart contracts for asset classification you'll need the following:
+```aidl
+brew install rust
+brew install jq
+```
 
 You'll additionally need `CoreUtils` if your system is missing it:
 ```

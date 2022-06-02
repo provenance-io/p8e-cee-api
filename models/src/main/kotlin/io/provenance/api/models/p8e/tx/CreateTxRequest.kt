@@ -1,6 +1,7 @@
-package io.provenance.api.models.p8e
+package io.provenance.api.models.p8e.tx
 
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.PermissionInfo
 import java.util.UUID
 
 data class CreateTxRequest(

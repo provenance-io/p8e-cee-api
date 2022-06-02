@@ -1,6 +1,6 @@
 package io.provenance.api.domain.usecase.objectStore.get.models
 
-import io.provenance.api.models.eos.GetFileRequest
+import io.provenance.api.models.eos.get.GetFileRequest
 import java.util.UUID
 
 data class GetFileRequestWrapper(

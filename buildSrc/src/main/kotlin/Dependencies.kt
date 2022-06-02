@@ -45,6 +45,7 @@ object Versions {
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
+    const val AssetClassification = "1.2.0-rc4"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -88,6 +89,11 @@ object Dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-test",
             Versions.KotlinCoroutines
         )
+    }
+
+    object AssetClassification {
+        val Client = DependencySpec("io.provenance.classification.asset:ac-client", Versions.AssetClassification)
+        val Verifier = DependencySpec("io.provenance.classification.asset:ac-verifier", Versions.AssetClassification)
     }
 
     object P8eScope {

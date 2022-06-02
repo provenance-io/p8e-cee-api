@@ -1,11 +1,11 @@
 package io.provenance.api.frameworks.web.external.provenance
 
-import io.provenance.api.models.p8e.CreateTxRequest
-import io.provenance.api.models.p8e.ExecuteTxRequest
-import io.provenance.api.models.p8e.TxBody
-import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
+import io.provenance.api.models.p8e.TxBody
+import io.provenance.api.models.p8e.TxResponse
+import io.provenance.api.models.p8e.tx.CreateTxRequest
+import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -86,13 +86,104 @@ class ProvenanceApi {
                 ]
             )
         ),
+        RouterOperation(
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/query",
+            method = arrayOf(RequestMethod.GET),
+            produces = ["application/json"],
+            operation = Operation(
+                tags = ["Provenance"],
+                operationId = "execute",
+                method = "POST",
+                parameters = [
+                    Parameter(
+                        name = "x-uuid",
+                        required = true,
+                        `in` = ParameterIn.HEADER,
+                        schema = Schema(implementation = UUID::class),
+                    ),
+                ],
+                requestBody = RequestBody(
+                    required = true,
+                    content = [Content(schema = Schema(implementation = ExecuteTxRequest::class))]
+                ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        description = "successful operation",
+                        content = [Content(schema = Schema(implementation = TxResponse::class))]
+                    )
+                ]
+            )
+        ),
+        RouterOperation(
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/classify",
+            method = arrayOf(RequestMethod.POST),
+            produces = ["application/json"],
+            operation = Operation(
+                tags = ["Provenance"],
+                operationId = "execute",
+                method = "POST",
+                parameters = [
+                    Parameter(
+                        name = "x-uuid",
+                        required = true,
+                        `in` = ParameterIn.HEADER,
+                        schema = Schema(implementation = UUID::class),
+                    ),
+                ],
+                requestBody = RequestBody(
+                    required = true,
+                    content = [Content(schema = Schema(implementation = ExecuteTxRequest::class))]
+                ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        description = "successful operation",
+                        content = [Content(schema = Schema(implementation = TxResponse::class))]
+                    )
+                ]
+            )
+        ),
+        RouterOperation(
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/verify",
+            method = arrayOf(RequestMethod.GET),
+            produces = ["application/json"],
+            operation = Operation(
+                tags = ["Provenance"],
+                operationId = "execute",
+                method = "POST",
+                parameters = [
+                    Parameter(
+                        name = "x-uuid",
+                        required = true,
+                        `in` = ParameterIn.HEADER,
+                        schema = Schema(implementation = UUID::class),
+                    ),
+                ],
+                requestBody = RequestBody(
+                    required = true,
+                    content = [Content(schema = Schema(implementation = ExecuteTxRequest::class))]
+                ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        description = "successful operation",
+                        content = [Content(schema = Schema(implementation = TxResponse::class))]
+                    )
+                ]
+            )
+        ),
     )
     fun externalProvenanceApiV1(handler: ProvenanceHandler) = coRouter {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/p8e".nest {
             POST("/tx/generate", handler::generateTx)
             POST("/tx/execute", handler::executeTx)
-            GET("/query", handler::queryScope)
+            GET("/scope/query", handler::queryScope)
+            POST("/classify", handler::classifyAsset)
+            POST("/verify", handler::verifyAsset)
+            GET("/fees", handler::getFees)
+            GET("/classify/status", handler::getClassificationStatus)
         }
     }
 }

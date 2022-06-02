@@ -19,6 +19,8 @@ dependencies {
         Dependencies.P8eScope.OsClient,
         Dependencies.Kotlin.CoroutinesReactor,
         Dependencies.Jackson.Databind,
+        Dependencies.AssetClassification.Client,
+        Dependencies.AssetClassification.Verifier,
     ).forEach { dep ->
         dep.implementation(this)
     }

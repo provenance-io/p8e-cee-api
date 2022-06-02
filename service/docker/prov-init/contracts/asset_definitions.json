@@ -1,0 +1,56 @@
+[
+    {
+        "asset_type": "mortgage",
+        "scope_spec_identifier": {
+            "type": "uuid",
+            "value": "c370d852-0f3b-4f70-85e6-25983ac07c0f"
+        },
+        "verifiers": [
+            {
+                "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
+                "onboarding_cost": "243857142857",
+                "onboarding_denom": "nhash",
+                "fee_destinations": [
+                    {
+                        "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
+                        "fee_amount": "1000000000"
+                    }
+                ],
+                "entity_detail": {
+                    "name": "Figure Mortgage Verifier",
+                    "description": "Validates onboarded Mortgage Assets",
+                    "home_url": "https://www.figure.com",
+                    "source_url": "https://github.com/FigureTechnologies/asset-classification-verifier"
+                }
+            }
+        ],
+        "enabled": true
+    },
+    {
+        "asset_type": "heloc",
+        "scope_spec_identifier": {
+            "type": "uuid",
+            "value": "c370d852-0f3b-4f70-85e6-25983ac07c0f"
+        },
+        "verifiers": [
+            {
+                "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
+                "onboarding_cost": "122428571428",
+                "onboarding_denom": "nhash",
+                "fee_destinations": [
+                    {
+                        "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
+                        "fee_amount": "1000000000"
+                    }
+                ],
+                "entity_detail": {
+                    "name": "Figure Heloc Verifier",
+                    "description": "Validates onboarded HELOC Assets",
+                    "home_url": "https://www.figure.com",
+                    "source_url": "https://github.com/FigureTechnologies/asset-classification-verifier"
+                }
+            }
+        ],
+        "enabled": true
+    },
+]

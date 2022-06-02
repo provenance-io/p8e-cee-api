@@ -17,8 +17,8 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoReque
 import io.provenance.api.frameworks.cee.parsers.MessageParser
 import io.provenance.api.frameworks.config.ObjectStoreConfig
 import io.provenance.api.models.account.AccountInfo
-import io.provenance.api.models.eos.StoreProtoRequest
-import io.provenance.api.models.eos.StoreProtoResponse
+import io.provenance.api.models.eos.store.StoreProtoRequest
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.scope.encryption.util.toJavaPublicKey

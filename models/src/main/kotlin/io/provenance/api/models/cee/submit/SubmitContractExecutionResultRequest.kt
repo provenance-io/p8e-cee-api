@@ -1,4 +1,4 @@
-package io.provenance.api.models.cee
+package io.provenance.api.models.cee.submit
 
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.ProvenanceConfig

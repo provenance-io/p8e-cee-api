@@ -1,4 +1,4 @@
-package io.provenance.api.models.cee
+package io.provenance.api.models.cee.execute
 
 import io.provenance.api.models.p8e.TxResponse
 
