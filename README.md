@@ -43,6 +43,10 @@ You'll additionally need `CoreUtils` if your system is missing it:
 ```
 brew install coreutils
 ```
+**Note: it's possible to install all dependencies with the following command:**
+```
+./dc.sh setup
+```
 
 The default configuration assumes that the following ports are available:
 
