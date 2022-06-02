@@ -26,31 +26,36 @@ class ExecuteContract(
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        val client = contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config)
         val session = contractUtilities.createSession(args.uuid, args.request.permissions, args.request.participants, args.request.config, args.request.records, listOf(args.request.scope)).single()
+        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
 
-        return when (val result = contractService.executeContract(client, session)) {
-            is SignedResult -> {
-                provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
-                    provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
-                        ContractExecutionResponse(
-                            false,
-                            null,
-                            TxResponse(
-                                pbResponse.txhash,
-                                pbResponse.gasWanted.toString(),
-                                pbResponse.gasUsed.toString(),
-                                pbResponse.height.toString()
+            return when (val result = contractService.executeContract(client, session)) {
+                is SignedResult -> {
+                    provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
+                        provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
+                            ContractExecutionResponse(
+                                false,
+                                null,
+                                TxResponse(
+                                    pbResponse.txhash,
+                                    pbResponse.gasWanted.toString(),
+                                    pbResponse.gasUsed.toString(),
+                                    pbResponse.height.toString(),
+                                )
                             )
-                        )
+                        }
                     }
                 }
+                is FragmentResult -> {
+                    client.requestAffiliateExecution(result.envelopeState)
+                    ContractExecutionResponse(
+                        true,
+                        Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
+                        null,
+                    )
+                }
+                else -> throw ContractExecutionException("Contract execution result was not of an expected type.")
             }
-            is FragmentResult -> {
-                client.requestAffiliateExecution(result.envelopeState)
-                ContractExecutionResponse(true, Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), null)
-            }
-            else -> throw ContractExecutionException("Contract execution result was not of an expected type.")
         }
     }
 }

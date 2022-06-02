@@ -22,13 +22,14 @@ class RetrieveAndDecrypt(
 ) : AbstractUseCase<RetrieveAndDecryptRequest, ByteArray>() {
     override suspend fun execute(args: RetrieveAndDecryptRequest): ByteArray {
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.keyManagementConfig))
-        val osClient = OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs)
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 
         val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
 
-        return objectStore.retrieveAndDecrypt(osClient, Base64.getUrlDecoder().decode(args.hash), publicKey, privateKey)
+        OsClient(URI.create(args.objectStoreAddress), objectStoreConfig.timeoutMs).use { osClient ->
+            return objectStore.retrieveAndDecrypt(osClient, Base64.getUrlDecoder().decode(args.hash), publicKey, privateKey)
+        }
     }
 }

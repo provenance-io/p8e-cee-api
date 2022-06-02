@@ -80,53 +80,57 @@ class ProvenanceService : Provenance {
         }
 
     override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
-        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
-
         log.info("Determining account information for the tx.")
         val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-        val account = getBaseAccount(pbClient, signer.address())
-        val baseSigner = BaseReqSigner(
-            signer,
-            account = account,
-            sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
-        )
 
-        log.info("Sending tx.")
-        val result = pbClient.estimateAndBroadcastTx(
-            txBody = tx,
-            signers = listOf(baseSigner),
-            gasAdjustment = config.gasAdjustment,
-            mode = config.broadcastMode
-        )
-        pbClient.close()
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            val account = getBaseAccount(pbClient, signer.address())
+            val baseSigner = BaseReqSigner(
+                signer,
+                account = account,
+                sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
+            )
 
-        if (result.isError()) {
-            cachedOffset.getAndDecrement(account.sequence)
-            throw ProvenanceTxException(result.txResponse.toString())
+            log.info("Sending tx.")
+            val result = pbClient.estimateAndBroadcastTx(
+                txBody = tx,
+                signers = listOf(baseSigner),
+                gasAdjustment = config.gasAdjustment,
+                mode = config.broadcastMode
+            )
+
+            if (result.isError()) {
+                cachedOffset.getAndDecrement(account.sequence)
+                throw ProvenanceTxException(result.txResponse.toString())
+            }
+
+            return result.txResponse
         }
-
-        return result.txResponse
     }
 
     override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse {
-        val pbClient = PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+        PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
 
-        val txBody = TxOuterClass.TxBody.newBuilder().also {
-            storeTxBody.base64.forEach { tx ->
-                it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
-            }
-        }.build()
+            val txBody = TxOuterClass.TxBody.newBuilder().also {
+                storeTxBody.base64.forEach { tx ->
+                    it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
+                }
+            }.build()
 
-        val response = pbClient.estimateAndBroadcastTx(
-            txBody = txBody,
-            signers = listOf(BaseReqSigner(signer)),
-            mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_SYNC,
-            gasAdjustment = 1.5
-        ).txResponse
+            val response = pbClient.estimateAndBroadcastTx(
+                txBody = txBody,
+                signers = listOf(BaseReqSigner(signer)),
+                mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_SYNC,
+                gasAdjustment = 1.5
+            ).txResponse
 
-        pbClient.close()
-
-        return TxResponse(response.txhash, response.gasWanted.toString(), response.gasUsed.toString(), response.height.toString())
+            return TxResponse(
+                response.txhash,
+                response.gasWanted.toString(),
+                response.gasUsed.toString(),
+                response.height.toString(),
+            )
+        }
     }
 
     @Suppress("DEPRECATION")

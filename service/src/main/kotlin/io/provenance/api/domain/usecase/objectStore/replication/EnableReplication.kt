@@ -19,9 +19,16 @@ class EnableReplication(
     private val log = KotlinLogging.logger { }
 
     override suspend fun execute(args: EnableReplicationRequest) {
-        val osClientReplicatingFrom = OsClient(URI.create(args.sourceObjectStoreAddress), objectStoreConfig.timeoutMs)
-        val publicKeyResponse = osClientReplicatingFrom.createPublicKey(args.targetSigningPublicKey.toJavaPublicKey(), args.targetEncryptionPublicKey.toJavaPublicKey(), args.targetObjectStoreAddress)
-            ?: throw IllegalStateException("Error performing operation")
+        val publicKeyResponse = OsClient(
+            URI.create(args.sourceObjectStoreAddress),
+            objectStoreConfig.timeoutMs,
+        ).use { osClientReplicatingFrom ->
+            osClientReplicatingFrom.createPublicKey(
+                args.targetSigningPublicKey.toJavaPublicKey(),
+                args.targetEncryptionPublicKey.toJavaPublicKey(),
+                args.targetObjectStoreAddress,
+            ) ?: throw IllegalStateException("Error performing operation")
+        }
         log.info("createPublicKey() response: ${publicKeyResponse.toJson()}")
     }
 }

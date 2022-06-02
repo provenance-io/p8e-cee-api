@@ -24,7 +24,6 @@ class StoreProto(
 ) : AbstractUseCase<StoreProtoRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreProtoRequestWrapper): StoreProtoResponse {
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.request.account.keyManagementConfig))
-        val osClient = OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs)
         val additionalAudiences = entityManager.hydrateKeys(args.request.permissions)
 
         val asset = parser.parse(args.request.message, Class.forName(args.request.type))
@@ -32,6 +31,13 @@ class StoreProto(
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 
-        return objectStore.storeMessage(osClient, asset, publicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
+        OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs).use { osClient ->
+            return objectStore.storeMessage(
+                osClient,
+                asset,
+                publicKey,
+                additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet(),
+            )
+        }
     }
 }
