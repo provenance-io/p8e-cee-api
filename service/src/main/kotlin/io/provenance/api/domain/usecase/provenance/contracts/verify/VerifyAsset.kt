@@ -9,11 +9,6 @@ import io.provenance.api.models.p8e.TxResponse
 import io.provenance.classification.asset.client.domain.execute.VerifyAssetBody
 import io.provenance.classification.asset.client.domain.execute.VerifyAssetExecute
 import io.provenance.classification.asset.client.domain.model.AssetIdentifier
-import io.provenance.hdwallet.bip39.MnemonicWords
-import io.provenance.hdwallet.ec.extensions.toJavaECPublicKey
-import io.provenance.hdwallet.wallet.Account
-import io.provenance.hdwallet.wallet.Wallet
-import io.provenance.scope.objectstore.util.toHex
 import org.springframework.stereotype.Component
 
 @Component
@@ -37,18 +32,6 @@ class VerifyAsset(
                 accessRoutes = args.request.contractConfig.accessRoutes,
             )
         )
-
-        val testnet = true
-        val keyRingIndex = 0
-        val keyIndex = 0
-        val wallet = Wallet.fromMnemonic("", "", MnemonicWords.of(""))
-        val accountPath = when (testnet) {
-            true -> "m/44'/1'/0'/$keyRingIndex/$keyIndex'"
-            false -> "m/505'/1'/0'/$keyRingIndex/$keyIndex"
-        }
-        val account: Account = wallet[accountPath]
-
-        println(account.keyPair.publicKey.toJavaECPublicKey().toHex())
 
         return provenanceService.verifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, verifyRequest)
     }

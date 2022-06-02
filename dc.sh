@@ -69,7 +69,6 @@ function publish() {
     fi
 }
 
-
 function down {
   docker-compose -p p8e-contract-execution-environment -f service/docker/dependencies.yaml down
   docker volume prune -f
@@ -100,27 +99,13 @@ function build_classification() {
 }
 
 function setup() {
-
-    if ! brew ls --versions docker > /dev/null; then
       brew install docker
-    fi
-
-    if ! brew ls --versions vault > /dev/null; then
       brew tap hashicorp/tap
       brew install hashicorp/tap/vault
-    fi
-
-    if ! brew ls --versions rust > /dev/null; then
       brew install rust
       brew install jq
-    fi
-
-    if ! brew ls --versions coreutils > /dev/null; then
       brew install coreutils
-    fi
 }
-
-function install_if_not()
 
 function upload_classification_contract() {
     echo "Uploading contract to provenance!"
