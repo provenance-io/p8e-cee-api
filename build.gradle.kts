@@ -27,21 +27,29 @@ subprojects {
     }
 
     repositories {
-        mavenLocal()
         mavenCentral()
+    }
+}
+
+allprojects {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
 
         kotlinOptions {
             freeCompilerArgs = listOf(
                 "-Xjsr305=strict",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-Xskip-prerelease-check"
+                "-Xskip-prerelease-check", // To support loan package contracts dependency using context receivers
             )
             jvmTarget = "11"
+            apiVersion = "1.6"
+            languageVersion = "1.6"
             allWarningsAsErrors = true
         }
     }
@@ -124,7 +132,6 @@ allprojects {
     version = semVersion
 
     repositories {
-        mavenLocal()
         mavenCentral()
     }
 }
