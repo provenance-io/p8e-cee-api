@@ -13,8 +13,6 @@ import io.provenance.core.Originator
 import io.provenance.core.OriginatorManager
 import io.provenance.core.Plugin
 import io.provenance.plugins.vault.VaultSpec
-import io.provenance.scope.encryption.util.toJavaPublicKey
-import io.provenance.scope.objectstore.util.toHex
 import java.io.File
 import java.util.UUID
 import kotlin.reflect.full.createInstance
@@ -71,8 +69,6 @@ class EntityManager(
                 }
             }
         }
-
-        println("0A410485E9EB677EFCC36CF49A24CDE99BE0D8EB432E5C6AE715103D22451E28182025DF868FEE1CD9CF00A8FD39F1998DEC097B7EE6E423BE97CD4C70D7639D60BE7A".toJavaPublicKey().toHex())
 
         if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getPropertyKeyPair(DefaultAudience.PORTFOLIO_MANAGER))
         if (permissions?.permissionDart == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.DART, config))
