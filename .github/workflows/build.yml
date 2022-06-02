@@ -6,15 +6,23 @@ on:
     types: [ synchronize, opened, reopened, ready_for_review, converted_to_draft ]
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      linting:
+        type: boolean
+        description: Run the linter
+        required: false
+        default: false
 
 concurrency:
     group: ${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
   linting:
     name: Linting
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    if: github.event.inputs.linting == true || github.event.pull_request.draft == false
 
     steps:
       - name: Checkout Code
