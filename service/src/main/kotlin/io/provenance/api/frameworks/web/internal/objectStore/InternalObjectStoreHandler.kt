@@ -9,8 +9,8 @@ import io.provenance.api.domain.usecase.objectStore.get.models.GetProtoRequestWr
 import io.provenance.api.domain.usecase.objectStore.store.StoreFile
 import io.provenance.api.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
-import io.provenance.api.models.eos.GetFileRequest
-import io.provenance.api.models.eos.GetProtoRequest
+import io.provenance.api.models.eos.get.GetFileRequest
+import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

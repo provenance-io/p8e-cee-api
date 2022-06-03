@@ -33,10 +33,19 @@ brew install docker
 brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
+If you plan on running smart contracts for asset classification you'll need the following:
+```
+brew install rust
+brew install jq
+```
 
 You'll additionally need `CoreUtils` if your system is missing it:
 ```
 brew install coreutils
+```
+**Note: it's possible to install all dependencies with the following command:**
+```
+./dc.sh setup
 ```
 
 The default configuration assumes that the following ports are available:

@@ -13,8 +13,8 @@ import io.provenance.api.domain.usecase.common.originator.models.KeyManagementCo
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.SingleTx
-import io.provenance.api.models.cee.ContractExecutionResponse
 import io.provenance.api.models.cee.ParserConfig
+import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse

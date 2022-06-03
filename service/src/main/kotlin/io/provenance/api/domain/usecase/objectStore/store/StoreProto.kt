@@ -7,7 +7,7 @@ import io.provenance.api.domain.usecase.common.originator.models.KeyManagementCo
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.cee.parsers.MessageParser
 import io.provenance.api.frameworks.config.ObjectStoreConfig
-import io.provenance.api.models.eos.StoreProtoResponse
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import org.springframework.stereotype.Component

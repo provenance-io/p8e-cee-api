@@ -3,7 +3,7 @@ package io.provenance.api.domain.usecase.objectStore.store
 import com.google.gson.Gson
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.models.eos.StoreProtoResponse
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.domain.usecase.common.originator.EntityManager
