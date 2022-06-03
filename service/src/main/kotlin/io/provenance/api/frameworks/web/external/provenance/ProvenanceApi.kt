@@ -311,13 +311,17 @@ class ProvenanceApi {
     fun externalProvenanceApiV1(handler: ProvenanceHandler) = coRouter {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/p8e".nest {
-            POST("/tx/generate", handler::generateTx)
-            POST("/tx/execute", handler::executeTx)
+            "/tx".nest {
+                POST("/generate", handler::generateTx)
+                POST("/execute", handler::executeTx)
+            }
+            "/classify".nest {
+                POST("", handler::classifyAsset)
+                GET("/status", handler::getClassificationStatus)
+            }
             GET("/scope/query", handler::queryScope)
-            POST("/classify", handler::classifyAsset)
             POST("/verify", handler::verifyAsset)
             GET("/fees", handler::getFees)
-            GET("/classify/status", handler::getClassificationStatus)
         }
     }
 }
