@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class GetFeesForAsset : AbstractUseCase<GetFeesForAssetRequest, AssetDefinition>() {
     override suspend fun execute(args: GetFeesForAssetRequest): AssetDefinition {
-        PbClient(args.chainId, URI(args.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).let {
+        PbClient(args.chainId, URI(args.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(args.contractName),
                 pbClient = it,
