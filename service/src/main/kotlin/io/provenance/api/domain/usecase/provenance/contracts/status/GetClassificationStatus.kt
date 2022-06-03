@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class GetClassificationStatus : AbstractUseCase<GetStatusOfClassificationRequest, AssetScopeAttribute>() {
     override suspend fun execute(args: GetStatusOfClassificationRequest): AssetScopeAttribute {
-        PbClient(args.chainId, URI(args.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).let {
+        PbClient(args.chainId, URI(args.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(args.contractName),
                 pbClient = it,

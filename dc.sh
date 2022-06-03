@@ -1,13 +1,13 @@
 #!/bin/bash
 
-while getopts 'p: c:' OPTION; do
+while getopts 'p: c' OPTION; do
   case "$OPTION" in
     p)
       PATH_TO_CONTRACTS="$OPTARG"
       echo "Path to contracts you wish to publish: $OPTARG"
       ;;
     c)
-      SETUP_SMART_CONTRACT="$OPTARG"
+      SETUP_SMART_CONTRACT=true
       echo "Running setup with smart contracts."
       ;;
     ?)
@@ -46,7 +46,7 @@ function up {
   docker ps -a
 
     if [ "$SETUP_SMART_CONTRACT" = true ]; then
-        echo "Setting up smart contracs!"
+        echo "Setting up smart contracts!"
         upload_classification_contract
     fi
 }
