@@ -6,7 +6,7 @@ import java.util.UUID
 data class SmartContractConfig(
     val contractName: String,
     val assetUuid: UUID,
-    val assetType: String,
+    val assetType: String = "",
     val verifierAddress: String,
-    val accessRoutes: List<AccessRoute>
+    val accessRoutes: List<AccessRoute> = emptyList()
 )

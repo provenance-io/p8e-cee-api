@@ -9,13 +9,13 @@ import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetSt
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.domain.usecase.provenance.query.QueryScope
-import io.provenance.api.domain.usecase.provenance.query.models.QueryScopeRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.CreateTx
 import io.provenance.api.domain.usecase.provenance.tx.ExecuteTx
 import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.model.ExecuteTxRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.models.p8e.query.QueryScopeRequest
 import io.provenance.scope.util.toUuid
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -41,7 +41,15 @@ class ProvenanceHandler(
     }.foldToServerResponse()
 
     suspend fun queryScope(req: ServerRequest): ServerResponse = runCatching {
-        queryScope.execute(QueryScopeRequestWrapper(req.getUser(), req.awaitBody()))
+        queryScope.execute(
+            QueryScopeRequest(
+                req.getUser(),
+                req.queryParam("scopeUuid").get().toUuid(),
+                req.queryParam("chainId").get(),
+                req.queryParam("nodeEndpoint").get(),
+                req.queryParam("objectStoreUrl").get(),
+            )
+        )
     }.foldToServerResponse()
 
     suspend fun classifyAsset(req: ServerRequest): ServerResponse = runCatching {
