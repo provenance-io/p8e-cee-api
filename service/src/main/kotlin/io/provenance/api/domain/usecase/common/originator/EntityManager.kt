@@ -2,6 +2,7 @@ package io.provenance.api.domain.usecase.common.originator
 
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
+import io.provenance.api.frameworks.config.ServiceKeys
 import io.provenance.api.frameworks.config.VaultProperties
 import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.account.Participant
@@ -14,13 +15,14 @@ import io.provenance.core.Plugin
 import io.provenance.plugins.vault.VaultSpec
 import java.io.File
 import java.util.UUID
-import org.springframework.stereotype.Component
 import kotlin.reflect.full.createInstance
+import org.springframework.stereotype.Component
 
 @Component
 class EntityManager(
     private val vaultProperties: VaultProperties,
     private val provenanceProperties: ProvenanceProperties,
+    private val serviceKeys: ServiceKeys
 ) {
     private var manager: OriginatorManager = OriginatorManager()
     private var tokenMap = mutableMapOf<KeyManagementConfig, String>()
@@ -68,7 +70,7 @@ class EntityManager(
             }
         }
 
-        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.PORTFOLIO_MANAGER, config))
+        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getPropertyKeyPair(DefaultAudience.PORTFOLIO_MANAGER))
         if (permissions?.permissionDart == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.DART, config))
 
         return additionalAudiences
@@ -103,4 +105,13 @@ class EntityManager(
                 entity.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
             )
         } ?: throw IllegalStateException("Failed to find requested aud")
+
+    private fun getPropertyKeyPair(audience: DefaultAudience): AudienceKeyPair =
+        when (audience) {
+            DefaultAudience.PORTFOLIO_MANAGER -> AudienceKeyPair(
+                serviceKeys.portfolioManager,
+                serviceKeys.portfolioManager,
+            )
+            else -> throw IllegalStateException("Service key of type ${audience.name} not supported.")
+        }
 }
