@@ -1,4 +1,4 @@
-package io.provenance.api.models.eos
+package io.provenance.api.models.eos.store
 
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.PermissionInfo

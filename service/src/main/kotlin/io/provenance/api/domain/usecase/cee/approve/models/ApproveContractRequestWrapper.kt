@@ -1,6 +1,6 @@
 package io.provenance.api.domain.usecase.cee.approve.models
 
-import io.provenance.api.models.cee.ApproveContractRequest
+import io.provenance.api.models.cee.approve.ApproveContractRequest
 import java.util.UUID
 
 data class ApproveContractRequestWrapper(

@@ -63,6 +63,8 @@ dependencies {
         Dependencies.BouncyCastleProvider,
         Dependencies.OpenApi.WebFluxSupport,
         Dependencies.OpenApi.KotlinSupport,
+        Dependencies.AssetClassification.Client,
+        Dependencies.AssetClassification.Verifier,
 
     ).forEach { dep ->
         dep.implementation(this)

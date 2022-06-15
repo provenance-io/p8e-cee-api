@@ -1,10 +1,14 @@
 #!/bin/bash
 
-while getopts 'p:' OPTION; do
+while getopts 'p: c' OPTION; do
   case "$OPTION" in
     p)
       PATH_TO_CONTRACTS="$OPTARG"
       echo "Path to contracts you wish to publish: $OPTARG"
+      ;;
+    c)
+      SETUP_SMART_CONTRACT=true
+      echo "Running setup with smart contracts."
       ;;
     ?)
       echo "script usage: $(basename \$0) [-p <path to p8e contracts directory>]" >&2
@@ -15,9 +19,6 @@ done
 shift "$(($OPTIND -1))"
 
 function up {
-  #config vault
-  sh service/docker/vault/config.sh
-
   docker-compose -p p8e-contract-execution-environment -f service/docker/dependencies.yaml up --build -d
 
   sleep 2
@@ -43,6 +44,11 @@ function up {
    "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
 
   docker ps -a
+
+    if [ "$SETUP_SMART_CONTRACT" = true ]; then
+        echo "Setting up smart contracts!"
+        upload_classification_contract
+    fi
 }
 
 function publish() {
@@ -71,6 +77,73 @@ function down {
 function bounce {
    down
    up
+}
+
+function build_classification() {
+    if [ -z ${PATH_TO_CONTRACTS+x} ]; then
+        echo "Provide a valid path to the smart contracts directory you wish to store on provenance using the -p argument."
+        exit
+    fi
+
+    export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
+
+    if [[ -d "$PATH_TO_CONTRACTS" ]]; then
+        pushd $PATH_TO_CONTRACTS > /dev/null
+        cargo build
+        make optimize
+        popd > /dev/null
+        cp $PATH_TO_CONTRACTS/artifacts/asset_classification_smart_contract.wasm service/docker/prov-init/contracts/asset_classification_smart_contract.wasm
+    else
+        echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
+    fi
+}
+
+function setup() {
+      brew install docker
+      brew tap hashicorp/tap
+      brew install hashicorp/tap/vault
+      brew install rust
+      brew install jq
+      brew install coreutils
+}
+
+function upload_classification_contract() {
+    echo "Uploading contract to provenance!"
+    upload=$(docker exec provenance provenanced tx wasm store contracts/asset_classification_smart_contract.wasm \
+                     --instantiate-only-address tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
+                     --from tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
+                     --chain-id chain-local \
+                     --gas auto \
+                     --gas-prices="1905nhash" \
+                     --gas-adjustment=1.2 \
+                     --broadcast-mode block \
+                     --testnet \
+                     --output json \
+                     --yes)
+
+    code_id=$(echo $upload | jq -r '.logs[] | select(.msg_index == 0) | .events[] | select(.type == "store_code") | .attributes[0].value')
+    echo "Upload complete. Code id: $code_id"
+    instantiate=$(docker exec provenance provenanced tx wasm instantiate $code_id \
+                       '{
+                         "base_contract_name": "assetclassificationalias.pb",
+                         "bind_base_name": true,
+                         "asset_definitions": '"$(cat service/docker/prov-init/contracts/asset_definitions.json)"',
+                         "is_test": true
+                       }' \
+                       --admin "tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag" \
+                       --from tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
+                       --label examples \
+                       --chain-id chain-local \
+                       --gas auto \
+                       --gas-prices="1905nhash" \
+                       --gas-adjustment=1.2 \
+                       --broadcast-mode block \
+                       --testnet \
+                       --output json \
+                       --yes | jq)
+
+    contract_address=$(echo $instantiate | jq '.logs[] | select(.msg_index == 0) | .events[] | select(.type == "instantiate") | .attributes[] | select(.key == "_contract_address") | .value')
+    echo "Asset classification contract fully setup! contract address: $contract_address"
 }
 
 ${1}

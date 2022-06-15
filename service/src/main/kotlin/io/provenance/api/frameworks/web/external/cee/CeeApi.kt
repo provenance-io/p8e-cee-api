@@ -1,10 +1,10 @@
 package io.provenance.api.frameworks.web.external.cee
 
-import io.provenance.api.models.cee.ApproveContractRequest
-import io.provenance.api.models.cee.ContractExecutionResponse
-import io.provenance.api.models.cee.ExecuteContractRequest
-import io.provenance.api.models.cee.RejectContractRequest
-import io.provenance.api.models.cee.SubmitContractExecutionResultRequest
+import io.provenance.api.models.cee.approve.ApproveContractRequest
+import io.provenance.api.models.cee.execute.ContractExecutionResponse
+import io.provenance.api.models.cee.execute.ExecuteContractRequest
+import io.provenance.api.models.cee.reject.RejectContractRequest
+import io.provenance.api.models.cee.submit.SubmitContractExecutionResultRequest
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange

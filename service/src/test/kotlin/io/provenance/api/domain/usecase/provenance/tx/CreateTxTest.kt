@@ -10,7 +10,7 @@ import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
-import io.provenance.api.models.p8e.CreateTxRequest
+import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.grpc.Signer
 import io.provenance.core.Originator

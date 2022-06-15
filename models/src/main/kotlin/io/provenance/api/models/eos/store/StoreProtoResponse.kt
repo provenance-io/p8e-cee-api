@@ -1,4 +1,4 @@
-package io.provenance.api.models.eos
+package io.provenance.api.models.eos.store
 
 import io.provenance.objectstore.proto.Objects
 import java.util.Base64

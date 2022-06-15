@@ -8,8 +8,8 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoReque
 import io.provenance.api.integration.base.IntegrationTestBase
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.account.KeyManagementConfig
-import io.provenance.api.models.eos.GetProtoRequest
-import io.provenance.api.models.eos.StoreProtoRequest
+import io.provenance.api.models.eos.get.GetProtoRequest
+import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.util.toUuid
 import java.util.UUID

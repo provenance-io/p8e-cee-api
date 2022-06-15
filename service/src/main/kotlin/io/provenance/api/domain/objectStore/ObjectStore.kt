@@ -1,7 +1,7 @@
 package io.provenance.api.domain.objectStore
 
 import com.google.protobuf.Message
-import io.provenance.api.models.eos.StoreProtoResponse
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.objectstore.client.OsClient
 import java.security.PrivateKey

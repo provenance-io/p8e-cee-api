@@ -1,4 +1,4 @@
-package io.provenance.api.models.eos
+package io.provenance.api.models.eos.get
 
 import io.provenance.api.models.account.AccountInfo
 

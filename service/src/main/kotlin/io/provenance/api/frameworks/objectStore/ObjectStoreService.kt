@@ -3,10 +3,10 @@ package io.provenance.api.frameworks.objectStore
 import com.google.protobuf.Message
 import io.provenance.objectstore.proto.Objects
 import io.provenance.api.domain.objectStore.ObjectStore
-import io.provenance.api.models.eos.toModel
+import io.provenance.api.models.eos.store.toModel
 import io.provenance.api.frameworks.config.ObjectStoreConfig
 import io.provenance.api.frameworks.provenance.extensions.getEncryptedPayload
-import io.provenance.api.models.eos.StoreProtoResponse
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.scope.encryption.crypto.Pen
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
