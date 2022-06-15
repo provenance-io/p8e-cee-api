@@ -12,9 +12,9 @@ import io.grpc.stub.MetadataUtils
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.frameworks.provenance.exceptions.ContractTxException
 import io.provenance.api.frameworks.provenance.extensions.getBaseAccount
-import io.provenance.api.frameworks.provenance.extensions.getCurrentHeight
 import io.provenance.api.frameworks.provenance.extensions.getErrorResult
 import io.provenance.api.frameworks.provenance.extensions.isError
+import io.provenance.api.frameworks.provenance.extensions.toTxBody
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
@@ -31,6 +31,7 @@ import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
+import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
 import java.net.URI
 import java.util.UUID
@@ -60,18 +61,21 @@ class ProvenanceService : Provenance {
                 is SingleTx -> {
                     when (val error = tx.getErrorResult()) {
                         null -> {
-                            log.info("Building the tx.")
                             val messages = tx.value.messages.map { Any.pack(it, "") }
-
-                            TxOuterClass.TxBody.newBuilder()
-                                .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
-                                .addAllMessages(messages)
-                                .build()
+                            messages.toTxBody(pbClient)
                         }
                         else -> throw ContractTxException(error.result.errorMessage)
                     }
                 }
-                is BatchTx -> throw IllegalArgumentException("Batched transactions are not supported.")
+                is BatchTx -> {
+                    when (val error = tx.getErrorResult()) {
+                        emptyList<Contracts.ConsiderationProto?>() -> {
+                            val messages = tx.value.flatMap { it.messages.map { Any.pack(it, "") } }
+                            messages.toTxBody(pbClient)
+                        }
+                        else -> throw ContractTxException("Tx Batch operation failed: $error")
+                    }
+                }
             }
         }
 
@@ -92,7 +96,7 @@ class ProvenanceService : Provenance {
             txBody = tx,
             signers = listOf(baseSigner),
             gasAdjustment = config.gasAdjustment,
-            mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
+            mode = config.broadcastMode
         )
         pbClient.close()
 
