@@ -9,6 +9,7 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.contract.proto.Envelopes
@@ -35,6 +36,6 @@ class ApproveContractExecution(
 
             client.respondWithApproval(result.envelopeState, tx.txhash)
             return tx.toTxResponse()
-        } else throw IllegalArgumentException("Attempted to approve an envelope that did not result in a fragment.")
+        } else throw ContractExecutionException("Attempted to approve an envelope that did not result in a fragment. Only non-approved envelopes should be sent!")
     }
 }

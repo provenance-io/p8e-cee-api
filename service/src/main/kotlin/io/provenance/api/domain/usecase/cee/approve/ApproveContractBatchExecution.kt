@@ -10,8 +10,10 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,7 +22,10 @@ class ApproveContractBatchExecution(
     private val provenance: Provenance,
     private val getSigner: GetSigner,
 ) : AbstractUseCase<ApproveContractBatchRequestWrapper, Unit>() {
+    private val log = KotlinLogging.logger { }
+
     override suspend fun execute(args: ApproveContractBatchRequestWrapper) {
+        val errors = mutableListOf<Throwable>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
         val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
@@ -36,14 +41,28 @@ class ApproveContractBatchExecution(
             }
         }
 
-        executionResults.chunked(args.request.chunkSize).forEach {
-            val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
-            val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
-            val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
+        val chunked = executionResults.chunked(args.request.chunkSize)
+        chunked.forEachIndexed { index, it ->
+            runCatching {
+                val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
+                val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
+                val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
 
-            it.forEach { executions ->
-                client.respondWithApproval(executions.first, broadcast.txhash)
-            }
+                it.forEach { executions ->
+                    client.respondWithApproval(executions.first, broadcast.txhash)
+                }
+            }.fold(
+                onSuccess = {
+                    log.info("Successfully processed batch $index of ${chunked.size}")
+                },
+                onFailure = {
+                    errors.add(it)
+                }
+            )
+        }
+
+        if (errors.any()) {
+            throw ContractExecutionBatchException(errors.map { it.message }.toString())
         }
     }
 }

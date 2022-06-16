@@ -8,5 +8,5 @@ data class ExecuteContractRequest(
     val config: ExecuteContractConfig,
     val records: Map<String, Any>,
     val participants: List<Participant> = emptyList(),
-    val permissions: PermissionInfo?,
+    val permissions: PermissionInfo? = null,
 )

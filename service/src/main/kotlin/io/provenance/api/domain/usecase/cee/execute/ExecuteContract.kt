@@ -3,11 +3,12 @@ package io.provenance.api.domain.usecase.cee.execute
 import io.provenance.api.domain.cee.ContractService
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.domain.usecase.cee.ContractUtilities
+import io.provenance.api.domain.usecase.cee.common.ContractUtilities
 import io.provenance.api.domain.usecase.cee.execute.model.ExecuteContractRequestWrapper
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.SingleTx
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.sdk.FragmentResult
@@ -30,7 +31,7 @@ class ExecuteContract(
 
         return when (val result = contractService.executeContract(client, session)) {
             is SignedResult -> {
-                provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result))?.let {
+                provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
                     provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
                         ContractExecutionResponse(
                             false,
@@ -43,13 +44,13 @@ class ExecuteContract(
                             )
                         )
                     }
-                } ?: throw IllegalStateException("Failed to build contract for execution output.")
+                }
             }
             is FragmentResult -> {
                 client.requestAffiliateExecution(result.envelopeState)
                 ContractExecutionResponse(true, Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), null)
             }
-            else -> throw IllegalStateException("Contract execution result was not of an expected type.")
+            else -> throw ContractExecutionException("Contract execution result was not of an expected type.")
         }
     }
 }

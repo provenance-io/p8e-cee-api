@@ -1,4 +1,4 @@
-package io.provenance.api.domain.usecase.cee
+package io.provenance.api.domain.usecase.cee.common
 
 import com.google.protobuf.Message
 import io.provenance.api.domain.cee.ContractParser

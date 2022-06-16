@@ -269,10 +269,12 @@ class CeeApi {
             POST("/execute", handler::executeContract)
             POST("/submit", handler::submitContractResult)
             POST("/reject", handler::rejectContractExecution)
-            POST("/batch/execute", handler::executeContractBatch)
-            POST("/batch/submit", handler::submitContractBatchResult)
-            POST("/batch/reject", handler::rejectContractBatchExecution)
-            POST("/batch/approve", handler::approveContractBatchExecution)
+            "/batch".nest {
+                POST("/execute", handler::executeContractBatch)
+                POST("/submit", handler::submitContractBatchResult)
+                POST("/reject", handler::rejectContractBatchExecution)
+                POST("/approve", handler::approveContractBatchExecution)
+            }
         }
     }
 }

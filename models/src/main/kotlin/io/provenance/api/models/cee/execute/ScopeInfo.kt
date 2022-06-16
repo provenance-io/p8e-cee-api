@@ -4,5 +4,5 @@ import java.util.UUID
 
 data class ScopeInfo(
     val scopeUuid: UUID,
-    val sessionUuid: UUID?,
+    val sessionUuid: UUID? = null,
 )

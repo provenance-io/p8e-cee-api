@@ -6,6 +6,7 @@ import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutio
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.SingleTx
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
@@ -25,13 +26,13 @@ class SubmitContractExecutionResult(
 
         return when (val result = envelope.mergeInto(state)) {
             is SignedResult -> {
-                provenanceService.buildContractTx(args.request.provenance, SingleTx(result))?.let {
+                provenanceService.buildContractTx(args.request.provenance, SingleTx(result)).let {
                     provenanceService.executeTransaction(args.request.provenance, it, signer).let { pbResponse ->
                         TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString())
                     }
-                } ?: throw IllegalStateException("Failed to build the contract tx with the supplied signed result.")
+                }
             }
-            else -> throw IllegalStateException("Received a execution result which was not a signed result.")
+            else -> throw ContractExecutionException("Received a execution result which was not a signed result.")
         }
     }
 }

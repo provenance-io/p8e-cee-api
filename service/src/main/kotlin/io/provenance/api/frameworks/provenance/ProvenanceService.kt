@@ -55,7 +55,7 @@ class ProvenanceService : Provenance {
     private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody? =
+    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             return when (tx) {
                 is SingleTx -> {
