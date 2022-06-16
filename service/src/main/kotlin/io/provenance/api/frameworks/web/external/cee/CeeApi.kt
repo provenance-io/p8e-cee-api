@@ -1,13 +1,13 @@
 package io.provenance.api.frameworks.web.external.cee
 
+import io.provenance.api.frameworks.web.Routes
+import io.provenance.api.frameworks.web.logging.logExchange
 import io.provenance.api.models.cee.approve.ApproveContractRequest
 import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.api.models.cee.execute.ExecuteContractRequest
 import io.provenance.api.models.cee.reject.RejectContractRequest
 import io.provenance.api.models.cee.submit.SubmitContractExecutionResultRequest
 import io.provenance.api.models.p8e.TxResponse
-import io.provenance.api.frameworks.web.Routes
-import io.provenance.api.frameworks.web.logging.logExchange
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -150,6 +150,7 @@ class CeeApi {
         "${Routes.EXTERNAL_BASE_V1}/cee".nest {
             POST("/approve", handler::approveContractExecution)
             POST("/execute", handler::executeContract)
+            POST("/execute/batch", handler::executeContract)
             POST("/submit", handler::submitContractResult)
             POST("/reject", handler::rejectContractExecution)
         }
