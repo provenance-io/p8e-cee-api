@@ -4,9 +4,10 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.ObjectStoreConfig
 import io.provenance.api.models.p8e.ProvenanceConfig
 
-data class ApproveContractRequest(
+class ApproveContractBatchRequest(
     val account: AccountInfo = AccountInfo(),
     val client: ObjectStoreConfig,
     val provenanceConfig: ProvenanceConfig,
-    val approval: EnvelopeApproval,
+    val approvals: List<EnvelopeApproval>,
+    val chunkSize: Int = 25,
 )

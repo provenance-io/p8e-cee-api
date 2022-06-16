@@ -8,6 +8,7 @@ import io.provenance.api.domain.usecase.cee.execute.model.ExecuteContractBatchRe
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.BatchTx
+import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.FragmentResult
@@ -28,14 +29,23 @@ class ExecuteContractBatch(
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
         val client = contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config)
 
-        contractUtilities.createSession(args.uuid, args.request.permissions, args.request.participants, args.request.config, args.request.records, args.request.batch).forEach {
+        contractUtilities.createSession(args.uuid, args.request.permissions, args.request.participants, args.request.config, args.request.records, args.request.scopes).forEach {
             results.add(contractService.executeContract(client, it))
 
         }
 
         results.filterIsInstance(SignedResult::class.java).chunked(args.request.chunkSize).forEach {
             provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(it))?.let { tx ->
-                provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer)
+                provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
+                    responses.add(
+                        ContractExecutionResponse(
+                            false,
+                            null,
+                            pbResponse.toTxResponse()
+                        )
+                    )
+                }
+
             } ?: throw IllegalStateException("Failed to build contract for execution output.")
         }
 
@@ -43,7 +53,10 @@ class ExecuteContractBatch(
             chunk.forEach { result ->
                 client.requestAffiliateExecution(result.envelopeState)
                 responses.add(
-                    ContractExecutionResponse(true, Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), null)
+                    ContractExecutionResponse(
+                        true,
+                        Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
+                        null)
                 )
             }
         }

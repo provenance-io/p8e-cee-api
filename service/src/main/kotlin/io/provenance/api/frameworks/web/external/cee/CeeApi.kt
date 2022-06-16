@@ -149,8 +149,8 @@ class CeeApi {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/cee".nest {
             POST("/approve", handler::approveContractExecution)
+            POST("/batch/execute", handler::executeContractBatch)
             POST("/execute", handler::executeContract)
-            POST("/execute/batch", handler::executeContract)
             POST("/submit", handler::submitContractResult)
             POST("/reject", handler::rejectContractExecution)
         }

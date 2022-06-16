@@ -9,5 +9,5 @@ data class ExecuteContractBatchRequest(
     val participants: List<Participant> = emptyList(),
     val permissions: PermissionInfo?,
     val chunkSize: Int = 25,
-    val batch: List<ScopeInfo> = emptyList(),
+    val scopes: List<ScopeInfo> = emptyList(),
 )
