@@ -30,7 +30,7 @@ object Versions {
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
-    const val AssetModel = "0.1.7"
+    const val AssetModel = "0.1.9"
     const val P8eScope = "0.6.0"
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
