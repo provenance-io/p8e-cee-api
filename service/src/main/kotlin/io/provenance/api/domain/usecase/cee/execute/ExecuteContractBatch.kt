@@ -31,7 +31,6 @@ class ExecuteContractBatch(
 
         contractUtilities.createSession(args.uuid, args.request.permissions, args.request.participants, args.request.config, args.request.records, args.request.scopes).forEach {
             results.add(contractService.executeContract(client, it))
-
         }
 
         results.filterIsInstance(SignedResult::class.java).chunked(args.request.chunkSize).forEach {
@@ -45,7 +44,6 @@ class ExecuteContractBatch(
                         )
                     )
                 }
-
             } ?: throw IllegalStateException("Failed to build contract for execution output.")
         }
 
@@ -56,7 +54,8 @@ class ExecuteContractBatch(
                     ContractExecutionResponse(
                         true,
                         Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
-                        null)
+                        null
+                    )
                 )
             }
         }

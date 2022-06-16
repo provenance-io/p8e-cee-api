@@ -33,7 +33,6 @@ class CeeHandler(
         executeContractBatch.execute(ExecuteContractBatchRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
-
     suspend fun submitContractResult(req: ServerRequest): ServerResponse = runCatching {
         submitContract.execute(SubmitContractExecutionResultRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()

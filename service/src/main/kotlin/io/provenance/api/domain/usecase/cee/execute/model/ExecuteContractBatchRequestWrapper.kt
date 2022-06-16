@@ -5,4 +5,5 @@ import java.util.UUID
 
 data class ExecuteContractBatchRequestWrapper(
     val uuid: UUID,
-    val request: ExecuteContractBatchRequest,)
+    val request: ExecuteContractBatchRequest,
+)

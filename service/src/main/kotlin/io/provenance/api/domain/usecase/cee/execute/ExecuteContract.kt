@@ -13,7 +13,6 @@ import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
 import java.util.Base64
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,8 +22,6 @@ class ExecuteContract(
     private val getSigner: GetSigner,
     private val contractUtilities: ContractUtilities,
 ) : AbstractUseCase<ExecuteContractRequestWrapper, ContractExecutionResponse>() {
-
-    private val log = KotlinLogging.logger {  }
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
@@ -55,5 +52,4 @@ class ExecuteContract(
             else -> throw IllegalStateException("Contract execution result was not of an expected type.")
         }
     }
-
 }

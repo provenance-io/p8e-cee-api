@@ -68,6 +68,7 @@ class ContractUtilities(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun getRecords(contractParser: ContractParser, records: Map<String, Any>, contract: Class<out P8eContract>, parserConfig: ParserConfig?): Map<String, Message> {
         val contractRecords = mutableMapOf<String, Message>()
 
@@ -101,5 +102,4 @@ class ContractUtilities(
     }
 
     private fun KType?.toClassNameString(): String? = this?.classifier?.toString()?.drop("class ".length)
-
 }

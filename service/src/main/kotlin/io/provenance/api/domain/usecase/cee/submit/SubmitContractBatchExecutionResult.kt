@@ -24,8 +24,8 @@ class SubmitContractBatchExecutionResult(
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
         args.request.submission.forEach {
-        val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()
-        val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(it.state).build()
+            val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()
+            val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(it.state).build()
             when (val result = envelope.mergeInto(state)) {
                 is SignedResult -> {
                     signedResults.add(result)

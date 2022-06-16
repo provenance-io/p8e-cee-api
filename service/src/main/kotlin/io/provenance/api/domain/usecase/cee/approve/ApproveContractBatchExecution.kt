@@ -17,7 +17,7 @@ class ApproveContractBatchExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,
     private val getSigner: GetSigner,
-): AbstractUseCase<ApproveContractBatchRequestWrapper, Unit>() {
+) : AbstractUseCase<ApproveContractBatchRequestWrapper, Unit>() {
     override suspend fun execute(args: ApproveContractBatchRequestWrapper) {
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
@@ -35,7 +35,7 @@ class ApproveContractBatchExecution(
         }
 
         executionResults.chunked(args.request.chunkSize).forEach {
-            val messages = it.flatMap{ grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
+            val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
             val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
             val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
 
