@@ -2,6 +2,8 @@ package io.provenance.api.frameworks.web
 
 import io.provenance.api.domain.usecase.common.errors.NotFoundError
 import io.provenance.api.domain.usecase.common.errors.ServerError
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -33,6 +35,8 @@ object ErrorResponses {
         return when (cause) {
             is NotFoundError -> notFound(cause)
             is IllegalArgumentException -> badRequest(cause)
+            is ContractExecutionException -> badRequest(cause)
+            is ContractExecutionBatchException -> badRequest(cause)
             is ServerError -> serverError(cause)
             else -> unknownError(cause)
         }

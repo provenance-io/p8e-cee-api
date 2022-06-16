@@ -24,14 +24,14 @@ jobs:
               uses: actions/setup-java@v1
               with:
                   java-version: 11
-                  
+
             - name: Setup Container
               run: |-
                   brew tap hashicorp/tap
                   brew install hashicorp/tap/vault
-                  
+
             - name: Build with Gradle
-              run: ./gradlew clean build --refresh-dependencies :generateVersionFile githubRelease
+              run: ./gradlew clean build --refresh-dependencies :generateVersionFile githubRelease -Psemver.modifier=${{ inputs.versionModifier }}
               if: ${{ github.ref_name == 'main' }}
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
