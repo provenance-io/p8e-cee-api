@@ -87,7 +87,7 @@ class ExecuteContractBatch(
         }
 
         if (errors.any()) {
-            throw ContractExecutionBatchException(errors.map { it.message }.toString())
+            throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
         }
 
         return responses
