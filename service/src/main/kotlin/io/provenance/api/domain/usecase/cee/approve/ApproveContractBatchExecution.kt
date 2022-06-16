@@ -12,7 +12,9 @@ import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
+import org.springframework.stereotype.Component
 
+@Component
 class ApproveContractBatchExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,

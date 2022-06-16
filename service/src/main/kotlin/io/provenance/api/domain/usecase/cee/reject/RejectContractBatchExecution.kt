@@ -5,7 +5,9 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.cee.reject.models.RejectContractBatchRequestWrapper
 import io.provenance.scope.contract.proto.Envelopes
+import org.springframework.stereotype.Component
 
+@Component
 class RejectContractBatchExecution(
     private val createClient: CreateClient
 ) : AbstractUseCase<RejectContractBatchRequestWrapper, Unit>() {
