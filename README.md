@@ -9,7 +9,7 @@ The p8e-cee-api allows for operations against the encrypted object store, with i
 [![License][license-badge]][license-url]
 [![LOC][loc-badge]][loc-report]
 
-[release-badge]: https://img.shields.io/github/v/tag/provenance-io/p8e-cee-api.svg?sort=semver
+[release-badge]: https://img.shields.io/github/v/tag/provenance-io/p8e-cee-api.svg
 [release-latest]: https://github.com/provenance-io/p8e-cee-api/releases/latest
 
 [license-badge]: https://img.shields.io/github/license/provenance-io/p8e-cee-api.svg
