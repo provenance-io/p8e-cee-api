@@ -43,7 +43,6 @@ class ContractUtilities(
 
     suspend fun createSession(uuid: UUID, permissions: PermissionInfo?, participants: List<Participant>, config: ExecuteContractConfig, records: Map<String, Any>, scopes: List<ScopeInfo>): List<Session> {
         val audiences = entityManager.hydrateKeys(permissions, participants)
-        val client = createClient.execute(CreateClientRequest(uuid, config.account, config.client, audiences))
         val contract = contractService.getContract(config.contract.contractName)
         val parsedRecords = getRecords(contractParser, records, contract, config.contract.parserConfig)
 
@@ -51,20 +50,22 @@ class ContractUtilities(
             it.partyType to entityManager.getEntity(KeyManagementConfigWrapper(it.uuid, config.account.keyManagementConfig))
         }
 
-        return scopes.map {
-            val scope = provenanceService.getScope(config.provenanceConfig, it.scopeUuid)
-            val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
-            contractService.setupContract(
-                client,
-                contract,
-                parsedRecords,
-                it.scopeUuid,
-                it.sessionUuid,
-                participantsMap,
-                scopeToUse,
-                config.contract.scopeSpecificationName,
-                audiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
-            )
+        createClient.execute(CreateClientRequest(uuid, config.account, config.client, audiences)).use { client ->
+            return scopes.map {
+                val scope = provenanceService.getScope(config.provenanceConfig, it.scopeUuid)
+                val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
+                contractService.setupContract(
+                    client,
+                    contract,
+                    parsedRecords,
+                    it.scopeUuid,
+                    it.sessionUuid,
+                    participantsMap,
+                    scopeToUse,
+                    config.contract.scopeSpecificationName,
+                    audiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
+                )
+            }
         }
     }
 

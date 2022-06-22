@@ -33,63 +33,71 @@ class ExecuteContractBatch(
         val errors = mutableListOf<Throwable>()
         val results = mutableListOf<ExecutionResult>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        val client = contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config)
+        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
 
-        contractUtilities.createSession(args.uuid, args.request.permissions, args.request.participants, args.request.config, args.request.records, args.request.scopes).forEach {
-            results.add(contractService.executeContract(client, it))
-        }
+            contractUtilities.createSession(
+                args.uuid,
+                args.request.permissions,
+                args.request.participants,
+                args.request.config,
+                args.request.records,
+                args.request.scopes,
+            ).forEach {
+                results.add(contractService.executeContract(client, it))
+            }
 
-        val chunkedSignedResult = results.filterIsInstance(SignedResult::class.java).chunked(args.request.chunkSize)
-        chunkedSignedResult.forEachIndexed { index, it ->
-            runCatching {
-                provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(it)).let { tx ->
-                    provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
+            val chunkedSignedResult = results.filterIsInstance(SignedResult::class.java).chunked(args.request.chunkSize)
+            chunkedSignedResult.forEachIndexed { index, it ->
+                runCatching {
+                    provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(it)).let { tx ->
+                        provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
+                            responses.add(
+                                ContractExecutionResponse(
+                                    false,
+                                    null,
+                                    pbResponse.toTxResponse()
+                                )
+                            )
+                        }
+                    }
+                }.fold(
+                    onSuccess = {
+                        log.info("Successfully processed batch $index of ${chunkedSignedResult.size}")
+                    },
+                    onFailure = {
+                        errors.add(it)
+                    }
+                )
+            }
+
+            val chunkedFragResult = results.filterIsInstance(FragmentResult::class.java).chunked(args.request.chunkSize)
+            chunkedFragResult.forEachIndexed { index, chunk ->
+                runCatching {
+                    chunk.forEach { result ->
+                        client.requestAffiliateExecution(result.envelopeState)
                         responses.add(
                             ContractExecutionResponse(
-                                false,
-                                null,
-                                pbResponse.toTxResponse()
+                                true,
+                                Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
+                                null
                             )
                         )
                     }
-                }
-            }.fold(
-                onSuccess = {
-                    log.info("Successfully processed batch $index of ${chunkedSignedResult.size}")
-                },
-                onFailure = {
-                    errors.add(it)
-                }
-            )
-        }
+                }.fold(
+                    onSuccess = {
+                        log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
+                    },
+                    onFailure = {
+                        errors.add(it)
+                    }
+                )
+            }
 
-        val chunkedFragResult = results.filterIsInstance(FragmentResult::class.java).chunked(args.request.chunkSize)
-        chunkedFragResult.forEachIndexed { index, chunk ->
-            runCatching {
-                chunk.forEach { result ->
-                    client.requestAffiliateExecution(result.envelopeState)
-                    responses.add(
-                        ContractExecutionResponse(
-                            true,
-                            Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
-                            null
-                        )
-                    )
-                }
-            }.fold(
-                onSuccess = {
-                    log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
-                },
-                onFailure = {
-                    errors.add(it)
-                }
-            )
-        }
+            if (errors.any()) {
+                throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
+            }
 
-        if (errors.any()) {
-            throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
+            return responses
         }
-
-        return responses
     }
 }

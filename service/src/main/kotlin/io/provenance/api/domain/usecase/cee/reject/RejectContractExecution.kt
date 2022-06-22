@@ -13,8 +13,9 @@ class RejectContractExecution(
 ) : AbstractUseCase<RejectContractExecutionRequestWrapper, Unit>() {
 
     override suspend fun execute(args: RejectContractExecutionRequestWrapper) {
-        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
         val error = Envelopes.EnvelopeError.newBuilder().mergeFrom(args.request.rejection).build()
-        client.respondWithError(error)
+        createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
+            client.respondWithError(error)
+        }
     }
 }

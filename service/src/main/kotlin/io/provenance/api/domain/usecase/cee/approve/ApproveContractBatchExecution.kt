@@ -28,39 +28,39 @@ class ApproveContractBatchExecution(
         val errors = mutableListOf<Throwable>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
-        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
+        createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
 
-        args.request.approvals.forEach {
-            val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()
-            val result = client.execute(envelope)
+            args.request.approvals.forEach {
+                val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()
+                val result = client.execute(envelope)
 
-            if (result is FragmentResult) {
-                client.approveScopeUpdate(result.envelopeState, it.expiration).let { grant ->
-                    executionResults.add(Pair(result.envelopeState, grant))
+                if (result is FragmentResult) {
+                    client.approveScopeUpdate(result.envelopeState, it.expiration).let { grant ->
+                        executionResults.add(Pair(result.envelopeState, grant))
+                    }
                 }
             }
+
+            val chunked = executionResults.chunked(args.request.chunkSize)
+            chunked.forEachIndexed { index, it ->
+                runCatching {
+                    val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
+                    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
+                    val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
+
+                    it.forEach { executions ->
+                        client.respondWithApproval(executions.first, broadcast.txhash)
+                    }
+                }.fold(
+                    onSuccess = {
+                        log.info("Successfully processed batch $index of ${chunked.size}")
+                    },
+                    onFailure = {
+                        errors.add(it)
+                    }
+                )
+            }
         }
-
-        val chunked = executionResults.chunked(args.request.chunkSize)
-        chunked.forEachIndexed { index, it ->
-            runCatching {
-                val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
-                val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
-                val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
-
-                it.forEach { executions ->
-                    client.respondWithApproval(executions.first, broadcast.txhash)
-                }
-            }.fold(
-                onSuccess = {
-                    log.info("Successfully processed batch $index of ${chunked.size}")
-                },
-                onFailure = {
-                    errors.add(it)
-                }
-            )
-        }
-
         if (errors.any()) {
             throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
         }

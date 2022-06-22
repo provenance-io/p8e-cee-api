@@ -40,7 +40,6 @@ class StoreFile(
 
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, keyConfig))
         var additionalAudiences = emptySet<AudienceKeyPair>()
-        val osClient = OsClient(URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()), objectStoreConfig.timeoutMs)
         if (!args.request.containsKey("id") || args.request.getAsType<FormFieldPart>("id").value().isEmpty()) {
             throw IllegalArgumentException("Request must provide the 'id' field for the file")
         }
@@ -61,8 +60,17 @@ class StoreFile(
             putKv(FileNFT.KEY_SIZE, file.awaitAllBytes().size.toString().toProtoAny())
             putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
         }
-
-        return objectStore.storeMessage(osClient, asset, originator.encryptionPublicKey() as PublicKey, additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet())
+        OsClient(
+            URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()),
+            objectStoreConfig.timeoutMs,
+        ).use { osClient ->
+            return objectStore.storeMessage(
+                osClient,
+                asset,
+                originator.encryptionPublicKey() as PublicKey,
+                additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet(),
+            )
+        }
     }
 
     private inline fun <reified T> Map<String, Part>.getAsType(key: String): T =

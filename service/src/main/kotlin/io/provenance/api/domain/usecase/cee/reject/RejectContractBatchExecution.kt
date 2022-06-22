@@ -12,11 +12,12 @@ class RejectContractBatchExecution(
     private val createClient: CreateClient
 ) : AbstractUseCase<RejectContractBatchRequestWrapper, Unit>() {
     override suspend fun execute(args: RejectContractBatchRequestWrapper) {
-        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
+        createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
 
-        args.request.rejection.forEach {
-            val error = Envelopes.EnvelopeError.newBuilder().mergeFrom(it).build()
-            client.respondWithError(error)
+            args.request.rejection.forEach {
+                val error = Envelopes.EnvelopeError.newBuilder().mergeFrom(it).build()
+                client.respondWithError(error)
+            }
         }
     }
 }

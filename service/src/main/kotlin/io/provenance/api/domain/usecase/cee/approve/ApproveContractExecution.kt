@@ -23,19 +23,20 @@ class ApproveContractExecution(
     private val getSigner: GetSigner,
 ) : AbstractUseCase<ApproveContractRequestWrapper, TxResponse>() {
     override suspend fun execute(args: ApproveContractRequestWrapper): TxResponse {
-        val client = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client))
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.approval.envelope).build()
+        createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
 
-        val result = client.execute(envelope)
-        if (result is FragmentResult) {
-            val tx = client.approveScopeUpdate(result.envelopeState, args.request.approval.expiration).let {
-                val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
-                val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
-                provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
-            }
+            val result = client.execute(envelope)
+            if (result is FragmentResult) {
+                val tx = client.approveScopeUpdate(result.envelopeState, args.request.approval.expiration).let {
+                    val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
+                    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(it.map { msg -> Any.pack(msg, "") }).build()
+                    provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
+                }
 
-            client.respondWithApproval(result.envelopeState, tx.txhash)
-            return tx.toTxResponse()
-        } else throw ContractExecutionException("Attempted to approve an envelope that did not result in a fragment. Only non-approved envelopes should be sent!")
+                client.respondWithApproval(result.envelopeState, tx.txhash)
+                return tx.toTxResponse()
+            } else throw ContractExecutionException("Attempted to approve an envelope that did not result in a fragment. Only non-approved envelopes should be sent!")
+        }
     }
 }
