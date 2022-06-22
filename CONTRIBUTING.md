@@ -84,8 +84,6 @@ User-facing repos should adhere to the trunk based development branching model: 
 
 Libraries need not follow the model strictly, but would be wise to.
 
-The SDK utilizes [semantic versioning](https://semver.org/).
-
 ### PR Targeting
 
 Ensure that you base and target your PR on the `main` branch.
