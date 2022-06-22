@@ -37,6 +37,7 @@ class ExecuteContractBatch(
 
             contractUtilities.createSession(
                 args.uuid,
+                client,
                 args.request.permissions,
                 args.request.participants,
                 args.request.config,
