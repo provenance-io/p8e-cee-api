@@ -49,7 +49,7 @@ jobs:
                   file: service/docker/Dockerfile
                   context: .
                   push: true
-                  tags: ${{ steps.prep.outputs.tags }}
+                  tags: ${{ steps.ci-release-create-outputs.outputs.tags }}
 
             - name: Install gpg secret key
               run: |
