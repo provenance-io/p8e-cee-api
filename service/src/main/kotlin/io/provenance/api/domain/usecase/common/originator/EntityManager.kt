@@ -35,7 +35,7 @@ class EntityManager(
         )
 
         val token = fetchToken(config)
-        return manager.get(args.uuid, VaultSpec(args.uuid, "${config.address}/${args.uuid}", token))
+        return manager.get(args.uuid.toString(), VaultSpec(args.uuid.toString(), "${config.address}/${args.uuid}", token))
     }
 
     fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
