@@ -3,12 +3,7 @@ name: Release
 on:
     release:
         types: [ published ]
-    workflow_dispatch:
-        inputs:
-            version:
-                description: 'Version'
-                type: string
-                required: true
+
 jobs:
     Release:
         runs-on: ubuntu-latest
@@ -30,13 +25,13 @@ jobs:
               run: ./gradlew clean build --refresh-dependencies
               if: ${{ github.ref_name == 'main' }}
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Prepare
               id: prep
               run: |
                   DOCKER_IMAGE=provenanceio/p8e-cee-api
-                  VERSION=${{ github.event.inputs.version }}
+                  VERSION=$( echo ${{ github.event.inputs.version }} | sed -e 's/^v//' )
                   TAGS="${DOCKER_IMAGE}:${VERSION}"
 
                   echo ::set-output name=version::${VERSION}
