@@ -7,7 +7,7 @@ on:
 jobs:
     Release:
         env:
-          VERSION: $( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' )
+          VERSION: ${{ $( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' ) }}
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
