@@ -3,14 +3,11 @@ name: Release
 on:
     release:
         types: [ published ]
-    workflow_dispatch:
-        inputs:
-            version:
-                description: 'Version'
-                type: string
-                required: true
+
 jobs:
     Release:
+        env:
+          VERSION: $( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' )
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -30,16 +27,14 @@ jobs:
               run: ./gradlew clean build --refresh-dependencies
               if: ${{ github.ref_name == 'main' }}
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Prepare
               id: prep
               run: |
                   DOCKER_IMAGE=provenanceio/p8e-cee-api
-                  VERSION=${{ github.event.inputs.version }}
-                  TAGS="${DOCKER_IMAGE}:${VERSION}"
+                  TAGS="${DOCKER_IMAGE}:$VERSION"
 
-                  echo ::set-output name=version::${VERSION}
                   echo ::set-output name=tags::${TAGS}
                   echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             - name: Set up Docker Buildx
@@ -69,6 +64,5 @@ jobs:
                     -Psigning.keyId=B7D30ABE -Psigning.password="${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}" -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/release.gpg \
                     --info
               env:
-                  VERSION: $( echo ${{ github.event.inputs.version }} | sed -e 's/^v//' )
                   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
                   OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
