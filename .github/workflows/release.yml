@@ -23,7 +23,6 @@ jobs:
 
             - name: Build with Gradle
               run: ./gradlew clean build --refresh-dependencies
-              if: ${{ github.ref_name == 'main' }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
