@@ -1,4 +1,4 @@
-package io.provenance.api.models.p8e.tx
+package io.provenance.api.models.p8e.tx.permission
 
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.ProvenanceConfig
@@ -11,12 +11,5 @@ data class UpdateScopeDataAccessRequest(
     val changes: List<DataAccessUpdate>
 )
 
-data class DataAccessUpdate(
-    val type: DataAccessChangeType,
-    val address: String,
-)
 
-enum class DataAccessChangeType {
-    ADD,
-    REMOVE
-}
+
