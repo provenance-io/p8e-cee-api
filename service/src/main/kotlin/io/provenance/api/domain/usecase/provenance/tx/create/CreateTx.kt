@@ -1,14 +1,14 @@
-package io.provenance.api.domain.usecase.provenance.tx
+package io.provenance.api.domain.usecase.provenance.tx.create
 
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.common.model.ScopeConfig
 import io.provenance.api.domain.usecase.common.originator.EntityManager
-import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
-import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.utility.ProvenanceUtils
+import io.provenance.api.models.p8e.TxBody
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import org.springframework.stereotype.Component

@@ -1,11 +1,11 @@
-package io.provenance.api.domain.usecase.provenance.tx
+package io.provenance.api.domain.usecase.provenance.tx.execute
 
-import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
-import io.provenance.api.domain.usecase.provenance.tx.model.ExecuteTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.execute.models.ExecuteTxRequestWrapper
+import io.provenance.api.models.p8e.TxResponse
 import org.springframework.stereotype.Component
 
 @Component

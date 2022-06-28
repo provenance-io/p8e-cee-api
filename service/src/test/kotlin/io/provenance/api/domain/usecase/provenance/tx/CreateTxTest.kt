@@ -15,7 +15,8 @@ import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.grpc.Signer
 import io.provenance.core.Originator
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
-import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
+import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid

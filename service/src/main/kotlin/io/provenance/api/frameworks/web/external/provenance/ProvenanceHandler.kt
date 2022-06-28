@@ -9,10 +9,12 @@ import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetSt
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.domain.usecase.provenance.query.QueryScope
-import io.provenance.api.domain.usecase.provenance.tx.CreateTx
-import io.provenance.api.domain.usecase.provenance.tx.ExecuteTx
-import io.provenance.api.domain.usecase.provenance.tx.model.CreateTxRequestWrapper
-import io.provenance.api.domain.usecase.provenance.tx.model.ExecuteTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
+import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.execute.ExecuteTx
+import io.provenance.api.domain.usecase.provenance.tx.execute.models.ExecuteTxRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permission.UpdateScopeDataAccess
+import io.provenance.api.domain.usecase.provenance.tx.permission.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.p8e.query.QueryScopeRequest
@@ -30,7 +32,8 @@ class ProvenanceHandler(
     private val classifyAsset: ClassifyAsset,
     private val verifyAsset: VerifyAsset,
     private val getFees: GetFeesForAsset,
-    private val getClassificationStatus: GetClassificationStatus
+    private val getClassificationStatus: GetClassificationStatus,
+    private val updateDataAccess: UpdateScopeDataAccess
 ) {
     suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
         createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
@@ -80,6 +83,15 @@ class ProvenanceHandler(
                 req.queryParam("contractName").get(),
                 req.queryParam("chainId").get(),
                 req.queryParam("nodeEndpoint").get()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun updateDataAccess(req: ServerRequest): ServerResponse = runCatching {
+        updateDataAccess.execute(
+            UpdateScopeDataAccessRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
             )
         )
     }.foldToServerResponse()

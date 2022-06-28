@@ -13,6 +13,7 @@ import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
+import io.provenance.scope.util.toUuid
 import java.util.Base64
 import org.springframework.stereotype.Component
 
@@ -29,6 +30,9 @@ class ExecuteContract(
         contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
             val session = contractUtilities.createSession(args.uuid, client, args.request.permissions, args.request.participants, args.request.config, args.request.records, listOf(args.request.scope)).single()
 
+            val signer2 = getSigner.execute(GetSignerRequest("deadbeef-face-2222-860c-facefaceface".toUuid(), args.request.config.account))
+            println("ADDRESS HERE!")
+            println(signer2.address())
             return when (val result = contractService.executeContract(client, session)) {
                 is SignedResult -> {
                     provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {

@@ -322,6 +322,7 @@ class ProvenanceApi {
             GET("/scope/query", handler::queryScope)
             POST("/verify", handler::verifyAsset)
             GET("/fees", handler::getFees)
+            POST("/permission", handler::updateDataAccess)
         }
     }
 }

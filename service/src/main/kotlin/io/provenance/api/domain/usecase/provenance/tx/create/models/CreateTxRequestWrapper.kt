@@ -1,4 +1,4 @@
-package io.provenance.api.domain.usecase.provenance.tx.model
+package io.provenance.api.domain.usecase.provenance.tx.create.models
 
 import io.provenance.api.models.p8e.tx.CreateTxRequest
 import java.util.UUID
