@@ -1,13 +1,13 @@
-package io.provenance.api.domain.usecase.provenance.tx.permission
+package io.provenance.api.domain.usecase.provenance.tx.permissions
 
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
-import io.provenance.api.domain.usecase.provenance.tx.permission.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.provenance.ProvenanceService
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
-import io.provenance.api.models.p8e.tx.DataAccessChangeType
+import io.provenance.api.models.p8e.tx.permissions.DataAccessChangeType
 import io.provenance.client.protobuf.extensions.toAny
 import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.metadata.v1.MsgAddScopeDataAccessRequest

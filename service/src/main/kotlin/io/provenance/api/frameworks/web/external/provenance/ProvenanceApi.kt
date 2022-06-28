@@ -8,7 +8,7 @@ import io.provenance.api.models.p8e.contracts.ClassifyAssetRequest
 import io.provenance.api.models.p8e.contracts.VerifyAssetRequest
 import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
-import io.provenance.api.models.p8e.tx.permission.UpdateScopeDataAccessRequest
+import io.provenance.api.models.p8e.tx.permissions.UpdateScopeDataAccessRequest
 import io.provenance.classification.asset.client.domain.model.AssetDefinition
 import io.provenance.metadata.v1.ScopeResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -309,7 +309,7 @@ class ProvenanceApi {
             )
         ),
         RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permission",
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permissions",
             method = arrayOf(RequestMethod.PATCH),
             produces = ["application/json"],
             operation = Operation(
@@ -352,7 +352,7 @@ class ProvenanceApi {
             GET("/scope/query", handler::queryScope)
             POST("/verify", handler::verifyAsset)
             GET("/fees", handler::getFees)
-            PATCH("/permission", handler::updateDataAccess)
+            PATCH("/permissions", handler::updateDataAccess)
         }
     }
 }

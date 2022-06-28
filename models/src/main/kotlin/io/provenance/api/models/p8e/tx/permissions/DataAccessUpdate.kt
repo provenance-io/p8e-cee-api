@@ -1,4 +1,4 @@
-package io.provenance.api.models.p8e.tx.permission
+package io.provenance.api.models.p8e.tx.permissions
 
 data class DataAccessUpdate(
     val type: DataAccessChangeType,

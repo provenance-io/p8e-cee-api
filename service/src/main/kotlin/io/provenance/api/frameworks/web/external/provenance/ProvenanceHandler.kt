@@ -13,8 +13,8 @@ import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
 import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.execute.ExecuteTx
 import io.provenance.api.domain.usecase.provenance.tx.execute.models.ExecuteTxRequestWrapper
-import io.provenance.api.domain.usecase.provenance.tx.permission.UpdateScopeDataAccess
-import io.provenance.api.domain.usecase.provenance.tx.permission.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.UpdateScopeDataAccess
+import io.provenance.api.domain.usecase.provenance.tx.permissions.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.p8e.query.QueryScopeRequest
