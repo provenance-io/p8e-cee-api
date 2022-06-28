@@ -10,6 +10,3 @@ data class UpdateScopeDataAccessRequest(
     val provenanceConfig: ProvenanceConfig,
     val changes: List<DataAccessUpdate>
 )
-
-
-
