@@ -1,17 +1,21 @@
 #!/bin/bash
 
-while getopts 'p: c' OPTION; do
+while getopts 'p:v:c' OPTION; do
   case "$OPTION" in
     p)
       PATH_TO_CONTRACTS="$OPTARG"
       echo "Path to contracts you wish to publish: $OPTARG"
+      ;;
+    v)
+      CONTRACTS_VERSION="$OPTARG"
+      echo "Version you wish to publish the contracts as: $OPTARG"
       ;;
     c)
       SETUP_SMART_CONTRACT=true
       echo "Running setup with smart contracts."
       ;;
     ?)
-      echo "script usage: $(basename \$0) [-p <path to p8e contracts directory>]" >&2
+      echo "script usage: $(basename \$0) [-p <path to p8e contracts directory> -v <version to publish contracts as>]" >&2
       exit 1
       ;;
   esac
@@ -54,7 +58,12 @@ function up {
 function publish() {
     if [ -z ${PATH_TO_CONTRACTS+x} ]; then
         echo "Provide a valid path to the contracts directory you wish to publish using the -p argument."
-        exit
+        exit 1
+    fi
+
+    if [ -z ${CONTRACTS_VERSION} ]; then
+        echo "Provide a valid version string you wish to publish the contracts as using the -v argument."
+        exit 1
     fi
 
    source ./service/docker/bootstrap.env
@@ -62,10 +71,11 @@ function publish() {
 
     if [[ -d "$FULL_PATH" ]]; then
         pushd $PATH_TO_CONTRACTS > /dev/null
-        ./gradlew p8eClean p8eCheck p8eBootstrap --info && ./gradlew publishToMavenLocal -xsignMavenPublication --info
+        ./gradlew p8eClean p8eCheck p8eBootstrap --info && ./gradlew publishToMavenLocal -Pversion="$CONTRACTS_VERSION" -xsignMavenPublication --info
         popd > /dev/null
     else
         echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
+        exit 1
     fi
 }
 
@@ -82,7 +92,7 @@ function bounce {
 function build_classification() {
     if [ -z ${PATH_TO_CONTRACTS+x} ]; then
         echo "Provide a valid path to the smart contracts directory you wish to store on provenance using the -p argument."
-        exit
+        exit 1
     fi
 
     export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
@@ -95,6 +105,7 @@ function build_classification() {
         cp $PATH_TO_CONTRACTS/artifacts/asset_classification_smart_contract.wasm service/docker/prov-init/contracts/asset_classification_smart_contract.wasm
     else
         echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
+        exit 1
     fi
 }
 
