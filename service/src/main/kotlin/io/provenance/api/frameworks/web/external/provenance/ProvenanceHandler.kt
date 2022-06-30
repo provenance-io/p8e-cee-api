@@ -13,8 +13,10 @@ import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
 import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.execute.ExecuteTx
 import io.provenance.api.domain.usecase.provenance.tx.execute.models.ExecuteTxRequestWrapper
-import io.provenance.api.domain.usecase.provenance.tx.permissions.UpdateScopeDataAccess
-import io.provenance.api.domain.usecase.provenance.tx.permissions.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.UpdateAuthzGrant
+import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.models.UpdateAuthzRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.UpdateScopeDataAccess
+import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.p8e.query.QueryScopeRequest
@@ -33,7 +35,8 @@ class ProvenanceHandler(
     private val verifyAsset: VerifyAsset,
     private val getFees: GetFeesForAsset,
     private val getClassificationStatus: GetClassificationStatus,
-    private val updateDataAccess: UpdateScopeDataAccess
+    private val updateDataAccess: UpdateScopeDataAccess,
+    private val updateAuthzGrant: UpdateAuthzGrant
 ) {
     suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
         createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
@@ -90,6 +93,15 @@ class ProvenanceHandler(
     suspend fun updateDataAccess(req: ServerRequest): ServerResponse = runCatching {
         updateDataAccess.execute(
             UpdateScopeDataAccessRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun updateAuthz(req: ServerRequest): ServerResponse = runCatching {
+        updateAuthzGrant.execute(
+            UpdateAuthzRequestWrapper(
                 req.getUser(),
                 req.awaitBody()
             )

@@ -8,7 +8,8 @@ import io.provenance.api.models.p8e.contracts.ClassifyAssetRequest
 import io.provenance.api.models.p8e.contracts.VerifyAssetRequest
 import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
-import io.provenance.api.models.p8e.tx.permissions.UpdateScopeDataAccessRequest
+import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
+import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
 import io.provenance.classification.asset.client.domain.model.AssetDefinition
 import io.provenance.metadata.v1.ScopeResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -309,7 +310,7 @@ class ProvenanceApi {
             )
         ),
         RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permissions",
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permissions/data-access",
             method = arrayOf(RequestMethod.PATCH),
             produces = ["application/json"],
             operation = Operation(
@@ -337,6 +338,35 @@ class ProvenanceApi {
                 ]
             )
         ),
+        RouterOperation(
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permissions/authz",
+            method = arrayOf(RequestMethod.PATCH),
+            produces = ["application/json"],
+            operation = Operation(
+                tags = ["Provenance"],
+                operationId = "updateAuthzGrant",
+                method = "PATCH",
+                parameters = [
+                    Parameter(
+                        name = "x-uuid",
+                        required = true,
+                        `in` = ParameterIn.HEADER,
+                        schema = Schema(implementation = UUID::class),
+                    ),
+                ],
+                requestBody = RequestBody(
+                    required = true,
+                    content = [Content(schema = Schema(implementation = UpdateAuthzRequest::class))]
+                ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        description = "successful operation",
+                        content = [Content(schema = Schema(implementation = TxResponse::class))]
+                    )
+                ]
+            )
+        )
     )
     fun externalProvenanceApiV1(handler: ProvenanceHandler) = coRouter {
         logExchange(log)
@@ -352,7 +382,10 @@ class ProvenanceApi {
             GET("/scope/query", handler::queryScope)
             POST("/verify", handler::verifyAsset)
             GET("/fees", handler::getFees)
-            PATCH("/permissions", handler::updateDataAccess)
+            "/permissions".nest {
+                PATCH("/data-access", handler::updateDataAccess)
+                PATCH("/authz", handler::updateAuthz)
+            }
         }
     }
 }

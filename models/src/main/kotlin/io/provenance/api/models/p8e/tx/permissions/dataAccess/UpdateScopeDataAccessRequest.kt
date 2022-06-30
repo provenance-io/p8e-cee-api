@@ -1,4 +1,4 @@
-package io.provenance.api.models.p8e.tx.permissions
+package io.provenance.api.models.p8e.tx.permissions.dataAccess
 
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.ProvenanceConfig
