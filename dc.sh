@@ -29,23 +29,33 @@ function up {
   sh service/docker/vault/init-and-unseal.sh 'http://127.0.0.1:8200' 'kv2_originations'
 
   sleep 2
-  sh service/docker/vault/add-secret.sh 'http://127.0.0.1:8200' 'kv2_originations' deadbeef-face-479b-860c-facefaceface \
-   0A4104C51E49E4F0ABA2FD5B8CF99445D6D6C385164DBC8F35E7374CAC241D4155ADC48EF9B199F799DC865EC24AF54376CF5DD29A1287F1FD3410709A62F5DDE49349 \
-   0A4104C51E49E4F0ABA2FD5B8CF99445D6D6C385164DBC8F35E7374CAC241D4155ADC48EF9B199F799DC865EC24AF54376CF5DD29A1287F1FD3410709A62F5DDE49349 \
-   0A4104C51E49E4F0ABA2FD5B8CF99445D6D6C385164DBC8F35E7374CAC241D4155ADC48EF9B199F799DC865EC24AF54376CF5DD29A1287F1FD3410709A62F5DDE49349 \
-   0A201AD27E627DD0A6A5816D293C41DF801D3E7BA868EEC0F433FDA581D71E38016E \
-   0A201AD27E627DD0A6A5816D293C41DF801D3E7BA868EEC0F433FDA581D71E38016E \
-   0A201AD27E627DD0A6A5816D293C41DF801D3E7BA868EEC0F433FDA581D71E38016E \
-   "stable payment cliff fault abuse clinic bus belt film then forward world goose bring picnic rich special brush basic lamp window coral worry change"
 
-  sh service/docker/vault/add-secret.sh 'http://127.0.0.1:8200' 'kv2_originations' deadbeef-face-2222-860c-facefaceface \
-   0A41042C52EB79307D248B6CFB2A4AF562E403D4826BB0F540F024BBC3937528F6EB0B7FFA7A6585B751DBA25C173E658F3FEAAB0F05980C76E985CE0D55294F3600D7 \
-   0A41042C52EB79307D248B6CFB2A4AF562E403D4826BB0F540F024BBC3937528F6EB0B7FFA7A6585B751DBA25C173E658F3FEAAB0F05980C76E985CE0D55294F3600D7 \
-   0A41042C52EB79307D248B6CFB2A4AF562E403D4826BB0F540F024BBC3937528F6EB0B7FFA7A6585B751DBA25C173E658F3FEAAB0F05980C76E985CE0D55294F3600D7 \
-   0A2100AF41AAD44E6D0A1DF587491D01C11DB4E0F1BBDDE33F19CB2C4ADDDBE7FC82C4 \
-   0A2100AF41AAD44E6D0A1DF587491D01C11DB4E0F1BBDDE33F19CB2C4ADDDBE7FC82C4 \
-   0A2100AF41AAD44E6D0A1DF587491D01C11DB4E0F1BBDDE33F19CB2C4ADDDBE7FC82C4 \
-   "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
+  export VAULT_ADDR="http://127.0.0.1:8200"
+  SECRET_PATH=kv2_originations
+  # local-originator
+  cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000001 - > /dev/null
+  cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0 - > /dev/null
+  # local-servicer
+  cat service/docker/vault/secrets/local-servicer.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000002 - > /dev/null
+  cat service/docker/vault/secrets/local-servicer.json | vault kv put $SECRET_PATH/originators/tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd - > /dev/null
+  # local-dart
+  cat service/docker/vault/secrets/local-dart.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000003 - > /dev/null
+  cat service/docker/vault/secrets/local-dart.json | vault kv put $SECRET_PATH/originators/tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl - > /dev/null
+  # local-portfolio-manager
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000004 - > /dev/null
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc - > /dev/null
+  # local-controller-a
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000005 - > /dev/null
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/tp138jtpz5zxa6yc33s0fk2jy9vahqcuvvtwnrzge - > /dev/null
+  # local-controller-b
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000006 - > /dev/null
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/tp1pz4tt4j802j2y3avs5mwy9uyyxtx7k5r8qlehw - > /dev/null
+  # local-validator
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000007 - > /dev/null
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/tp1he6rfnxyx2ssqyknq4ayzf5j46dp29pqt6z708 - > /dev/null
+  # local-investor
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000008 - > /dev/null
+  cat service/docker/vault/secrets/local-portfolio-manager.json | vault kv put $SECRET_PATH/originators/tp1f99dgtxxjmgczjsuc48utq4lkk0uhx6eqfqju0 - > /dev/null
 
   docker ps -a
 
