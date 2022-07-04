@@ -84,13 +84,13 @@ http://localhost:8080/p8e-cee-api/secure/docs/api.html
 As a convenience, you can publish contracts from another repository without leaving this project in the command line.
 
 ```
-./dc.sh -p <path to contracts repository> publish
+./dc.sh -p <path to contracts repository> -v <version to publish> publish
 ```
 
 For example:
 
 ```
-./dc.sh -p ../../provenance-io/loan-package-contracts publish
+./dc.sh -p ../../provenance-io/loan-package-contracts -v 0.3.2 publish
 ```
 
 Note: This convenience method uses preset environment variables found in `/service/docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/docker/prov-init/config/genesis.json`).
