@@ -21,6 +21,5 @@ write a little note why.
 - [ ] Targeted PR against correct branch (see [CONTRIBUTING.md](https://github.com/provenance-io/p8e-cee-api/blob/main/CONTRIBUTING.md#pr-targeting))
 - [ ] Linked to Github issue with discussion and accepted design OR link to spec that describes this work.
 - [ ] Wrote unit and integration
-- [ ] Added a relevant changelog entry to the `Unreleased` section in `CHANGELOG.md`
 - [ ] Re-reviewed `Files changed` in the Github PR explorer
-- [ ] Review `Codecov Report` in the comment section below once CI passes
+- [ ] Review `Unit Test Results` in the comment section below once CI passes
