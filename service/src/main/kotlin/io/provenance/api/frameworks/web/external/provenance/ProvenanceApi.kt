@@ -383,7 +383,7 @@ class ProvenanceApi {
             POST("/verify", handler::verifyAsset)
             GET("/fees", handler::getFees)
             "/permissions".nest {
-                PATCH("/data-access", handler::updateDataAccess)
+                PATCH("/data", handler::updateDataAccess)
                 PATCH("/authz", handler::updateAuthz)
             }
         }
