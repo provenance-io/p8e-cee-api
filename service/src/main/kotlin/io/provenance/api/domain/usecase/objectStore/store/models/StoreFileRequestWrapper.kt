@@ -12,7 +12,9 @@ data class StoreFileRequestWrapper(
 
 data class SwaggerStoreFileRequestWrapper(
     val objectStoreAddress: String,
+    val id: UUID,
     val file: FilePart,
+    val storeRawBytes: Boolean,
 )
 
 data class SwaggerGetFileResponse(
