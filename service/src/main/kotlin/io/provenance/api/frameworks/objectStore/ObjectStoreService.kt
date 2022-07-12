@@ -32,30 +32,25 @@ class ObjectStoreService(
         return res.getDecryptedPayload(DirectKeyRef(publicKey, privateKey)).readAllBytes()
     }
 
-    override fun storeMessage(
-        client: OsClient,
-        message: Message,
-        publicKey: PublicKey,
-        additionalAudiences: Set<PublicKey>
-    ): StoreProtoResponse {
-        val future = client.put(
-            message,
-            publicKey,
-            Pen(ProvenanceKeyGenerator.generateKeyPair(publicKey)),
-            additionalAudiences
-        )
-
-        return future.get(osConfig.timeoutMs, TimeUnit.MILLISECONDS).toModel()
-    }
-
-    override fun storeFile(client: OsClient, file: InputStream, publicKey: PublicKey, additionalAudiences: Set<PublicKey>): StoreProtoResponse {
-        val future = client.put(
-            file,
-            publicKey,
-            Pen(ProvenanceKeyGenerator.generateKeyPair(publicKey)),
-            file.available().toLong(),
-            additionalAudiences
-        )
+    override fun <T> store(client: OsClient, message: T, publicKey: PublicKey, additionalAudiences: Set<PublicKey>): StoreProtoResponse {
+        val future = when (message) {
+            is InputStream -> client.put(
+                message,
+                publicKey,
+                Pen(ProvenanceKeyGenerator.generateKeyPair(publicKey)),
+                message.available().toLong(),
+                additionalAudiences
+            )
+            is Message -> client.put(
+                message,
+                publicKey,
+                Pen(ProvenanceKeyGenerator.generateKeyPair(publicKey)),
+                additionalAudiences
+            )
+            else -> {
+                throw IllegalArgumentException("Not supported file type to store against EOS!")
+            }
+        }
 
         return future.get(osConfig.timeoutMs, TimeUnit.MILLISECONDS).toModel()
     }

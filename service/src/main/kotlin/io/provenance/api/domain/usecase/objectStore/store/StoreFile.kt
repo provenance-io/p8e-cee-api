@@ -22,6 +22,9 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
 import org.springframework.stereotype.Component
+import tech.figure.asset.v1beta1.AssetOuterClassBuilders
+import tech.figure.proto.util.FileNFT
+import tech.figure.proto.util.toProtoAny
 
 @Component
 class StoreFile(
@@ -32,6 +35,7 @@ class StoreFile(
     override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse {
         var additionalAudiences = emptySet<AudienceKeyPair>()
         var keyConfig: KeyManagementConfig? = null
+
         args.request["account"]?.let {
             keyConfig = Gson().fromJson((it as FormFieldPart).value(), AccountInfo::class.java).keyManagementConfig
         }
@@ -47,16 +51,30 @@ class StoreFile(
 
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, keyConfig))
         val file = args.request.getAsType<FilePart>("file")
+        var message: Any = ByteArrayInputStream(file.awaitAllBytes())
 
         OsClient(
             URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()),
             objectStoreConfig.timeoutMs,
         ).use { osClient ->
-            return objectStore.storeFile(
+            if (!args.storeRawBytes) {
+                message = AssetOuterClassBuilders.Asset {
+                    idBuilder.value = args.request.getAsType<FormFieldPart>("id").value()
+                    type = FileNFT.ASSET_TYPE
+                    description = file.filename()
+
+                    putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
+                    putKv(FileNFT.KEY_BYTES, file.awaitAllBytes().toProtoAny())
+                    putKv(FileNFT.KEY_SIZE, file.awaitAllBytes().size.toString().toProtoAny())
+                    putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
+                }
+            }
+
+            return objectStore.store(
                 osClient,
-                ByteArrayInputStream(file.awaitAllBytes()),
+                message,
                 originator.encryptionPublicKey() as PublicKey,
-                additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet(),
+                additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
             )
         }
     }
