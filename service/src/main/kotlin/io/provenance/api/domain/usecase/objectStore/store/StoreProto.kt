@@ -10,10 +10,9 @@ import io.provenance.api.frameworks.config.ObjectStoreConfig
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
-import org.springframework.stereotype.Component
-import java.lang.IllegalStateException
 import java.net.URI
 import java.security.PublicKey
+import org.springframework.stereotype.Component
 
 @Component
 class StoreProto(
@@ -32,7 +31,7 @@ class StoreProto(
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 
         OsClient(URI.create(args.request.objectStoreAddress), objectStoreConfig.timeoutMs).use { osClient ->
-            return objectStore.storeMessage(
+            return objectStore.store(
                 osClient,
                 asset,
                 publicKey,

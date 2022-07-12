@@ -5,5 +5,6 @@ import java.util.UUID
 
 data class GetFileRequestWrapper(
     val uuid: UUID,
-    val request: GetFileRequest
+    val request: GetFileRequest,
+    val rawBytes: Boolean = false,
 )
