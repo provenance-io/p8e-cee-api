@@ -1,5 +1,6 @@
 package io.provenance.api.domain.usecase.objectstore
 
+import com.google.protobuf.Message
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
@@ -8,8 +9,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.core.Originator
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.objectStore.store.StoreProto
@@ -21,10 +20,12 @@ import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
+import io.provenance.api.models.p8e.PermissionInfo
+import io.provenance.core.Originator
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
-import org.junit.jupiter.api.Assertions.assertEquals
 import java.security.PublicKey
+import org.junit.jupiter.api.Assertions.assertEquals
 import tech.figure.asset.v1beta1.Asset
 
 const val ADD_ASSET_OBJECT_STORE_ADDRESS = "grpc://localhost:5005"
@@ -70,7 +71,7 @@ class StoreAssetTest : FunSpec({
     test("happy path") {
         val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
-        every { mockObjectStore.storeMessage(any(), any(), any(), any()) } returns storeAssetResponse
+        every { mockObjectStore.store(any(), any<Message>(), any(), any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
@@ -96,9 +97,9 @@ class StoreAssetTest : FunSpec({
         assertEquals(response, storeAssetResponse)
 
         verify {
-            mockObjectStore.storeMessage(
+            mockObjectStore.store(
                 any(),
-                any(),
+                any<Message>(),
                 mockOriginatorPublicKey,
                 any()
             )
