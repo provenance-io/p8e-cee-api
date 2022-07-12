@@ -22,10 +22,10 @@ class GetFile(
             } else {
                 Asset.parseFrom(it)
                     .takeIf { asset -> asset.isSet() && asset.type == FileNFT.ASSET_TYPE }
-                    ?.let {
-                        val fileName = it.getKvOrThrow(FileNFT.KEY_FILENAME).unpack(StringValue::class.java).value
-                        val contentType = it.getKvOrThrow(FileNFT.KEY_CONTENT_TYPE).unpack(StringValue::class.java).value
-                        return it.getKvOrThrow(FileNFT.KEY_BYTES).unpack(BytesValue::class.java).value.toByteArray().toByteResponse(fileName, contentType)
+                    ?.let { asset ->
+                        val fileName = asset.getKvOrThrow(FileNFT.KEY_FILENAME).unpack(StringValue::class.java).value
+                        val contentType = asset.getKvOrThrow(FileNFT.KEY_CONTENT_TYPE).unpack(StringValue::class.java).value
+                        return asset.getKvOrThrow(FileNFT.KEY_BYTES).unpack(BytesValue::class.java).value.toByteArray().toByteResponse(fileName, contentType)
                     } ?: throw IllegalArgumentException("Provided hash is not an Asset.")
             }
         }
