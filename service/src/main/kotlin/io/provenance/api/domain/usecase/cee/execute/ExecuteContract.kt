@@ -21,7 +21,7 @@ class ExecuteContract(
     private val contractService: ContractService,
     private val provenanceService: Provenance,
     private val getSigner: GetSigner,
-    private val contractUtilities: ContractUtilities
+    private val contractUtilities: ContractUtilities,
 ) : AbstractUseCase<ExecuteContractRequestWrapper, ContractExecutionResponse>() {
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
