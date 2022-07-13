@@ -2,6 +2,8 @@
 
 The p8e-cee-api allows for operations against the encrypted object store, with included support for multi-store replication, and creating and broadcasting scoped transmissions to the Provenance Blockchain.
 
+`p8e-cee-api` stands for the Provenance Contract Execution Environment API.
+
 ## Status
 
 [![stability-release-candidate](https://img.shields.io/badge/stability-pre--release-48c9b0.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#release-candidate)
