@@ -6,8 +6,7 @@ import org.springframework.http.codec.multipart.Part
 
 data class StoreFileRequestWrapper(
     val uuid: UUID,
-    val request: Map<String, Part>,
-    val storeRawBytes: Boolean = false,
+    val request: Map<String, Part>
 )
 
 data class SwaggerStoreFileRequestWrapper(

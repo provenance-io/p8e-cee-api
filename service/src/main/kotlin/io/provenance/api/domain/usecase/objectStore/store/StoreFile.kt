@@ -57,7 +57,7 @@ class StoreFile(
             URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()),
             objectStoreConfig.timeoutMs,
         ).use { osClient ->
-            if (!args.storeRawBytes) {
+            if (!args.request.getAsType<FormFieldPart>("storeRawBytes").value().toBoolean()) {
                 message = AssetOuterClassBuilders.Asset {
                     idBuilder.value = args.request.getAsType<FormFieldPart>("id").value()
                     type = FileNFT.ASSET_TYPE
