@@ -11,7 +11,7 @@ import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
-import io.provenance.api.models.cee.approve.ApproveContractResponse
+import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
 import java.util.Base64
@@ -22,8 +22,8 @@ class ApproveContractExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,
     private val getSigner: GetSigner,
-) : AbstractUseCase<ApproveContractRequestWrapper, ApproveContractResponse>() {
-    override suspend fun execute(args: ApproveContractRequestWrapper): ApproveContractResponse {
+) : AbstractUseCase<ApproveContractRequestWrapper, ApproveContractExecutionResponse>() {
+    override suspend fun execute(args: ApproveContractRequestWrapper): ApproveContractExecutionResponse {
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.approval.envelope).build()
         createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
 
@@ -36,7 +36,7 @@ class ApproveContractExecution(
                 }
 
                 client.respondWithApproval(result.envelopeState, tx.txhash)
-                return ApproveContractResponse(Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), tx.toTxResponse())
+                return ApproveContractExecutionResponse(Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), tx.toTxResponse())
             } else throw ContractExecutionException("Attempted to approve an envelope that did not result in a fragment. Only non-approved envelopes should be sent!")
         }
     }

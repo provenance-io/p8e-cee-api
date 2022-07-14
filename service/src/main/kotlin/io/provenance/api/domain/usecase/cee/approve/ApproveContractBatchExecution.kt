@@ -12,7 +12,7 @@ import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
-import io.provenance.api.models.cee.approve.ApproveContractResponse
+import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
 import java.util.Base64
@@ -24,12 +24,12 @@ class ApproveContractBatchExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,
     private val getSigner: GetSigner,
-) : AbstractUseCase<ApproveContractBatchRequestWrapper, List<ApproveContractResponse>>() {
+) : AbstractUseCase<ApproveContractBatchRequestWrapper, List<ApproveContractExecutionResponse>>() {
     private val log = KotlinLogging.logger { }
 
-    override suspend fun execute(args: ApproveContractBatchRequestWrapper): List<ApproveContractResponse> {
+    override suspend fun execute(args: ApproveContractBatchRequestWrapper): List<ApproveContractExecutionResponse> {
         val errors = mutableListOf<Throwable>()
-        val responses = mutableListOf<ApproveContractResponse>()
+        val responses = mutableListOf<ApproveContractExecutionResponse>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
         createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
@@ -54,7 +54,7 @@ class ApproveContractBatchExecution(
 
                     it.forEach { executions ->
                         client.respondWithApproval(executions.first, broadcast.txhash)
-                        responses.add(ApproveContractResponse(Base64.getEncoder().encodeToString(executions.first.toByteArray()), broadcast.toTxResponse()))
+                        responses.add(ApproveContractExecutionResponse(Base64.getEncoder().encodeToString(executions.first.toByteArray()), broadcast.toTxResponse()))
                     }
                 }.fold(
                     onSuccess = {
