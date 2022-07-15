@@ -42,7 +42,7 @@ class ContractUtilities(
     }
 
     suspend fun createSession(uuid: UUID, client: Client, permissions: PermissionInfo?, participants: List<Participant>, config: ExecuteContractConfig, records: Map<String, Any>, scopes: List<ScopeInfo>): List<Session> {
-        var audiences = entityManager.hydrateKeys(permissions, participants)
+        val audiences = entityManager.hydrateKeys(permissions, participants)
         val contract = contractService.getContract(config.contract.contractName)
         val parsedRecords = getRecords(contractParser, records, contract, config.contract.parserConfig)
 
