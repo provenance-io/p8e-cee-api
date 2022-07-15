@@ -47,12 +47,19 @@ class ContractUtilities(
         val parsedRecords = getRecords(contractParser, records, contract, config.contract.parserConfig)
 
         val participantsMap = participants.associate {
-            it.partyType to entityManager.getEntity(KeyManagementConfigWrapper(it.uuid, config.account.keyManagementConfig))
+            it.partyType to entityManager.getEntity(KeyManagementConfigWrapper(it.uuid.toString(), config.account.keyManagementConfig))
         }
 
         return scopes.map {
             val scope = provenanceService.getScope(config.provenanceConfig, it.scopeUuid)
             val scopeToUse: ScopeResponse? = if (scope.scope.scope.isSet() && !scope.scope.scope.scopeId.isEmpty) scope else null
+
+            if (scope.scope.scope.dataAccessList.any()) {
+                entityManager.hydrateKeys(scope.scope.scope.dataAccessList).forEach { kp ->
+                    client.inner.affiliateRepository.addAffiliate(kp.signingKey.toJavaPublicKey(), kp.encryptionKey.toJavaPublicKey())
+                }
+            }
+
             contractService.setupContract(
                 client,
                 contract,

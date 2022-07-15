@@ -20,7 +20,7 @@ class RetrieveAndDecrypt(
     private val objectStoreConfig: ObjectStoreConfig,
 ) : AbstractUseCase<RetrieveAndDecryptRequest, ByteArray>() {
     override suspend fun execute(args: RetrieveAndDecryptRequest): ByteArray {
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.keyManagementConfig))
+        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.keyManagementConfig))
         val publicKey = (originator.encryptionPublicKey() as? PublicKey)
             ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
 

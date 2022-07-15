@@ -35,7 +35,7 @@ class EntityManager(
         )
 
         val token = fetchToken(config)
-        return manager.get(args.uuid.toString(), VaultSpec(args.uuid.toString(), "${config.address}/${args.uuid}", token))
+        return manager.get(args.entity, VaultSpec(args.entity, "${config.address}/${args.entity}", token))
     }
 
     fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
@@ -47,7 +47,7 @@ class EntityManager(
         )
 
         fun getEntityKeys(uuid: UUID) {
-            val originator = getEntity(KeyManagementConfigWrapper(uuid, config))
+            val originator = getEntity(KeyManagementConfigWrapper(uuid.toString(), config))
             additionalAudiences.add(
                 AudienceKeyPair(
                     originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
@@ -76,6 +76,16 @@ class EntityManager(
         return additionalAudiences
     }
 
+    fun hydrateKeys(addresses: List<String>, keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> =
+        addresses.map {
+            getEntity(KeyManagementConfigWrapper(it, keyManagementConfig)).let { entity ->
+                AudienceKeyPair(
+                    entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
+                    entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
+                )
+            }
+        }.toSet()
+
     @Suppress("UnsafeCallOnNullableType")
     private fun fetchToken(config: KeyManagementConfig): String {
 
@@ -99,7 +109,7 @@ class EntityManager(
 
     private fun getMemberKeyPair(audience: DefaultAudience, keyManagementConfig: KeyManagementConfig): AudienceKeyPair =
         provenanceProperties.members.firstOrNull { it.name == audience }?.let {
-            val entity = getEntity(KeyManagementConfigWrapper(it.uuid, keyManagementConfig))
+            val entity = getEntity(KeyManagementConfigWrapper(it.uuid.toString(), keyManagementConfig))
             AudienceKeyPair(
                 entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
                 entity.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),

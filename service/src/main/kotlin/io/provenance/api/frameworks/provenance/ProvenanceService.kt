@@ -91,7 +91,6 @@ class ProvenanceService : Provenance {
                 sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
             )
 
-            log.info("Sending tx.")
             val result = pbClient.estimateAndBroadcastTx(
                 txBody = tx,
                 signers = listOf(baseSigner),

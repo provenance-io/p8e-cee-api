@@ -7,21 +7,21 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.provenance.api.domain.usecase.common.originator.EntityManager
-import io.provenance.api.models.account.AccountInfo
-import io.provenance.api.models.p8e.Audience
-import io.provenance.api.models.p8e.AudienceKeyPair
-import io.provenance.api.models.p8e.tx.CreateTxRequest
-import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.client.grpc.Signer
-import io.provenance.core.Originator
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
 import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
+import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.p8e.Audience
+import io.provenance.api.models.p8e.AudienceKeyPair
+import io.provenance.api.models.p8e.PermissionInfo
+import io.provenance.api.models.p8e.tx.CreateTxRequest
+import io.provenance.client.grpc.Signer
+import io.provenance.core.Originator
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.util.toUuid
-import org.junit.jupiter.api.Assertions.assertNotNull
 import java.security.PublicKey
+import org.junit.jupiter.api.Assertions.assertNotNull
 
 const val ADD_ASSET_AUDIENCE_PUBLIC_KEY =
     "0A41046C57E9E25101D5E553AE003E2F79025E389B51495607C796B4E95C0A94001FBC24D84CD0780819612529B803E8AD0A397F474C965D957D33DD64E642B756FBC4"
@@ -69,7 +69,7 @@ class CreateTxTest : FunSpec({
 
     test("happy path") {
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
-        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
+        every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
 
         // Execute enable replication code
         val response = createTx.execute(

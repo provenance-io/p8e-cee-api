@@ -11,12 +11,12 @@ import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
-import org.springframework.stereotype.Component
 import java.net.URI
 import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.concurrent.TimeUnit
+import org.springframework.stereotype.Component
 
 @Component
 class CreateClient(
@@ -24,7 +24,7 @@ class CreateClient(
     private val entityManager: EntityManager,
 ) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.account.keyManagementConfig))
+        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
         val affiliate = Affiliate(
             signingKeyRef = DirectKeyRef(KeyPair(originator.signingPublicKey() as PublicKey, originator.signingPrivateKey() as PrivateKey)),
             encryptionKeyRef = DirectKeyRef(KeyPair(originator.encryptionPublicKey() as PublicKey, originator.encryptionPrivateKey() as PrivateKey)),
