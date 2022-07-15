@@ -22,7 +22,7 @@ class StoreProto(
     private val parser: MessageParser
 ) : AbstractUseCase<StoreProtoRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreProtoRequestWrapper): StoreProtoResponse {
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, args.request.account.keyManagementConfig))
+        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.request.account.keyManagementConfig))
         val additionalAudiences = entityManager.hydrateKeys(args.request.permissions)
 
         val asset = parser.parse(args.request.message, Class.forName(args.request.type))

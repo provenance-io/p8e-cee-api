@@ -72,7 +72,7 @@ class StoreAssetTest : FunSpec({
         val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
         every { mockObjectStore.store(any(), any<Message>(), any(), any()) } returns storeAssetResponse
-        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
+        every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
@@ -108,7 +108,7 @@ class StoreAssetTest : FunSpec({
 
     test("exception when public key is not set") {
         every { mockOriginator.encryptionPublicKey() } returns FakeKey()
-        every { mockEntityManager.hydrateKeys(any()) } returns emptySet()
+        every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
         // Execute enable replication code

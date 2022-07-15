@@ -49,7 +49,7 @@ class StoreFile(
             additionalAudiences = entityManager.hydrateKeys(permissions)
         }
 
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid, keyConfig))
+        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), keyConfig))
         val file = args.request.getAsType<FilePart>("file")
         var message: Any = ByteArrayInputStream(file.awaitAllBytes())
 
