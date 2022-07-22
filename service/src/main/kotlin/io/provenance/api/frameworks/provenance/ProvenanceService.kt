@@ -83,31 +83,38 @@ class ProvenanceService : Provenance {
         log.info("Determining account information for the tx.")
         val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-            val account = getBaseAccount(pbClient, signer.address())
-            val offset = cachedOffset.getAndIncrementOffset(account.sequence)
-            log.info("--- Offset at: $offset ---")
+                val account = getBaseAccount(pbClient, signer.address())
+                val offset = cachedOffset.getAndIncrementOffset(account.sequence)
 
-            val baseSigner = BaseReqSigner(
-                signer,
-                account = account,
-                sequenceOffset = offset
+                val baseSigner = BaseReqSigner(
+                    signer,
+                    account = account,
+                    sequenceOffset = offset
+                )
+
+            runCatching {
+                val result = pbClient.estimateAndBroadcastTx(
+                    txBody = tx,
+                    signers = listOf(baseSigner),
+                    gasAdjustment = config.gasAdjustment,
+                    mode = config.broadcastMode
+                )
+
+                if (result.isError()) {
+                    throw ProvenanceTxException(result.txResponse.toString())
+                }
+
+                result
+
+            }.fold(
+                onSuccess = {
+                    return it.txResponse
+                },
+                onFailure = {
+                    cachedOffset.getAndDecrement(account.sequence)
+                    throw it
+                }
             )
-
-            val result = pbClient.estimateAndBroadcastTx(
-                txBody = tx,
-                signers = listOf(baseSigner),
-                gasAdjustment = config.gasAdjustment,
-                mode = config.broadcastMode
-            )
-
-            if (result.isError()) {
-
-                log.warn("--- Result contains error! Decrementing offset. ---")
-                cachedOffset.getAndDecrement(account.sequence)
-                throw ProvenanceTxException(result.txResponse.toString())
-            }
-
-            return result.txResponse
         }
     }
 
