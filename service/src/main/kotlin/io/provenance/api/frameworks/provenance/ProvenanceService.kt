@@ -82,13 +82,15 @@ class ProvenanceService : Provenance {
     override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
         log.info("Determining account information for the tx.")
         val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             val account = getBaseAccount(pbClient, signer.address())
+            val offset = cachedOffset.getAndIncrementOffset(account.sequence)
+            log.info("--- Offset at: $offset ---")
+
             val baseSigner = BaseReqSigner(
                 signer,
                 account = account,
-                sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
+                sequenceOffset = offset
             )
 
             val result = pbClient.estimateAndBroadcastTx(
@@ -99,6 +101,8 @@ class ProvenanceService : Provenance {
             )
 
             if (result.isError()) {
+
+                log.warn("--- Result contains error! Decrementing offset. ---")
                 cachedOffset.getAndDecrement(account.sequence)
                 throw ProvenanceTxException(result.txResponse.toString())
             }
