@@ -35,6 +35,7 @@ import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
 import java.net.URI
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -52,6 +53,7 @@ object ProvenanceConst {
 class ProvenanceService : Provenance {
 
     private val log = KotlinLogging.logger { }
+    private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
     override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
@@ -79,26 +81,38 @@ class ProvenanceService : Provenance {
 
     override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
         log.info("Determining account information for the tx.")
-
+        val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             val account = getBaseAccount(pbClient, signer.address())
+
             val baseSigner = BaseReqSigner(
                 signer,
-                account = account
+                account = account,
+                sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
             )
 
-            val result = pbClient.estimateAndBroadcastTx(
-                txBody = tx,
-                signers = listOf(baseSigner),
-                gasAdjustment = config.gasAdjustment,
-                mode = config.broadcastMode
+            runCatching {
+                val result = pbClient.estimateAndBroadcastTx(
+                    txBody = tx,
+                    signers = listOf(baseSigner),
+                    gasAdjustment = config.gasAdjustment,
+                    mode = config.broadcastMode
+                )
+
+                if (result.isError()) {
+                    throw ProvenanceTxException(result.txResponse.toString())
+                }
+
+                result
+            }.fold(
+                onSuccess = {
+                    return it.txResponse
+                },
+                onFailure = {
+                    cachedOffset.getAndDecrement(account.sequence)
+                    throw it
+                }
             )
-
-            if (result.isError()) {
-                throw ProvenanceTxException(result.txResponse.toString())
-            }
-
-            return result.txResponse
         }
     }
 
@@ -144,6 +158,7 @@ class ProvenanceService : Provenance {
 
     override fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
+            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
             val account = getBaseAccount(it, signer.address())
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
@@ -155,6 +170,7 @@ class ProvenanceService : Provenance {
                 onboardAssetRequest, signer,
                 options = BroadcastOptions(
                     broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
                     baseAccount = account
                 )
             ).txResponse
@@ -164,6 +180,7 @@ class ProvenanceService : Provenance {
 
     override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
+            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
             val account = getBaseAccount(it, signer.address())
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
@@ -175,6 +192,7 @@ class ProvenanceService : Provenance {
                 verifyAssetRequest, signer,
                 options = BroadcastOptions(
                     broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
                     baseAccount = account
                 )
             ).txResponse
