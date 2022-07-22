@@ -83,14 +83,13 @@ class ProvenanceService : Provenance {
         log.info("Determining account information for the tx.")
         val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-                val account = getBaseAccount(pbClient, signer.address())
-                val offset = cachedOffset.getAndIncrementOffset(account.sequence)
+            val account = getBaseAccount(pbClient, signer.address())
 
-                val baseSigner = BaseReqSigner(
-                    signer,
-                    account = account,
-                    sequenceOffset = offset
-                )
+            val baseSigner = BaseReqSigner(
+                signer,
+                account = account,
+                sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
+            )
 
             runCatching {
                 val result = pbClient.estimateAndBroadcastTx(
@@ -105,7 +104,6 @@ class ProvenanceService : Provenance {
                 }
 
                 result
-
             }.fold(
                 onSuccess = {
                     return it.txResponse
