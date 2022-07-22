@@ -2,7 +2,6 @@ package io.provenance.api.domain.usecase.common.originator
 
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
-import io.provenance.api.frameworks.config.ServiceKeys
 import io.provenance.api.frameworks.config.VaultProperties
 import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.account.Participant
@@ -21,8 +20,7 @@ import org.springframework.stereotype.Component
 @Component
 class EntityManager(
     private val vaultProperties: VaultProperties,
-    private val provenanceProperties: ProvenanceProperties,
-    private val serviceKeys: ServiceKeys
+    private val provenanceProperties: ProvenanceProperties
 ) {
     private var manager: OriginatorManager = OriginatorManager()
     private var tokenMap = mutableMapOf<KeyManagementConfig, String>()
@@ -70,7 +68,7 @@ class EntityManager(
             }
         }
 
-        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getPropertyKeyPair(DefaultAudience.PORTFOLIO_MANAGER))
+        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.PORTFOLIO_MANAGER, config))
         if (permissions?.permissionDart == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.DART, config))
 
         return additionalAudiences
@@ -109,19 +107,10 @@ class EntityManager(
 
     private fun getMemberKeyPair(audience: DefaultAudience, keyManagementConfig: KeyManagementConfig): AudienceKeyPair =
         provenanceProperties.members.firstOrNull { it.name == audience }?.let {
-            val entity = getEntity(KeyManagementConfigWrapper(it.uuid.toString(), keyManagementConfig))
+            val entity = getEntity(KeyManagementConfigWrapper(it.id, keyManagementConfig))
             AudienceKeyPair(
                 entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
                 entity.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
             )
         } ?: throw IllegalStateException("Failed to find requested aud")
-
-    private fun getPropertyKeyPair(audience: DefaultAudience): AudienceKeyPair =
-        when (audience) {
-            DefaultAudience.PORTFOLIO_MANAGER -> AudienceKeyPair(
-                serviceKeys.portfolioManager,
-                serviceKeys.portfolioManager,
-            )
-            else -> throw IllegalStateException("Service key of type ${audience.name} not supported.")
-        }
 }
