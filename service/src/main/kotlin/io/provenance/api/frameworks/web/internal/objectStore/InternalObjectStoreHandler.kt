@@ -1,22 +1,23 @@
 package io.provenance.api.frameworks.web.internal.objectStore
 
-import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.domain.usecase.objectStore.get.GetFile
 import io.provenance.api.domain.usecase.objectStore.get.GetProto
 import io.provenance.api.domain.usecase.objectStore.get.models.GetFileRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.get.models.GetProtoRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.StoreFile
 import io.provenance.api.domain.usecase.objectStore.store.StoreProto
+import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
+import io.provenance.api.frameworks.web.misc.foldToServerResponse
+import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.eos.get.GetFileRequest
 import io.provenance.api.models.eos.get.GetProtoRequest
-import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
 import org.springframework.web.reactive.function.server.awaitMultipartData
+import org.springframework.web.reactive.function.server.queryParamOrNull
 
 @Component
 class InternalObjectStoreHandler(
@@ -38,6 +39,6 @@ class InternalObjectStoreHandler(
     }.foldToServerResponse()
 
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
-        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get())))
+        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false) ))
     }.foldToServerResponse()
 }

@@ -17,7 +17,7 @@ class GetFile(
 ) : AbstractUseCase<GetFileRequestWrapper, Any>() {
     override suspend fun execute(args: GetFileRequestWrapper): Any {
         retrieveAndDecrypt.execute(RetrieveAndDecryptRequest(args.uuid, args.request.objectStoreAddress, args.request.hash, args.request.accountInfo.keyManagementConfig)).let {
-            if (args.rawBytes) {
+            if (args.request.rawBytes) {
                 return it
             } else {
                 Asset.parseFrom(it)
