@@ -39,6 +39,6 @@ class InternalObjectStoreHandler(
     }.foldToServerResponse()
 
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
-        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false) ))
+        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false)))
     }.foldToServerResponse()
 }
