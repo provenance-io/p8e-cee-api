@@ -3,8 +3,8 @@ package io.provenance.api.domain.usecase.objectStore.get
 import com.google.protobuf.Message
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.objectStore.get.models.GetProtoRequestWrapper
-import io.provenance.api.util.toPrettyJson
 import io.provenance.api.domain.usecase.objectStore.get.models.RetrieveAndDecryptRequest
+import io.provenance.api.util.toPrettyJson
 import org.springframework.stereotype.Component
 
 @Component
