@@ -38,7 +38,7 @@ object Versions {
     const val KeyAccessLib = "0.2.18"
     const val LoanPackage = "0.4.0"
     const val Grpc = "1.45.0"
-    const val ProvenanceProto = "1.8.0"
+    const val ProvenanceProto = "1.11.1"
     const val Reflections = "0.9.10"
     const val NexusPublishing = "1.1.0"
     const val BouncyCastle = "1.70"
