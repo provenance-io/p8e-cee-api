@@ -44,7 +44,7 @@ object Versions {
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
-    const val AssetClassification = "1.2.0-rc4"
+    const val AssetClassification = "2.0.0"
 }
 
 object Plugins { // please keep this sorted in sections
