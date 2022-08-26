@@ -6,7 +6,6 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.frameworks.provenance.ProvenanceService
 import io.provenance.api.models.p8e.TxResponse
-import io.provenance.classification.asset.client.domain.execute.VerifyAssetBody
 import io.provenance.classification.asset.client.domain.execute.VerifyAssetExecute
 import io.provenance.classification.asset.client.domain.model.AssetIdentifier
 import org.springframework.stereotype.Component
@@ -25,12 +24,10 @@ class VerifyAsset(
         )
 
         val verifyRequest = VerifyAssetExecute(
-            VerifyAssetBody(
-                identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
-                success = args.request.success,
-                message = args.request.message,
-                accessRoutes = args.request.contractConfig.accessRoutes,
-            )
+            identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
+            success = args.request.success,
+            message = args.request.message,
+            accessRoutes = args.request.contractConfig.accessRoutes,
         )
 
         return provenanceService.verifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, verifyRequest)
