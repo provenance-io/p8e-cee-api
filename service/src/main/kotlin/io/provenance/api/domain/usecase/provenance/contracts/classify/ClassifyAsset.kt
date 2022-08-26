@@ -24,10 +24,10 @@ class ClassifyAsset(
         )
 
         val assetRequest = OnboardAssetExecute(
-                identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
-                assetType = args.request.contractConfig.assetType,
-                verifierAddress = args.request.contractConfig.verifierAddress,
-                accessRoutes = args.request.contractConfig.accessRoutes,
+            identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
+            assetType = args.request.contractConfig.assetType,
+            verifierAddress = args.request.contractConfig.verifierAddress,
+            accessRoutes = args.request.contractConfig.accessRoutes,
         )
 
         return provenanceService.classifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, assetRequest)

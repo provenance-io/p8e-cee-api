@@ -24,10 +24,10 @@ class VerifyAsset(
         )
 
         val verifyRequest = VerifyAssetExecute(
-                identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
-                success = args.request.success,
-                message = args.request.message,
-                accessRoutes = args.request.contractConfig.accessRoutes,
+            identifier = AssetIdentifier.AssetUuid(args.request.contractConfig.assetUuid),
+            success = args.request.success,
+            message = args.request.message,
+            accessRoutes = args.request.contractConfig.accessRoutes,
         )
 
         return provenanceService.verifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, verifyRequest)
