@@ -136,7 +136,7 @@ function upload_classification_contract() {
                      --chain-id chain-local \
                      --gas auto \
                      --gas-prices="1905nhash" \
-                     --gas-adjustment=1.2 \
+                     --gas-adjustment=1.1 \
                      --broadcast-mode block \
                      --testnet \
                      --output json \
@@ -157,7 +157,7 @@ function upload_classification_contract() {
                        --chain-id chain-local \
                        --gas auto \
                        --gas-prices="1905nhash" \
-                       --gas-adjustment=1.2 \
+                       --gas-adjustment=1.1 \
                        --broadcast-mode block \
                        --testnet \
                        --output json \

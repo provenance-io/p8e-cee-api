@@ -378,10 +378,10 @@ class ProvenanceApi {
             "/classify".nest {
                 POST("", handler::classifyAsset)
                 GET("/status", handler::getClassificationStatus)
+                GET("/fees", handler::getFees)
             }
             GET("/scope/query", handler::queryScope)
             POST("/verify", handler::verifyAsset)
-            GET("/fees", handler::getFees)
             "/permissions".nest {
                 PATCH("/data", handler::updateDataAccess)
                 PATCH("/authz", handler::updateAuthz)

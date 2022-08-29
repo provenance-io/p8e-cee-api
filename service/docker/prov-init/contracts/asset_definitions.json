@@ -8,12 +8,12 @@
         "verifiers": [
             {
                 "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
-                "onboarding_cost": "243857142857",
+                "onboarding_cost": "2000",
                 "onboarding_denom": "nhash",
                 "fee_destinations": [
                     {
                         "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
-                        "fee_amount": "1000000000"
+                        "fee_amount": "200"
                     }
                 ],
                 "entity_detail": {
