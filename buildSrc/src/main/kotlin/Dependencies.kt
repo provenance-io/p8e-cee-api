@@ -44,7 +44,7 @@ object Versions {
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
-    const val AssetClassification = "2.0.0"
+    const val AssetClassification = "3.0.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -91,8 +91,8 @@ object Dependencies {
     }
 
     object AssetClassification {
-        val Client = DependencySpec("io.provenance.classification.asset:ac-client", Versions.AssetClassification)
-        val Verifier = DependencySpec("io.provenance.classification.asset:ac-verifier", Versions.AssetClassification)
+        val Client = DependencySpec("tech.figure.classification.asset:ac-client", Versions.AssetClassification)
+        val Verifier = DependencySpec("tech.figure.classification.asset:ac-verifier", Versions.AssetClassification)
     }
 
     object P8eScope {

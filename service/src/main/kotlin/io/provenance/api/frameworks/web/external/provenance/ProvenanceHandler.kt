@@ -83,6 +83,7 @@ class ProvenanceHandler(
             GetStatusOfClassificationRequest(
                 req.getUser(),
                 req.queryParam("assetUuid").get().toUuid(),
+                req.queryParam("assetType").get(),
                 req.queryParam("contractName").get(),
                 req.queryParam("chainId").get(),
                 req.queryParam("nodeEndpoint").get()

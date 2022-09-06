@@ -19,12 +19,6 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
-import io.provenance.classification.asset.client.client.base.ACClient
-import io.provenance.classification.asset.client.client.base.BroadcastOptions
-import io.provenance.classification.asset.client.client.base.ContractIdentifier
-import io.provenance.classification.asset.client.domain.execute.OnboardAssetExecute
-import io.provenance.classification.asset.client.domain.execute.VerifyAssetExecute
-import io.provenance.classification.asset.util.objects.ACObjectMapperUtil
 import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
@@ -38,6 +32,12 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import tech.figure.classification.asset.client.client.base.ACClient
+import tech.figure.classification.asset.client.client.base.BroadcastOptions
+import tech.figure.classification.asset.client.client.base.ContractIdentifier
+import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
+import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
+import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
 
 class ProvenanceTxException(message: String) : Exception(message)
 

@@ -7,8 +7,8 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
-import io.provenance.classification.asset.client.domain.execute.OnboardAssetExecute
-import io.provenance.classification.asset.client.domain.execute.VerifyAssetExecute
+import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
+import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeResponse
 import java.util.UUID

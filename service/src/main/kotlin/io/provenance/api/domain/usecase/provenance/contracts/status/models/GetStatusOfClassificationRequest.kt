@@ -5,6 +5,7 @@ import java.util.UUID
 data class GetStatusOfClassificationRequest(
     val uuid: UUID,
     val assetUuid: UUID,
+    val assetType: String,
     val contractName: String,
     val chainId: String,
     val nodeEndpoint: String,

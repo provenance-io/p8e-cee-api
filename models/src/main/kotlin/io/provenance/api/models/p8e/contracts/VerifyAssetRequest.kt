@@ -8,5 +8,6 @@ data class VerifyAssetRequest(
     val contractConfig: SmartContractConfig,
     val account: AccountInfo = AccountInfo(),
     val message: String,
-    val success: Boolean
+    val success: Boolean,
+    val assetType: String,
 )

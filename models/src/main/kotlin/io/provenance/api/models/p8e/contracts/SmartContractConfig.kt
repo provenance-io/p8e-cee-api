@@ -1,6 +1,6 @@
 package io.provenance.api.models.p8e.contracts
 
-import io.provenance.classification.asset.client.domain.model.AccessRoute
+import tech.figure.classification.asset.client.domain.model.AccessRoute
 import java.util.UUID
 
 data class SmartContractConfig(

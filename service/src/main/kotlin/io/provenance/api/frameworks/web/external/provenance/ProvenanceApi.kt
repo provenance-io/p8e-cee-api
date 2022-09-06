@@ -10,7 +10,7 @@ import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
-import io.provenance.classification.asset.client.domain.model.AssetDefinition
+import tech.figure.classification.asset.client.domain.model.AssetDefinition
 import io.provenance.metadata.v1.ScopeResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -378,10 +378,10 @@ class ProvenanceApi {
             "/classify".nest {
                 POST("", handler::classifyAsset)
                 GET("/status", handler::getClassificationStatus)
+                GET("/fees", handler::getFees)
             }
             GET("/scope/query", handler::queryScope)
             POST("/verify", handler::verifyAsset)
-            GET("/fees", handler::getFees)
             "/permissions".nest {
                 PATCH("/data", handler::updateDataAccess)
                 PATCH("/authz", handler::updateAuthz)
