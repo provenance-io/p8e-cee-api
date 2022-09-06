@@ -100,7 +100,7 @@ class ProvenanceService : Provenance {
         }.txResponse
 
     override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse =
-        tryAction(ProvenanceConfig(chainId, nodeEndpoint), signer) { pbClient, account, offset ->
+        tryAction(ProvenanceConfig(chainId, nodeEndpoint), signer) { pbClient, _, _ ->
             val txBody = TxOuterClass.TxBody.newBuilder().also {
                 storeTxBody.base64.forEach { tx ->
                     it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
