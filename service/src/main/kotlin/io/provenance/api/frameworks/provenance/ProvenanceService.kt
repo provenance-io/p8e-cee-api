@@ -2,6 +2,7 @@ package io.provenance.api.frameworks.provenance
 
 import com.google.common.io.BaseEncoding
 import com.google.protobuf.Any
+import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
@@ -15,6 +16,7 @@ import io.provenance.api.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.api.frameworks.provenance.extensions.getErrorResult
 import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
+import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
@@ -79,67 +81,42 @@ class ProvenanceService : Provenance {
             }
         }
 
-    override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse {
-        log.info("Determining account information for the tx.")
-        val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-            val account = getBaseAccount(pbClient, signer.address())
-
+    override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse =
+        tryAction(config, signer) { pbClient, account, offset ->
             val baseSigner = BaseReqSigner(
                 signer,
                 account = account,
-                sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence)
+                sequenceOffset = offset
             )
 
-            runCatching {
-                val result = pbClient.estimateAndBroadcastTx(
-                    txBody = tx,
-                    signers = listOf(baseSigner),
-                    gasAdjustment = config.gasAdjustment,
-                    mode = config.broadcastMode
-                )
-
-                if (result.isError()) {
-                    throw ProvenanceTxException(result.txResponse.toString())
-                }
-
-                result
-            }.fold(
-                onSuccess = {
-                    return it.txResponse
-                },
-                onFailure = {
-                    cachedOffset.getAndDecrement(account.sequence)
-                    throw it
-                }
+            val result = pbClient.estimateAndBroadcastTx(
+                txBody = tx,
+                signers = listOf(baseSigner),
+                gasAdjustment = config.gasAdjustment,
+                mode = config.broadcastMode
             )
-        }
-    }
 
-    override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse {
-        PbClient(chainId, URI(nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            if (result.isError()) {
+                throw ProvenanceTxException(result.txResponse.toString())
+            }
+            result
+        }.txResponse
 
+    override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse =
+        tryAction(ProvenanceConfig(chainId, nodeEndpoint), signer) { pbClient, account, offset ->
             val txBody = TxOuterClass.TxBody.newBuilder().also {
                 storeTxBody.base64.forEach { tx ->
                     it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
                 }
             }.build()
 
-            val response = pbClient.estimateAndBroadcastTx(
+            pbClient.estimateAndBroadcastTx(
                 txBody = txBody,
                 signers = listOf(BaseReqSigner(signer)),
                 mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_SYNC,
                 gasAdjustment = 1.5
-            ).txResponse
-
-            return TxResponse(
-                response.txhash,
-                response.gasWanted.toString(),
-                response.gasUsed.toString(),
-                response.height.toString(),
             )
-        }
-    }
+        }.txResponse.toTxResponse()
 
     @Suppress("DEPRECATION")
     override fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long?): ScopeResponse =
@@ -157,48 +134,62 @@ class ProvenanceService : Provenance {
         }
 
     override fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse =
-        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
-            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-            val account = getBaseAccount(it, signer.address())
+        tryAction(config, signer) { pbClient, account, offset ->
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
-                pbClient = it,
+                pbClient = pbClient,
                 objectMapper = ACObjectMapperUtil.getObjectMapper()
             )
 
-            val broadcast = assetClassificationClient.onboardAsset(
+            assetClassificationClient.onboardAsset(
                 onboardAssetRequest, signer,
                 options = BroadcastOptions(
                     broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
-                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
+                    sequenceOffset = offset,
                     baseAccount = account
                 )
-            ).txResponse
+            )
+        }.txResponse.toTxResponse()
 
-            return TxResponse(broadcast.txhash, broadcast.gasWanted.toString(), broadcast.gasUsed.toString(), broadcast.height.toString())
-        }
 
     override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
-        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use {
-            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-            val account = getBaseAccount(it, signer.address())
+        tryAction(config, signer) { pbClient, account, offset ->
+
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
-                pbClient = it,
+                pbClient = pbClient,
                 objectMapper = ACObjectMapperUtil.getObjectMapper()
             )
 
-            val broadcast = assetClassificationClient.verifyAsset(
+            assetClassificationClient.verifyAsset(
                 verifyAssetRequest, signer,
                 options = BroadcastOptions(
                     broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
-                    sequenceOffset = cachedOffset.getAndIncrementOffset(account.sequence),
+                    sequenceOffset = offset,
                     baseAccount = account
                 )
-            ).txResponse
+            )
 
-            return TxResponse(broadcast.txhash, broadcast.gasWanted.toString(), broadcast.gasUsed.toString(), broadcast.height.toString())
+        }.txResponse.toTxResponse()
+
+    fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
+        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
+            val account = getBaseAccount(pbClient, signer.address())
+            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
+
+            runCatching {
+                action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
+            }.fold(
+                onSuccess = {
+                    return it
+                },
+                onFailure = {
+                    cachedOffset.getAndDecrement(account.sequence)
+                    throw it
+                }
+            )
         }
+    }
 }
 
 @Suppress("DEPRECATION")
