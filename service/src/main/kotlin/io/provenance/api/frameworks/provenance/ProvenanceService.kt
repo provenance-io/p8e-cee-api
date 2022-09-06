@@ -32,7 +32,6 @@ import io.provenance.scope.sdk.SignedResult
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import tech.figure.classification.asset.client.client.base.ACClient
 import tech.figure.classification.asset.client.client.base.BroadcastOptions
@@ -53,8 +52,6 @@ object ProvenanceConst {
 
 @Component
 class ProvenanceService : Provenance {
-
-    private val log = KotlinLogging.logger { }
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
     override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
@@ -151,7 +148,6 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
-
     override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
 
@@ -169,7 +165,6 @@ class ProvenanceService : Provenance {
                     baseAccount = account
                 )
             )
-
         }.txResponse.toTxResponse()
 
     fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
