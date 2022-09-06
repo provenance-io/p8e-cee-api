@@ -1,8 +1,8 @@
 package io.provenance.api.domain.usecase.provenance.contracts.common
 
-import io.provenance.classification.asset.client.client.base.ACClient
-import io.provenance.classification.asset.client.client.base.ContractIdentifier
-import io.provenance.classification.asset.util.objects.ACObjectMapperUtil
+import tech.figure.classification.asset.client.client.base.ACClient
+import tech.figure.classification.asset.client.client.base.ContractIdentifier
+import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import java.net.URI

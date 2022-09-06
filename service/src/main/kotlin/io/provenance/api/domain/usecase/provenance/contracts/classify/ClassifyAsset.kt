@@ -6,9 +6,9 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.domain.usecase.provenance.contracts.classify.models.ClassifyAssetRequestWrapper
 import io.provenance.api.frameworks.provenance.ProvenanceService
 import io.provenance.api.models.p8e.TxResponse
-import io.provenance.classification.asset.client.domain.execute.OnboardAssetExecute
-import io.provenance.classification.asset.client.domain.model.AssetIdentifier
 import org.springframework.stereotype.Component
+import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
+import tech.figure.classification.asset.client.domain.model.AssetIdentifier
 
 @Component
 class ClassifyAsset(

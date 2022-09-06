@@ -10,7 +10,7 @@ import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
-import io.provenance.classification.asset.client.domain.model.AssetDefinition
+import tech.figure.classification.asset.client.domain.model.AssetDefinition
 import io.provenance.metadata.v1.ScopeResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
