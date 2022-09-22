@@ -1,6 +1,5 @@
 package io.provenance.api.frameworks.provenance
 
-import com.google.common.io.BaseEncoding
 import com.google.protobuf.Any
 import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
@@ -30,6 +29,7 @@ import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
 import java.net.URI
+import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Component
@@ -101,10 +101,12 @@ class ProvenanceService : Provenance {
 
     override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse =
         tryAction(ProvenanceConfig(chainId, nodeEndpoint), signer) { pbClient, _, _ ->
-            val txBody = TxOuterClass.TxBody.newBuilder().also {
-                storeTxBody.base64.forEach { tx ->
-                    it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
-                }
+            val txBody = TxOuterClass.TxBody.newBuilder().also { txBodyBuilder ->
+                txBodyBuilder.addAllMessages(
+                    storeTxBody.base64.map { tx ->
+                        Any.parseFrom(Base64.getDecoder().decode(tx))
+                    }
+                )
             }.build()
 
             pbClient.estimateAndBroadcastTx(

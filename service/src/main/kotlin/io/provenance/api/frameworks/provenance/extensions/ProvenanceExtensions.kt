@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package io.provenance.api.frameworks.provenance.extensions
 
 import com.google.protobuf.Any
@@ -21,7 +22,7 @@ fun BroadcastTxResponse.isError() = txResponse.isError()
 
 fun TxResponse.isError() = code > 0
 
-// fun TxResponse.isSuccess() = !isError() && height > 0
+fun TxResponse.isSuccess() = !isError() && height > 0
 
 fun TxResponse.getError(): String =
     logsList.filter { it.log.isNotBlank() }.takeIf { it.isNotEmpty() }?.joinToString("; ") { it.log } ?: rawLog

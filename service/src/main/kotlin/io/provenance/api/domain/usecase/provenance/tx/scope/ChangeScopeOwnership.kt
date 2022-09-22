@@ -1,7 +1,5 @@
 package io.provenance.api.domain.usecase.provenance.tx.scope
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.common.errors.NotFoundError
@@ -11,16 +9,14 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.extensions.toAny
-import io.provenance.api.frameworks.provenance.extensions.toBase64String
 import io.provenance.api.frameworks.provenance.extensions.toMessageSet
+import io.provenance.api.frameworks.provenance.extensions.toModel
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
-import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.MsgWriteScopeRequest
 import io.provenance.metadata.v1.Party
 import io.provenance.metadata.v1.PartyType
-import io.provenance.scope.util.ProtoJsonUtil.toJson
 import org.springframework.stereotype.Component
 
 @Component
@@ -77,12 +73,7 @@ class ChangeScopeOwnership(
             args.request.provenanceConfig.chainId,
             args.request.provenanceConfig.nodeEndpoint,
             signer,
-            listOf(message.toAny()).toTxBody().let { cosmosTxBody ->
-                TxBody(
-                    json = ObjectMapper().readValue(cosmosTxBody.toJson(), ObjectNode::class.java),
-                    base64 = cosmosTxBody.messagesList.map { cosmosTxBody.toByteArray().toBase64String() },
-                )
-            },
+            message.toAny().toTxBody().toModel(),
         )
     }
 }

@@ -1,7 +1,5 @@
 package io.provenance.api.frameworks.provenance.utility
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.Signer
@@ -20,8 +18,7 @@ import io.provenance.metadata.v1.ResultStatus
 import io.provenance.api.domain.usecase.common.model.ScopeConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.frameworks.provenance.extensions.toAny
-import io.provenance.api.frameworks.provenance.extensions.toBase64String
-import io.provenance.api.frameworks.provenance.extensions.toJson
+import io.provenance.api.frameworks.provenance.extensions.toModel
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.MetadataAddress
@@ -168,10 +165,7 @@ object ProvenanceUtils {
             additionalAudiences,
         )
 
-        return TxBody(
-            json = ObjectMapper().readValue(txBody.toJson(), ObjectNode::class.java),
-            base64 = txBody.messagesList.map { it.toByteArray().toBase64String() }
-        )
+        return txBody.toModel()
     }
 
     fun getSigner(publicKey: PublicKey, privateKey: PrivateKey, isMainnet: Boolean): Signer {
