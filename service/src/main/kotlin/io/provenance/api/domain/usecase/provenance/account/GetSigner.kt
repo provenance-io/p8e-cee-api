@@ -17,13 +17,11 @@ class GetSigner(
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<GetSignerRequest, Signer>() {
     override suspend fun execute(args: GetSignerRequest): Signer {
-        val utils = ProvenanceUtils()
-
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
 
         return originator.signingPublicKey().let { public ->
             originator.signingPrivateKey().let { private ->
-                utils.getSigner(public as PublicKey, private as PrivateKey, provenanceProperties.mainnet)
+                ProvenanceUtils.getSigner(public as PublicKey, private as PrivateKey, provenanceProperties.mainnet)
             }
         }
     }

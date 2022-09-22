@@ -9,16 +9,19 @@ import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastTxResponse
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.api.frameworks.provenance.BatchTx
 import io.provenance.api.frameworks.provenance.SingleTx
+import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.protobuf.extensions.getBaseAccount
 import io.provenance.scope.contract.proto.Contracts
+import io.provenance.scope.encryption.util.getAddress
+import io.provenance.scope.encryption.util.toJavaPublicKey
 import java.util.concurrent.TimeUnit
 
 fun BroadcastTxResponse.isError() = txResponse.isError()
 
 fun TxResponse.isError() = code > 0
 
-fun TxResponse.isSuccess() = !isError() && height > 0
+// fun TxResponse.isSuccess() = !isError() && height > 0
 
 fun TxResponse.getError(): String =
     logsList.filter { it.log.isNotBlank() }.takeIf { it.isNotEmpty() }?.joinToString("; ") { it.log } ?: rawLog
@@ -44,3 +47,7 @@ fun getCurrentHeight(pbClient: PbClient): Long = pbClient.tendermintService
 fun getBaseAccount(pbClient: PbClient, address: String): Auth.BaseAccount = pbClient.authClient
     .withDeadlineAfter(10, TimeUnit.SECONDS)
     .getBaseAccount(address)
+
+fun Set<AudienceKeyPair>.toMessageSet(isMainnet: Boolean): Set<String> = map {
+    it.signingKey.toJavaPublicKey().getAddress(isMainnet)
+}.toSet()

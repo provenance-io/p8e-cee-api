@@ -31,7 +31,7 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
 
-class ProvenanceUtils {
+object ProvenanceUtils {
 
     data class RecordInputSpec(
         val name: String,
@@ -39,23 +39,20 @@ class ProvenanceUtils {
         val hash: String,
     )
 
-    companion object {
-
-        // Record specification
-        const val RecordSpecName = "Asset"
-        val RecordSpecInputs = listOf(
-            RecordInputSpec(
-                name = "AssetHash",
-                typeName = "String",
-                hash = "4B6A6C36E8B2622334C244B46799A47DBEAAF94E9D5B7637BC12A3A4988A62C0", // sha356(RecordSpecInputs.name)
-            )
+    // Record specification
+    const val RecordSpecName = "Asset"
+    val RecordSpecInputs = listOf(
+        RecordInputSpec(
+            name = "AssetHash",
+            typeName = "String",
+            hash = "4B6A6C36E8B2622334C244B46799A47DBEAAF94E9D5B7637BC12A3A4988A62C0", // sha356(RecordSpecInputs.name)
         )
+    )
 
-        // Record process
-        const val RecordProcessName = "OnboardAssetProcess"
-        const val RecordProcessMethod = "OnboardAsset"
-        const val RecordProcessHash = "32D60974A2B2E9A9D9E93D9956E3A7D2BD226E1511D64D1EA39F86CBED62CE78" // sha356(RecordProcessMethod)
-    }
+    // Record process
+    const val RecordProcessName = "OnboardAssetProcess"
+    const val RecordProcessMethod = "OnboardAsset"
+    const val RecordProcessHash = "32D60974A2B2E9A9D9E93D9956E3A7D2BD226E1511D64D1EA39F86CBED62CE78" // sha356(RecordProcessMethod)
 
     // Create a metadata TX message for a new scope onboard
     private fun buildNewScopeMetadataTransaction(
