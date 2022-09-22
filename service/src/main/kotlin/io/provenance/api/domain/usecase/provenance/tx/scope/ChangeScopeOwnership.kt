@@ -18,6 +18,8 @@ import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.MsgWriteScopeRequest
+import io.provenance.metadata.v1.Party
+import io.provenance.metadata.v1.PartyType
 import io.provenance.scope.util.ProtoJsonUtil.toJson
 import org.springframework.stereotype.Component
 
@@ -49,9 +51,20 @@ class ChangeScopeOwnership(
             scopeUuid = args.request.scopeId.toString()
             specUuid = scopeResponse.scope.scopeSpecIdInfo.scopeSpecUuid
             scope = scopeResponse.scope.scope.toBuilder().also { scopeBuilder ->
+                /** Only change owner if [valueOwnerAddress][args.request.valueOwnerAddress] was not null. */
                 args.request.newValueOwner?.let { requestedNewValueOwner ->
-                    /** Only change value owner if [valueOwnerAddress][args.request.valueOwnerAddress] was not null. */
                     scopeBuilder.valueOwnerAddress = requestedNewValueOwner
+                    scopeBuilder.ownersList.filter { owner ->
+                        owner.role == PartyType.PARTY_TYPE_OWNER
+                    }.forEach { existingOwner ->
+                        scopeBuilder.removeOwners(scopeBuilder.ownersList.indexOf(existingOwner))
+                    }
+                    scopeBuilder.addOwners(
+                        Party.newBuilder().also { ownerPartyBuilder ->
+                            ownerPartyBuilder.role = PartyType.PARTY_TYPE_OWNER
+                            ownerPartyBuilder.address = requestedNewValueOwner
+                        }.build()
+                    )
                 }
                 /** Only change data access if [newDataAccess][args.request.newDataAccess] was not null. */
                 args.request.newDataAccess?.let { requestedNewDataAccess ->
