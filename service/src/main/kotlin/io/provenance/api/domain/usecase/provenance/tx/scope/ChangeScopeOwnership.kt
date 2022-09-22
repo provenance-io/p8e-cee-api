@@ -41,12 +41,6 @@ class ChangeScopeOwnership(
             .takeIf { response -> response.scope.isSet() }
             ?: throw NotFoundError("No scope found")
 
-        scopeResponse.scope.scopeIdInfo.scopeUuid.let { actualScopeId ->
-            require(actualScopeId === args.request.scopeId.toString()) {
-                "Expected to fetch a scope with UUID ${args.request.scopeId} but got a UUID of $actualScopeId"
-            }
-        }
-
         val message = MsgWriteScopeRequest.newBuilder().apply {
             scopeUuid = args.request.scopeId.toString()
             specUuid = scopeResponse.scope.scopeSpecIdInfo.scopeSpecUuid
