@@ -242,7 +242,7 @@ class ProvenanceApi {
             )
         ),
         RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/fees",
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/classify/fees",
             method = arrayOf(RequestMethod.GET),
             produces = ["application/json"],
             operation = Operation(
@@ -340,7 +340,7 @@ class ProvenanceApi {
             )
         ),
         RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/permissions/data-access",
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/scope/data",
             method = arrayOf(RequestMethod.PATCH),
             produces = ["application/json"],
             operation = Operation(
@@ -413,12 +413,10 @@ class ProvenanceApi {
             "/scope".nest {
                 GET("/query", handler::queryScope)
                 POST("/ownership", handler::changeScopeOwnership)
+                PATCH("/data", handler::updateDataAccess)
             }
             POST("/verify", handler::verifyAsset)
-            "/permissions".nest {
-                PATCH("/data", handler::updateDataAccess)
-                PATCH("/authz", handler::updateAuthz)
-            }
+            PATCH("/permissions/authz", handler::updateAuthz)
         }
     }
 }
