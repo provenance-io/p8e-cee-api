@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package io.provenance.api.frameworks.provenance.extensions
 
 import com.google.protobuf.Any
@@ -9,9 +10,12 @@ import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastTxResponse
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.api.frameworks.provenance.BatchTx
 import io.provenance.api.frameworks.provenance.SingleTx
+import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.protobuf.extensions.getBaseAccount
 import io.provenance.scope.contract.proto.Contracts
+import io.provenance.scope.encryption.util.getAddress
+import io.provenance.scope.encryption.util.toJavaPublicKey
 import java.util.concurrent.TimeUnit
 
 fun BroadcastTxResponse.isError() = txResponse.isError()
@@ -44,3 +48,7 @@ fun getCurrentHeight(pbClient: PbClient): Long = pbClient.tendermintService
 fun getBaseAccount(pbClient: PbClient, address: String): Auth.BaseAccount = pbClient.authClient
     .withDeadlineAfter(10, TimeUnit.SECONDS)
     .getBaseAccount(address)
+
+fun Set<AudienceKeyPair>.toMessageSet(isMainnet: Boolean): Set<String> = map {
+    it.signingKey.toJavaPublicKey().getAddress(isMainnet)
+}.toSet()

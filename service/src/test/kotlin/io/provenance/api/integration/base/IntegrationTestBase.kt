@@ -55,6 +55,7 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
         // could not be found. related github issue: https://github.com/testcontainers/testcontainers-java/issues/4281
         const val objectStoreAddress = "grpc://localhost:9993"
         const val vaultAddress = "http://localhost:8200/v1/kv2_originations/data/originators"
+        const val provenanceAddress = "grpc://localhost:9090"
 
 //        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
 //        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }

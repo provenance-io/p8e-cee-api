@@ -1,7 +1,5 @@
 package io.provenance.api.frameworks.provenance.utility
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import cosmos.crypto.secp256k1.Keys
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.Signer
@@ -20,8 +18,7 @@ import io.provenance.metadata.v1.ResultStatus
 import io.provenance.api.domain.usecase.common.model.ScopeConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.frameworks.provenance.extensions.toAny
-import io.provenance.api.frameworks.provenance.extensions.toBase64String
-import io.provenance.api.frameworks.provenance.extensions.toJson
+import io.provenance.api.frameworks.provenance.extensions.toModel
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.MetadataAddress
@@ -31,7 +28,7 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
 
-class ProvenanceUtils {
+object ProvenanceUtils {
 
     data class RecordInputSpec(
         val name: String,
@@ -39,23 +36,20 @@ class ProvenanceUtils {
         val hash: String,
     )
 
-    companion object {
-
-        // Record specification
-        const val RecordSpecName = "Asset"
-        val RecordSpecInputs = listOf(
-            RecordInputSpec(
-                name = "AssetHash",
-                typeName = "String",
-                hash = "4B6A6C36E8B2622334C244B46799A47DBEAAF94E9D5B7637BC12A3A4988A62C0", // sha356(RecordSpecInputs.name)
-            )
+    // Record specification
+    const val RecordSpecName = "Asset"
+    val RecordSpecInputs = listOf(
+        RecordInputSpec(
+            name = "AssetHash",
+            typeName = "String",
+            hash = "4B6A6C36E8B2622334C244B46799A47DBEAAF94E9D5B7637BC12A3A4988A62C0", // sha356(RecordSpecInputs.name)
         )
+    )
 
-        // Record process
-        const val RecordProcessName = "OnboardAssetProcess"
-        const val RecordProcessMethod = "OnboardAsset"
-        const val RecordProcessHash = "32D60974A2B2E9A9D9E93D9956E3A7D2BD226E1511D64D1EA39F86CBED62CE78" // sha356(RecordProcessMethod)
-    }
+    // Record process
+    const val RecordProcessName = "OnboardAssetProcess"
+    const val RecordProcessMethod = "OnboardAsset"
+    const val RecordProcessHash = "32D60974A2B2E9A9D9E93D9956E3A7D2BD226E1511D64D1EA39F86CBED62CE78" // sha356(RecordProcessMethod)
 
     // Create a metadata TX message for a new scope onboard
     private fun buildNewScopeMetadataTransaction(
@@ -171,10 +165,7 @@ class ProvenanceUtils {
             additionalAudiences,
         )
 
-        return TxBody(
-            json = ObjectMapper().readValue(txBody.toJson(), ObjectNode::class.java),
-            base64 = txBody.messagesList.map { it.toByteArray().toBase64String() }
-        )
+        return txBody.toModel()
     }
 
     fun getSigner(publicKey: PublicKey, privateKey: PrivateKey, isMainnet: Boolean): Signer {

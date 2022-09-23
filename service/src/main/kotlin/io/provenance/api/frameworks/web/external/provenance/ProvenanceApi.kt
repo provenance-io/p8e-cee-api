@@ -6,12 +6,13 @@ import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.ClassifyAssetRequest
 import io.provenance.api.models.p8e.contracts.VerifyAssetRequest
+import io.provenance.api.models.p8e.query.QueryScopeResponse
+import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
 import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
 import tech.figure.classification.asset.client.domain.model.AssetDefinition
-import io.provenance.metadata.v1.ScopeResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -148,10 +149,39 @@ class ProvenanceApi {
                     ApiResponse(
                         responseCode = "200",
                         description = "successful operation",
-                        content = [Content(schema = Schema(implementation = ScopeResponse::class))]
+                        content = [Content(schema = Schema(implementation = QueryScopeResponse::class))]
                     )
                 ]
             )
+        ),
+        RouterOperation(
+            path = "${Routes.EXTERNAL_BASE_V1}/p8e/scope/ownership",
+            method = arrayOf(RequestMethod.POST),
+            produces = ["application/json"],
+            operation = Operation(
+                tags = ["Provenance"],
+                operationId = "changeScopeOwnership",
+                method = "POST",
+                parameters = [
+                    Parameter(
+                        name = "x-uuid",
+                        required = true,
+                        `in` = ParameterIn.HEADER,
+                        schema = Schema(implementation = UUID::class),
+                    ),
+                ],
+                requestBody = RequestBody(
+                    required = true,
+                    content = [Content(schema = Schema(implementation = ChangeScopeOwnershipRequest::class))]
+                ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        description = "successful operation",
+                        content = [Content(schema = Schema(implementation = TxResponse::class))]
+                    )
+                ]
+            ),
         ),
         RouterOperation(
             path = "${Routes.EXTERNAL_BASE_V1}/p8e/classify",
@@ -380,7 +410,10 @@ class ProvenanceApi {
                 GET("/status", handler::getClassificationStatus)
                 GET("/fees", handler::getFees)
             }
-            GET("/scope/query", handler::queryScope)
+            "/scope".nest {
+                GET("/query", handler::queryScope)
+                POST("/ownership", handler::changeScopeOwnership)
+            }
             POST("/verify", handler::verifyAsset)
             "/permissions".nest {
                 PATCH("/data", handler::updateDataAccess)

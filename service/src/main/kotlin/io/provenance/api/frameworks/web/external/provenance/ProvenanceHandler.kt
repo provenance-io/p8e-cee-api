@@ -17,6 +17,8 @@ import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.UpdateAu
 import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.models.UpdateAuthzRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.UpdateScopeDataAccess
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.scope.ChangeScopeOwnership
+import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.p8e.query.QueryScopeRequest
@@ -31,6 +33,7 @@ class ProvenanceHandler(
     private val executeTx: ExecuteTx,
     private val createTx: CreateTx,
     private val queryScope: QueryScope,
+    private val changeScopeOwnership: ChangeScopeOwnership,
     private val classifyAsset: ClassifyAsset,
     private val verifyAsset: VerifyAsset,
     private val getFees: GetFeesForAsset,
@@ -54,6 +57,15 @@ class ProvenanceHandler(
                 req.queryParam("chainId").get(),
                 req.queryParam("nodeEndpoint").get(),
                 req.queryParam("objectStoreUrl").get(),
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun changeScopeOwnership(req: ServerRequest): ServerResponse = runCatching {
+        changeScopeOwnership.execute(
+            ChangeScopeOwnershipRequestWrapper(
+                req.getUser(),
+                req.awaitBody(),
             )
         )
     }.foldToServerResponse()
