@@ -52,6 +52,9 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Add Homebrew to PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+
       - name: Setup Container
         run: |-
             brew tap hashicorp/tap
