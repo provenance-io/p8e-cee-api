@@ -57,6 +57,7 @@ jobs:
 
       - name: Setup Container
         run: |-
+            echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
             brew tap hashicorp/tap
             brew install hashicorp/tap/vault
 
