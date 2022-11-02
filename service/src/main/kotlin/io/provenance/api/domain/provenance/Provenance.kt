@@ -11,6 +11,7 @@ import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecut
 import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeResponse
+import tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute
 import java.util.UUID
 
 interface Provenance {
@@ -20,4 +21,5 @@ interface Provenance {
     fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long? = null): ScopeResponse
     fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse
     fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse
+    fun executeValidationOracleTransaction(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, json: String): TxResponse
 }

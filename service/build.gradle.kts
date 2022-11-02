@@ -65,7 +65,7 @@ dependencies {
         Dependencies.OpenApi.KotlinSupport,
         Dependencies.AssetClassification.Client,
         Dependencies.AssetClassification.Verifier,
-
+        Dependencies.ValidationOracle.Client,
     ).forEach { dep ->
         dep.implementation(this)
     }

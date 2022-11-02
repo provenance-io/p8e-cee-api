@@ -415,6 +415,9 @@ class ProvenanceApi {
                 POST("/ownership", handler::changeScopeOwnership)
                 PATCH("/data", handler::updateDataAccess)
             }
+            "/validationoracle".nest {
+                POST("execute", handler::executeValidationOracle)
+            }
             POST("/verify", handler::verifyAsset)
             PATCH("/permissions/authz", handler::updateAuthz)
         }

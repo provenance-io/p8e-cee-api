@@ -1,5 +1,6 @@
 package io.provenance.api.frameworks.provenance
 
+import com.google.gson.Gson
 import com.google.protobuf.Any
 import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
@@ -28,10 +29,6 @@ import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
-import java.net.URI
-import java.util.Base64
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Component
 import tech.figure.classification.asset.client.client.base.ACClient
 import tech.figure.classification.asset.client.client.base.BroadcastOptions
@@ -39,6 +36,12 @@ import tech.figure.classification.asset.client.client.base.ContractIdentifier
 import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
 import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
+import tech.figure.validationoracle.client.client.base.VOClient
+import java.net.URI
+import java.util.Base64
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.KCallable
 
 class ProvenanceTxException(message: String) : Exception(message)
 
@@ -78,7 +81,11 @@ class ProvenanceService : Provenance {
             }
         }
 
-    override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse =
+    override fun executeTransaction(
+        config: ProvenanceConfig,
+        tx: TxOuterClass.TxBody,
+        signer: Signer,
+    ): Abci.TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
             val baseSigner = BaseReqSigner(
                 signer,
@@ -132,7 +139,12 @@ class ProvenanceService : Provenance {
             )
         }
 
-    override fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse =
+    override fun classifyAsset(
+        config: ProvenanceConfig,
+        signer: Signer,
+        contractConfig: SmartContractConfig,
+        onboardAssetRequest: OnboardAssetExecute<UUID>,
+    ): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
             val assetClassificationClient = ACClient.getDefault(
                 contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
@@ -150,7 +162,67 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
-    override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
+    override fun executeValidationOracleTransaction(
+        config: ProvenanceConfig,
+        signer: Signer,
+        contractConfig: SmartContractConfig,
+        json: String,
+    ): TxResponse =
+        tryAction(config, signer) { pbClient, account, offset ->
+
+            val className = "tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute"
+            val clazz = Class.forName(className)
+            val executeClass = Gson().fromJson(json, clazz)
+
+            val methodName = "addValidationDefinition"
+            val validationClient = VOClient.getDefault(
+                contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Name(contractConfig.contractName),
+                pbClient = pbClient,
+                objectMapper = ACObjectMapperUtil.getObjectMapper()
+            )
+            val methods: Collection<KCallable<*>> = validationClient.javaClass.kotlin.members
+            // @TODO Add type checking here
+            @Suppress("UNCHECKED_CAST") val method : KCallable<ServiceOuterClass.BroadcastTxResponse> = methods.find { it.name == methodName } as KCallable<ServiceOuterClass.BroadcastTxResponse>
+
+            /*
+            ddValidationDefinition(
+            Ltech/figure/validationoracle/client/domain/execute/AddValidationDefinitionExecute;
+            Lio/provenance/client/grpc/Signer;
+            Ltech/figure/validationoracle/client/client/base/BroadcastOptions;
+            )Lcosmos/tx/v1beta1/ServiceOuterClass$BroadcastTxResponse;
+             */
+            method.call(
+                validationClient,
+                executeClass,
+                signer,
+                tech.figure.validationoracle.client.client.base.BroadcastOptions(
+                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = offset,
+                    baseAccount = account
+                )
+            )
+
+//            val method = addValidationDefinitionExecute.javaClass.getMethod("addValidationDefinition")
+//            val method = addValidationDefinitionExecute.javaClass.getMethod("addValidationDefinition")
+
+//            method.call()
+//            val addValidationDefinitionExecute : AddValidationDefinitionExecute = Gson().fromJson(json, AddValidationDefinitionExecute::class.java)
+//            validationClient.addValidationDefinition(
+//                addValidationDefinitionExecute, signer,
+//                options = tech.figure.validationoracle.client.client.base.BroadcastOptions(
+//                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+//                    sequenceOffset = offset,
+//                    baseAccount = account
+//                )
+//            )
+        }.txResponse.toTxResponse()
+
+    override fun verifyAsset(
+        config: ProvenanceConfig,
+        signer: Signer,
+        contractConfig: SmartContractConfig,
+        verifyAssetRequest: VerifyAssetExecute<UUID>,
+    ): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
 
             val assetClassificationClient = ACClient.getDefault(
@@ -169,7 +241,11 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
-    fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
+    fun tryAction(
+        config: ProvenanceConfig,
+        signer: Signer,
+        action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse,
+    ): ServiceOuterClass.BroadcastTxResponse {
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             val account = getBaseAccount(pbClient, signer.address())
             val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
