@@ -27,7 +27,6 @@ import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.query.QueryScopeRequest
 import io.provenance.scope.util.toUuid
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
