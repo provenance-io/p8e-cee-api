@@ -9,9 +9,6 @@ object Versions {
     const val Master = "master-+"
     const val Develop = "develop-+"
 
-    const val ProvenanceCore = Master
-    const val StreamData = Master
-
     const val Kotlin = "1.6.21"
     const val KotlinCoroutines = "1.6.2"
     const val Protobuf = "3.20.1"
@@ -30,7 +27,7 @@ object Versions {
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
-    const val AssetModel = "0.1.14"
+    const val AssetModel = "0.1.15"
     const val P8eScope = "0.6.2"
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
@@ -44,7 +41,7 @@ object Versions {
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
-    const val AssetClassification = "3.4.2"
+    const val AssetClassification = "3.4.3"
 }
 
 object Plugins { // please keep this sorted in sections
