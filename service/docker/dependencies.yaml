@@ -51,7 +51,7 @@ services:
             - ./object-store-2:/mnt/data
 
     provenance:
-        image: provenanceio/provenance:v1.11.1
+        image: provenanceio/provenance:v1.12.0
         container_name: provenance
         command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
         networks:

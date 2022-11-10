@@ -6,7 +6,9 @@ import io.provenance.api.domain.usecase.provenance.contracts.fees.GetFeesForAsse
 import io.provenance.api.domain.usecase.provenance.contracts.fees.models.GetFeesForAssetRequest
 import io.provenance.api.domain.usecase.provenance.contracts.status.GetClassificationStatus
 import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetStatusOfClassificationRequest
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.QueryValidationOracle
 import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.ValidationOracleTransaction
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.models.ValidationOracleQueryRequestWrapper
 import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.models.ValidationOracleTransactionRequestWrapper
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
@@ -37,6 +39,7 @@ class ProvenanceHandler(
     private val queryScope: QueryScope,
     private val changeScopeOwnership: ChangeScopeOwnership,
     private val validationOracleTransaction: ValidationOracleTransaction,
+    private val queryValidationOracle: QueryValidationOracle,
     private val classifyAsset: ClassifyAsset,
     private val verifyAsset: VerifyAsset,
     private val getFees: GetFeesForAsset,
@@ -75,6 +78,10 @@ class ProvenanceHandler(
 
     suspend fun executeValidationOracle(req: ServerRequest): ServerResponse = runCatching {
         validationOracleTransaction.execute(ValidationOracleTransactionRequestWrapper(req.getUser(), req.awaitBody()))
+    }.foldToServerResponse()
+
+    suspend fun queryValidationOracle(req: ServerRequest): ServerResponse = runCatching {
+        queryValidationOracle.execute(ValidationOracleQueryRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun classifyAsset(req: ServerRequest): ServerResponse = runCatching {

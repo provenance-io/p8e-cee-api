@@ -417,6 +417,7 @@ class ProvenanceApi {
             }
             "/validationoracle".nest {
                 POST("execute", handler::executeValidationOracle)
+                GET("query", handler::queryValidationOracle)
             }
             POST("/verify", handler::verifyAsset)
             PATCH("/permissions/authz", handler::updateAuthz)

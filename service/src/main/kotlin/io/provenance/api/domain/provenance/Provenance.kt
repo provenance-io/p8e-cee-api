@@ -7,11 +7,12 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
-import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
-import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
+import io.provenance.api.models.p8e.contracts.VOSmartContractConfig
+import io.provenance.api.models.p8e.contracts.VOSmartContractLibraryClientCall
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeResponse
-import tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute
+import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
+import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import java.util.UUID
 
 interface Provenance {
@@ -21,5 +22,6 @@ interface Provenance {
     fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long? = null): ScopeResponse
     fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse
     fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse
-    fun executeValidationOracleTransaction(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, json: String): TxResponse
+    fun executeValidationOracleTransaction(config: ProvenanceConfig, signer: Signer, contractConfig: VOSmartContractConfig, libraryCall: VOSmartContractLibraryClientCall): TxResponse
+    fun queryValidationOracle(config: ProvenanceConfig, contractConfig: VOSmartContractConfig, libraryCall: VOSmartContractLibraryClientCall): String
 }

@@ -21,6 +21,9 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
+import io.provenance.api.models.p8e.contracts.VOSmartContractConfig
+import io.provenance.api.models.p8e.contracts.VOSmartContractLibraryClientCall
+import io.provenance.api.util.toPrettyJson
 import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
@@ -37,6 +40,8 @@ import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecut
 import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
 import tech.figure.validationoracle.client.client.base.VOClient
+import tech.figure.validationoracle.client.client.impl.DefaultVOQuerier
+import tech.figure.validationoracle.util.objects.VOObjectMapperUtil
 import java.net.URI
 import java.util.Base64
 import java.util.UUID
@@ -165,32 +170,25 @@ class ProvenanceService : Provenance {
     override fun executeValidationOracleTransaction(
         config: ProvenanceConfig,
         signer: Signer,
-        contractConfig: SmartContractConfig,
-        json: String,
+        contractConfig: VOSmartContractConfig,
+        libraryCall: VOSmartContractLibraryClientCall
     ): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
 
-            val className = "tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute"
-            val clazz = Class.forName(className)
-            val executeClass = Gson().fromJson(json, clazz)
+            val clazz = Class.forName(libraryCall.parameterClassName)
+            val executeClass = Gson().fromJson(libraryCall.parameterClassJson, clazz)
 
-            val methodName = "addValidationDefinition"
             val validationClient = VOClient.getDefault(
-                contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Name(contractConfig.contractName),
+                contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
+                    contractConfig.contractAddress),
                 pbClient = pbClient,
-                objectMapper = ACObjectMapperUtil.getObjectMapper()
+                objectMapper = VOObjectMapperUtil.getObjectMapper()
             )
             val methods: Collection<KCallable<*>> = validationClient.javaClass.kotlin.members
             // @TODO Add type checking here
-            @Suppress("UNCHECKED_CAST") val method : KCallable<ServiceOuterClass.BroadcastTxResponse> = methods.find { it.name == methodName } as KCallable<ServiceOuterClass.BroadcastTxResponse>
+            @Suppress("UNCHECKED_CAST") val method: KCallable<ServiceOuterClass.BroadcastTxResponse> =
+                methods.find { it.name == libraryCall.methodName } as KCallable<ServiceOuterClass.BroadcastTxResponse>
 
-            /*
-            ddValidationDefinition(
-            Ltech/figure/validationoracle/client/domain/execute/AddValidationDefinitionExecute;
-            Lio/provenance/client/grpc/Signer;
-            Ltech/figure/validationoracle/client/client/base/BroadcastOptions;
-            )Lcosmos/tx/v1beta1/ServiceOuterClass$BroadcastTxResponse;
-             */
             method.call(
                 validationClient,
                 executeClass,
@@ -202,20 +200,34 @@ class ProvenanceService : Provenance {
                 )
             )
 
-//            val method = addValidationDefinitionExecute.javaClass.getMethod("addValidationDefinition")
-//            val method = addValidationDefinitionExecute.javaClass.getMethod("addValidationDefinition")
-
-//            method.call()
-//            val addValidationDefinitionExecute : AddValidationDefinitionExecute = Gson().fromJson(json, AddValidationDefinitionExecute::class.java)
-//            validationClient.addValidationDefinition(
-//                addValidationDefinitionExecute, signer,
-//                options = tech.figure.validationoracle.client.client.base.BroadcastOptions(
-//                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
-//                    sequenceOffset = offset,
-//                    baseAccount = account
-//                )
-//            )
         }.txResponse.toTxResponse()
+
+    override fun queryValidationOracle(
+        config: ProvenanceConfig,
+        contractConfig: VOSmartContractConfig,
+        libraryCall: VOSmartContractLibraryClientCall
+    ): String {
+        val clazz = Class.forName(libraryCall.parameterClassName)
+        val queryClass = Gson().fromJson(libraryCall.parameterClassJson, clazz)
+
+        val pbClient = PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
+        val voQueryClient = DefaultVOQuerier(
+            contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
+                contractConfig.contractAddress),
+            pbClient = pbClient,
+            objectMapper = ACObjectMapperUtil.getObjectMapper()
+        )
+
+        val methods: Collection<KCallable<*>> = voQueryClient.javaClass.kotlin.members
+        // @TODO Add type checking here
+        @Suppress("UNCHECKED_CAST") val method: KCallable<ServiceOuterClass.BroadcastTxResponse> =
+            methods.find { it.name == libraryCall.methodName } as KCallable<ServiceOuterClass.BroadcastTxResponse>
+
+        return method.call(
+            voQueryClient,
+            queryClass
+        ).toPrettyJson()
+    }
 
     override fun verifyAsset(
         config: ProvenanceConfig,
