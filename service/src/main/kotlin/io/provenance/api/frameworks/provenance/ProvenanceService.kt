@@ -167,6 +167,30 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
+    override fun verifyAsset(
+        config: ProvenanceConfig,
+        signer: Signer,
+        contractConfig: SmartContractConfig,
+        verifyAssetRequest: VerifyAssetExecute<UUID>,
+    ): TxResponse =
+        tryAction(config, signer) { pbClient, account, offset ->
+
+            val assetClassificationClient = ACClient.getDefault(
+                contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
+                pbClient = pbClient,
+                objectMapper = ACObjectMapperUtil.getObjectMapper()
+            )
+
+            assetClassificationClient.verifyAsset(
+                verifyAssetRequest, signer,
+                options = BroadcastOptions(
+                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    sequenceOffset = offset,
+                    baseAccount = account
+                )
+            )
+        }.txResponse.toTxResponse()
+
     override fun executeValidationOracleTransaction(
         config: ProvenanceConfig,
         signer: Signer,
@@ -228,30 +252,6 @@ class ProvenanceService : Provenance {
             queryClass
         ).toPrettyJson()
     }
-
-    override fun verifyAsset(
-        config: ProvenanceConfig,
-        signer: Signer,
-        contractConfig: SmartContractConfig,
-        verifyAssetRequest: VerifyAssetExecute<UUID>,
-    ): TxResponse =
-        tryAction(config, signer) { pbClient, account, offset ->
-
-            val assetClassificationClient = ACClient.getDefault(
-                contractIdentifier = ContractIdentifier.Name(contractConfig.contractName),
-                pbClient = pbClient,
-                objectMapper = ACObjectMapperUtil.getObjectMapper()
-            )
-
-            assetClassificationClient.verifyAsset(
-                verifyAssetRequest, signer,
-                options = BroadcastOptions(
-                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
-                    sequenceOffset = offset,
-                    baseAccount = account
-                )
-            )
-        }.txResponse.toTxResponse()
 
     fun tryAction(
         config: ProvenanceConfig,
