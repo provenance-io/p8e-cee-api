@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Abstract base to share common functionality across services.
  */
-abstract class BaseService {
+open class BaseService {
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
     fun tryAction(

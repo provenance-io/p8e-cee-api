@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package io.provenance.api.frameworks.web.external.provenance
 
 import io.provenance.api.domain.usecase.provenance.contracts.classify.ClassifyAsset

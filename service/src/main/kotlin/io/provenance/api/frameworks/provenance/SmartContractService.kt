@@ -40,13 +40,18 @@ class SmartContractService : SmartContract, BaseService() {
     ): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
             val smartContractKotlinClient =
-                getSmartContractSpecificClient(libraryInvocation.parameterClassName,
+                getSmartContractSpecificClient(
+                    libraryInvocation.parameterClassName,
                     contractConfig.contractName,
                     contractConfig.contractAddress,
-                    pbClient)
+                    pbClient
+                )
             reflectMethodFromClass(smartContractKotlinClient, libraryInvocation.methodName).call(
                 smartContractKotlinClient,
-                createClassUsingNameAndPopulateWithJson(libraryInvocation.parameterClassName, libraryInvocation.parameterClassJson),
+                createClassUsingNameAndPopulateWithJson(
+                    libraryInvocation.parameterClassName,
+                    libraryInvocation.parameterClassJson
+                ),
                 signer,
                 tech.figure.validationoracle.client.client.base.BroadcastOptions(
                     broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
@@ -61,17 +66,21 @@ class SmartContractService : SmartContract, BaseService() {
         contractConfig: SmartContractConfiguration,
         libraryCall: SmartContractClientLibraryInvocation,
     ): String {
-        val smartContractKotlinClient = getSmartContractSpecificClient(libraryCall.parameterClassName,
+        val smartContractKotlinClient = getSmartContractSpecificClient(
+            libraryCall.parameterClassName,
             contractConfig.contractName,
             contractConfig.contractAddress,
             PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION)
         )
-        return (reflectMethodFromClass(smartContractKotlinClient, libraryCall.methodName).call(
-            smartContractKotlinClient,
-            createClassUsingNameAndPopulateWithJson(libraryCall.parameterClassName, libraryCall.parameterClassJson)
-        ) as Any).toPrettyJson()
+        return (
+            reflectMethodFromClass(smartContractKotlinClient, libraryCall.methodName).call(
+                smartContractKotlinClient,
+                createClassUsingNameAndPopulateWithJson(libraryCall.parameterClassName, libraryCall.parameterClassJson)
+            ) as Any
+            ).toPrettyJson()
     }
 
+    @Suppress("ThrowsCount")
     private fun getSmartContractSpecificClient(
         className: String,
         contractName: String?,
@@ -83,7 +92,8 @@ class SmartContractService : SmartContract, BaseService() {
                 requireNotNull(contractAddress) { "Your must specify a contract address for this smart contract." }
                 VOClient.getDefault(
                     contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
-                        contractAddress),
+                        contractAddress
+                    ),
                     pbClient = pbClient,
                     objectMapper = VOObjectMapperUtil.getObjectMapper()
                 )
@@ -92,7 +102,8 @@ class SmartContractService : SmartContract, BaseService() {
                 requireNotNull(contractAddress) { "Your must specify a contract address for this smart contract." }
                 DefaultVOQuerier(
                     contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
-                        contractAddress),
+                        contractAddress
+                    ),
                     pbClient = pbClient,
                     objectMapper = ACObjectMapperUtil.getObjectMapper()
                 )
@@ -133,5 +144,4 @@ class SmartContractService : SmartContract, BaseService() {
         val clazz = Class.forName(className) // This throws a ClassNotFoundException
         return ObjectMapper().configureProvenance().readValue(json, clazz) // This throws a JsonMappingException
     }
-
 }

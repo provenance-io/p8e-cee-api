@@ -37,7 +37,6 @@ import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
 import java.net.URI
 import java.util.Base64
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 
 class ProvenanceTxException(message: String) : Exception(message)
 
@@ -51,8 +50,6 @@ object ProvenanceConst {
 
 @Component
 class ProvenanceService : Provenance, BaseService() {
-    private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
-
     override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             return when (tx) {
@@ -131,6 +128,7 @@ class ProvenanceService : Provenance, BaseService() {
             )
         }
 
+    @Deprecated("Use the new smart contract execute endpoint")
     override fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
             val assetClassificationClient = ACClient.getDefault(
@@ -149,6 +147,7 @@ class ProvenanceService : Provenance, BaseService() {
             )
         }.txResponse.toTxResponse()
 
+    @Deprecated("Use the new smart contract execute endpoint")
     override fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
 
@@ -167,7 +166,6 @@ class ProvenanceService : Provenance, BaseService() {
                 )
             )
         }.txResponse.toTxResponse()
-
 }
 
 @Suppress("DEPRECATION")
