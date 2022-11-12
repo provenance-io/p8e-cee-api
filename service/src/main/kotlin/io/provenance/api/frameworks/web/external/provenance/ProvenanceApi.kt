@@ -12,7 +12,6 @@ import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
-import tech.figure.classification.asset.client.domain.model.AssetDefinition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -20,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import java.util.UUID
 import mu.KotlinLogging
 import org.springdoc.core.annotations.RouterOperation
 import org.springdoc.core.annotations.RouterOperations
@@ -28,6 +26,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.reactive.function.server.coRouter
+import tech.figure.classification.asset.client.domain.model.AssetDefinition
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -414,6 +414,10 @@ class ProvenanceApi {
                 GET("/query", handler::queryScope)
                 POST("/ownership", handler::changeScopeOwnership)
                 PATCH("/data", handler::updateDataAccess)
+            }
+            "/smartcontract".nest {
+                POST("execute", handler::executeSmartContract)
+                GET("query", handler::querySmartContract)
             }
             POST("/verify", handler::verifyAsset)
             PATCH("/permissions/authz", handler::updateAuthz)

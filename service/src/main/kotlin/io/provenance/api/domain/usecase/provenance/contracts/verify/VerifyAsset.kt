@@ -31,6 +31,7 @@ class VerifyAsset(
             accessRoutes = args.request.contractConfig.accessRoutes,
         )
 
+        @Suppress("DEPRECATION")
         return provenanceService.verifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, verifyRequest)
     }
 }

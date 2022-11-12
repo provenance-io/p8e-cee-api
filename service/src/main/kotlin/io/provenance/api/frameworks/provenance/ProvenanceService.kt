@@ -1,7 +1,6 @@
 package io.provenance.api.frameworks.provenance
 
 import com.google.protobuf.Any
-import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
 import cosmos.tx.v1beta1.TxOuterClass
@@ -10,8 +9,8 @@ import io.grpc.Metadata.ASCII_STRING_MARSHALLER
 import io.grpc.stub.AbstractStub
 import io.grpc.stub.MetadataUtils
 import io.provenance.api.domain.provenance.Provenance
+import io.provenance.api.frameworks.BaseService
 import io.provenance.api.frameworks.provenance.exceptions.ContractTxException
-import io.provenance.api.frameworks.provenance.extensions.getBaseAccount
 import io.provenance.api.frameworks.provenance.extensions.getErrorResult
 import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
@@ -28,10 +27,6 @@ import io.provenance.metadata.v1.ScopeRequest
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
-import java.net.URI
-import java.util.Base64
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Component
 import tech.figure.classification.asset.client.client.base.ACClient
 import tech.figure.classification.asset.client.client.base.BroadcastOptions
@@ -39,6 +34,10 @@ import tech.figure.classification.asset.client.client.base.ContractIdentifier
 import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
 import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
+import java.net.URI
+import java.util.Base64
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 class ProvenanceTxException(message: String) : Exception(message)
 
@@ -51,7 +50,7 @@ object ProvenanceConst {
 }
 
 @Component
-class ProvenanceService : Provenance {
+class ProvenanceService : Provenance, BaseService() {
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
     override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
@@ -169,24 +168,6 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
-    fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
-        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-            val account = getBaseAccount(pbClient, signer.address())
-            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
-
-            runCatching {
-                action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
-            }.fold(
-                onSuccess = {
-                    return it
-                },
-                onFailure = {
-                    cachedOffset.getAndDecrement(account.sequence)
-                    throw it
-                }
-            )
-        }
-    }
 }
 
 @Suppress("DEPRECATION")

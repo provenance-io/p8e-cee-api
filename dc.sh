@@ -1,6 +1,17 @@
 #!/bin/bash
-
-while getopts 'p:v:c' OPTION; do
+###############################################################################
+# If you are setting up a smart contract, the name of the smart contract
+# that was build locally in your smart contract wasm repo is needed
+# so that it can be copied over and put onto your local chain.
+# M1 Macs build the WASM a little differently, so their WASM filename looks like:
+#      validation_oracle_smart_contract-aarch64.wasm whereas
+# Non-M1 Macs don't have the "-aarch64" piece.
+# Regardless of the name, you need that WASM to be put on your local Provenance instance
+#     in order to run this script.
+# Here is a sample which installs a validation oracle wasm on my M1:
+#      ./dc.sh -w "validation_oracle_smart_contract-aarch64.wasm" -p "../validation-oracle-smart-contract" build_contract
+###############################################################################
+while getopts 'p:v:c:w:' OPTION; do
   case "$OPTION" in
     p)
       PATH_TO_CONTRACTS="$OPTARG"
@@ -9,6 +20,10 @@ while getopts 'p:v:c' OPTION; do
     v)
       CONTRACTS_VERSION="$OPTARG"
       echo "Version you wish to publish the contracts as: $OPTARG"
+      ;;
+    w)
+      CONTRACT_WASM_NAME="$OPTARG"
+      echo "Name of contract wasm: $OPTARG"
       ;;
     c)
       SETUP_SMART_CONTRACT=true
@@ -35,9 +50,15 @@ function up {
   # local-originator
   cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000001 - > /dev/null
   cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0 - > /dev/null
+
   # local-servicer
   cat service/docker/vault/secrets/local-servicer.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000002 - > /dev/null
   cat service/docker/vault/secrets/local-servicer.json | vault kv put $SECRET_PATH/originators/tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd - > /dev/null
+  # Adding local-servicer keys onto Provenance
+  echo "awful arrow detail train either smoke right twice mesh language abstract dad child special credit sister winner toss expand good convince strike erode allow" |  docker exec -i provenance provenanced -t keys add another-admin --recover --hd-path m/44\'/1\'/0\'/0/0
+  keys=$(docker exec provenance provenanced keys list -t)
+  echo "Keys: $keys"
+
   # local-dart
   cat service/docker/vault/secrets/local-dart.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000003 - > /dev/null
   cat service/docker/vault/secrets/local-dart.json | vault kv put $SECRET_PATH/originators/tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl - > /dev/null
@@ -99,10 +120,21 @@ function bounce {
    up
 }
 
-function build_classification() {
+function build_contract() {
     if [ -z ${PATH_TO_CONTRACTS+x} ]; then
         echo "Provide a valid path to the smart contracts directory you wish to store on provenance using the -p argument."
         exit 1
+    fi
+
+    if [ -z ${CONTRACT_WASM_NAME+x} ]; then
+        echo "Provide a valid input contract name (e.g. asset_classification_smart_contract-aarch64.wasm) -i argument."
+        exit 1
+    fi
+
+    if [ -z ${CONTRACT_WASM_NAME_ARTIFACT_OVERRIDE+x} ]; then
+        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+    else
+        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME_ARTIFACT_OVERRIDE
     fi
 
     export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
@@ -112,7 +144,7 @@ function build_classification() {
         cargo build
         make optimize
         popd > /dev/null
-        cp $PATH_TO_CONTRACTS/artifacts/asset_classification_smart_contract.wasm service/docker/prov-init/contracts/asset_classification_smart_contract.wasm
+        cp $PATH_TO_CONTRACTS/artifacts/$WASM_NAME_ATRIFACT service/docker/prov-init/contracts/$CONTRACT_WASM_NAME
     else
         echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
         exit 1
@@ -129,7 +161,7 @@ function setup() {
 }
 
 function upload_classification_contract() {
-    echo "Uploading contract to provenance!"
+    echo "Uploading asset classification contract to provenance!"
     upload=$(docker exec provenance provenanced tx wasm store contracts/asset_classification_smart_contract.wasm \
                      --instantiate-only-address tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
                      --from tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
@@ -165,6 +197,47 @@ function upload_classification_contract() {
 
     contract_address=$(echo $instantiate | jq '.logs[] | select(.msg_index == 0) | .events[] | select(.type == "instantiate") | .attributes[] | select(.key == "_contract_address") | .value')
     echo "Asset classification contract fully setup! contract address: $contract_address"
+}
+
+function upload_validation_oracle_contract() {
+    echo "Uploading validation oracle contract to provenance!"
+    upload=$(docker exec provenance provenanced tx wasm store contracts/validation_oracle_smart_contract.wasm \
+                     --instantiate-only-address tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
+                     --from tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
+                     --chain-id chain-local \
+                     --gas auto \
+                     --gas-prices="1905nhash" \
+                     --gas-adjustment=1.1 \
+                     --broadcast-mode block \
+                     --testnet \
+                     --output json \
+                     --yes)
+
+    echo "VO WASM Store Results: $upload"
+    code_id=$(echo $upload | jq -r '.logs[] | select(.msg_index == 0) | .events[] | select(.type == "store_code") | .attributes[0].value')
+    echo "Upload complete. Code id: $code_id"
+
+    instantiate=$(docker exec provenance provenanced tx wasm instantiate $code_id \
+                       '{
+                         "bind_name": "validationraoclealias.pb",
+                         "contract_name": "validation_oracle_smart_contract",
+                         "create_request_nhash_fee": "100"
+                       }' \
+                       --admin "tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd" \
+                       --from tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
+                       --label examples \
+                       --chain-id chain-local \
+                       --gas auto \
+                       --gas-prices="1905nhash" \
+                       --gas-adjustment=1.1 \
+                       --broadcast-mode block \
+                       --testnet \
+                       --output json \
+                       --yes | jq)
+
+    echo "VO WASM Instantiate Results: $instantiate"
+    contract_address=$(echo $instantiate | jq '.logs[] | select(.msg_index == 0) | .events[] | select(.type == "instantiate") | .attributes[] | select(.key == "_contract_address") | .value')
+    echo "Validation oracle contract fully setup! contract address: $contract_address"
 }
 
 ${1}

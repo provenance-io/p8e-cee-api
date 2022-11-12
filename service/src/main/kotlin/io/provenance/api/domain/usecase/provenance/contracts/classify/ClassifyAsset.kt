@@ -30,6 +30,7 @@ class ClassifyAsset(
             accessRoutes = args.request.contractConfig.accessRoutes,
         )
 
+        @Suppress("DEPRECATION")
         return provenanceService.classifyAsset(args.request.provenanceConfig, signer, args.request.contractConfig, assetRequest)
     }
 }

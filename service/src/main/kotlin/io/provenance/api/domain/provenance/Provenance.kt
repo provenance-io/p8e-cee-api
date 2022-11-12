@@ -7,10 +7,10 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
-import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
-import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import io.provenance.client.grpc.Signer
 import io.provenance.metadata.v1.ScopeResponse
+import tech.figure.classification.asset.client.domain.execute.OnboardAssetExecute
+import tech.figure.classification.asset.client.domain.execute.VerifyAssetExecute
 import java.util.UUID
 
 interface Provenance {
@@ -18,6 +18,6 @@ interface Provenance {
     fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse
     fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody
     fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long? = null): ScopeResponse
-    fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse
-    fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse
+    @Deprecated("Use the new smart contract execute endpoint") fun classifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, onboardAssetRequest: OnboardAssetExecute<UUID>): TxResponse
+    @Deprecated("Use the new smart contract execute endpoint") fun verifyAsset(config: ProvenanceConfig, signer: Signer, contractConfig: SmartContractConfig, verifyAssetRequest: VerifyAssetExecute<UUID>): TxResponse
 }

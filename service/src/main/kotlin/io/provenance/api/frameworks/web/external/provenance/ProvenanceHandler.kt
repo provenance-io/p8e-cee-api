@@ -6,6 +6,10 @@ import io.provenance.api.domain.usecase.provenance.contracts.fees.GetFeesForAsse
 import io.provenance.api.domain.usecase.provenance.contracts.fees.models.GetFeesForAssetRequest
 import io.provenance.api.domain.usecase.provenance.contracts.status.GetClassificationStatus
 import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetStatusOfClassificationRequest
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.ExecuteSmartContract
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.QuerySmartContract
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.models.SmartContractQueryRequestWrapper
+import io.provenance.api.domain.usecase.provenance.contracts.validationoracle.models.SmartContractTransactionRequestWrapper
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.domain.usecase.provenance.query.QueryScope
@@ -34,6 +38,8 @@ class ProvenanceHandler(
     private val createTx: CreateTx,
     private val queryScope: QueryScope,
     private val changeScopeOwnership: ChangeScopeOwnership,
+    private val executeSmartContract: ExecuteSmartContract,
+    private val queryValidationOracle: QuerySmartContract,
     private val classifyAsset: ClassifyAsset,
     private val verifyAsset: VerifyAsset,
     private val getFees: GetFeesForAsset,
@@ -68,6 +74,14 @@ class ProvenanceHandler(
                 req.awaitBody(),
             )
         )
+    }.foldToServerResponse()
+
+    suspend fun executeSmartContract(req: ServerRequest): ServerResponse = runCatching {
+        executeSmartContract.execute(SmartContractTransactionRequestWrapper(req.getUser(), req.awaitBody()))
+    }.foldToServerResponse()
+
+    suspend fun querySmartContract(req: ServerRequest): ServerResponse = runCatching {
+        queryValidationOracle.execute(SmartContractQueryRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun classifyAsset(req: ServerRequest): ServerResponse = runCatching {

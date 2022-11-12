@@ -42,6 +42,10 @@ object Versions {
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
     const val AssetClassification = "3.4.3"
+    // @TODO I need to publish this library and
+    //     update the version here before
+    //     this CEE PR is merged!
+    const val ValidationOracle = "1.0-SNAPSHOT"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -90,6 +94,10 @@ object Dependencies {
     object AssetClassification {
         val Client = DependencySpec("tech.figure.classification.asset:ac-client", Versions.AssetClassification)
         val Verifier = DependencySpec("tech.figure.classification.asset:ac-verifier", Versions.AssetClassification)
+    }
+
+    object ValidationOracle {
+        val Client = DependencySpec("tech.figure.validationoracle:vo-client", Versions.ValidationOracle)
     }
 
     object P8eScope {
