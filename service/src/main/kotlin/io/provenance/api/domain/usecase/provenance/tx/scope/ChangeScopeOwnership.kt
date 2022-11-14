@@ -48,13 +48,13 @@ class ChangeScopeOwnership(
                         owner.role == PartyType.PARTY_TYPE_OWNER
                     }.forEach { existingOwner ->
                         scopeBuilder.removeOwners(scopeBuilder.ownersList.indexOf(existingOwner))
+                        scopeBuilder.addOwners(
+                            Party.newBuilder().also { ownerPartyBuilder ->
+                                ownerPartyBuilder.role = PartyType.PARTY_TYPE_OWNER
+                                ownerPartyBuilder.address = requestedNewValueOwner
+                            }.build()
+                        )
                     }
-                    scopeBuilder.addOwners(
-                        Party.newBuilder().also { ownerPartyBuilder ->
-                            ownerPartyBuilder.role = PartyType.PARTY_TYPE_OWNER
-                            ownerPartyBuilder.address = requestedNewValueOwner
-                        }.build()
-                    )
                 }
                 /** Only change data access if [newDataAccess][args.request.newDataAccess] was not null. */
                 args.request.newDataAccess?.let { requestedNewDataAccess ->
