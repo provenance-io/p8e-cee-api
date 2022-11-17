@@ -135,7 +135,7 @@ echo "********************************************************************" >> r
 echo | tee -a results.txt
 
 echo "Getting VO Smart Contract Address" | tee -a results.txt
-vo_contract_address_results=`$provenanced -t q name resolve validationraoclealias.pb`
+vo_contract_address_results=`$provenanced -t q name resolve validationoraclealias.pb`
 echo "vo_contract_address_results: $vo_contract_address_results" >> results.txt
 
 vo_contract_address=`echo $vo_contract_address_results | sed  's/^.*address: \([0-9a-zA-Z]*\).*$/\1/g'`
@@ -166,9 +166,11 @@ execute_results_for_vo_setup=`curl --location --request POST 'http://localhost:'
                                                             }
                                                         ]
                                                     },
-                                                    "className": "tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute",
-                                                    "methodName": "addValidationDefinition",
-                                                    "classJson": "{\"validationType\":\"'$validation_type'\",\"displayName\":\"displayName123\",\"validators\":[{\"validationCosts\":[{\"amount\":\"345\",\"denom\":\"nhash\",\"destination\":{\"address\":\"tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc\",\"name\":\"Entity1\",\"description\":\"descr2\"}}],\"validationType\":\"abc123\",\"validator\":{\"address\":\"tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc\",\"name\":\"Entity1\",\"description\":\"descr2\"}}],\"enabled\":true}"
+                                                    "libraryInvocation": {
+                                                        "methodName": "addValidationDefinition",
+                                                        "parameterClassName": "tech.figure.validationoracle.client.domain.execute.AddValidationDefinitionExecute",
+                                                        "parameterClassJson": "{\"validationType\":\"'$validation_type'\",\"displayName\":\"displayName123\",\"validators\":[{\"validationCosts\":[{\"amount\":\"345\",\"denom\":\"nhash\",\"destination\":{\"address\":\"tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc\",\"name\":\"Entity1\",\"description\":\"descr2\"}}],\"validation_type\":\"abc123\",\"validator\":{\"address\":\"tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc\",\"name\":\"Entity1\",\"description\":\"descr2\"}}],\"enabled\":true}"
+                                                    }
                                                 }' 2>>results.txt`
 
 echo "$execute_results_for_vo_setup" >> results.txt
@@ -196,9 +198,11 @@ execute_query_results_for_vo_setup=`curl --location --request GET 'http://localh
                                                             }
                                                         ]
                                                     },
-                                                    "className": "tech.figure.validationoracle.client.domain.query.QueryValidationDefinition",
-                                                    "methodName": "queryValidationDefinition",
-                                                    "classJson": "{\"key\":\"'$validation_type'\"}"
+                                                    "libraryInvocation": {
+                                                        "methodName": "queryValidationDefinitionByType",
+                                                        "parameterClassName": "tech.figure.validationoracle.client.domain.query.QueryValidationDefinitionByType",
+                                                        "parameterClassJson": "{\"query_validation_definition_by_type\":{\"type\":\"'$validation_type'\"}}"
+                                                    }
                                                 }' 2>>results.txt`
 
 echo "$execute_query_results_for_vo_setup" >> results.txt
@@ -227,7 +231,7 @@ execute_vo_request=`curl --location --request POST 'http://localhost:'$cee_port'
                                                             }
                                                         ]
                                                     },
-                                                    "libraryCall" :{
+                                                    "libraryInvocation": {
                                                         "methodName": "requestValidationExecute",
                                                         "parameterClassName": "tech.figure.validationoracle.client.domain.execute.RequestValidationExecute",
                                                         "parameterClassJson": "{ \"id\": \"'$vo_request_id'\", \"scopes\": [\"'$loan_scope_id_from_cli_hash_lookup'\"], \"quote\": [] }"
@@ -259,10 +263,10 @@ execute_query_vo_request=`curl --location --request GET 'http://localhost:'$cee_
                                                             }
                                                         ]
                                                     },
-                                                    "libraryCall" :{
-                                                        "methodName": "queryValidationRequestOrder",
-                                                        "parameterClassName": "tech.figure.validationoracle.client.domain.query.QueryValidationRequestOrder",
-                                                        "parameterClassJson": "{\"query_request_order\":{ \"id\": \"'$vo_request_id'\"}}"
+                                                    "libraryInvocation" :{
+                                                        "methodName": "queryValidationRequestById",
+                                                        "parameterClassName": "tech.figure.validationoracle.client.domain.query.QueryValidationRequestById",
+                                                        "parameterClassJson": "{\"query_validation_request_by_id\":{ \"id\": \"'$vo_request_id'\"}}"
                                                     }
                                                 }' 2>>results.txt`
 

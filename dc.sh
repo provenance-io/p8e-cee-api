@@ -162,7 +162,13 @@ function setup() {
 
 function upload_classification_contract() {
     echo "Uploading asset classification contract to provenance!"
-    upload=$(docker exec provenance provenanced tx wasm store contracts/asset_classification_smart_contract.wasm \
+    if [ -z ${CONTRACT_WASM_NAME+x} ]; then
+        WASM_NAME_ATRIFACT="asset_classification_smart_contract.wasm"
+    else
+        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+    fi
+
+    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRIFACT \
                      --instantiate-only-address tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
                      --from tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
                      --chain-id chain-local \
@@ -201,7 +207,13 @@ function upload_classification_contract() {
 
 function upload_validation_oracle_contract() {
     echo "Uploading validation oracle contract to provenance!"
-    upload=$(docker exec provenance provenanced tx wasm store contracts/validation_oracle_smart_contract.wasm \
+    if [ -z ${CONTRACT_WASM_NAME+x} ]; then
+        WASM_NAME_ATRIFACT="validation_oracle_smart_contract.wasm"
+    else
+        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+    fi
+
+    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRIFACT \
                      --instantiate-only-address tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
                      --from tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
                      --chain-id chain-local \
@@ -219,7 +231,7 @@ function upload_validation_oracle_contract() {
 
     instantiate=$(docker exec provenance provenanced tx wasm instantiate $code_id \
                        '{
-                         "bind_name": "validationraoclealias.pb",
+                         "bind_name": "validationoraclealias.pb",
                          "contract_name": "validation_oracle_smart_contract",
                          "create_request_nhash_fee": "100"
                        }' \

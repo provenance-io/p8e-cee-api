@@ -42,10 +42,7 @@ object Versions {
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
     const val AssetClassification = "3.4.3"
-    // @TODO I need to publish this library and
-    //     update the version here before
-    //     this CEE PR is merged!
-    const val ValidationOracle = "1.0-SNAPSHOT"
+    const val ValidationOracle = "0.1.1"
 }
 
 object Plugins { // please keep this sorted in sections
