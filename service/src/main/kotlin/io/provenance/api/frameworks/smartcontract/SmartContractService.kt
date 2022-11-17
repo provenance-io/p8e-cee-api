@@ -1,10 +1,14 @@
-package io.provenance.api.frameworks.provenance
+package io.provenance.api.frameworks.smartcontract
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import cosmos.tx.v1beta1.ServiceOuterClass
 import io.provenance.api.domain.smartcontract.SmartContract
 import io.provenance.api.frameworks.BaseService
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
+import io.provenance.api.frameworks.smartcontract.clients.ACExecuteClient
+import io.provenance.api.frameworks.smartcontract.clients.ACQueryClient
+import io.provenance.api.frameworks.smartcontract.clients.VOExecuteClient
+import io.provenance.api.frameworks.smartcontract.clients.VOQueryClient
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractClientLibraryInvocation
@@ -14,24 +18,30 @@ import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.grpc.Signer
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream.Companion.configureProvenance
+import io.provenance.scope.objectstore.util.orThrow
 import org.springframework.stereotype.Component
-import tech.figure.classification.asset.client.client.base.ACClient
-import tech.figure.classification.asset.client.client.base.ContractIdentifier
-import tech.figure.classification.asset.client.client.impl.DefaultACQuerier
-import tech.figure.classification.asset.util.objects.ACObjectMapperUtil
-import tech.figure.validationoracle.client.client.base.VOClient
-import tech.figure.validationoracle.client.client.impl.DefaultVOQuerier
-import tech.figure.validationoracle.util.objects.VOObjectMapperUtil
 import java.net.URI
 import kotlin.reflect.KCallable
 
 /**
- * If a new smart contract is ever added to CEE, it is included in Dependencies.kt and
- *   getSmartContractSpecificClient() needs to be updated to return the proper smart contract client library class based on the className
- *   that is passed in to the smart contract execute transaction and query endpoints.
+ * If you want to support a new smart contract in CEE
+ * 1. Include in Dependencies.kt
+ * 2. Add a Kotlin client class implementing SmartContractClient in io.provenance.api.frameworks.smartcontract.clients
+ * 3. Update smartContractSupportedClients below to associate the "startsWith" path of class names to use for the Kotlin class
+ *       you added in step 2.
+ *
+ *  We could replace this map with something reflective to make these contracts truly closed, like Spring beans.
  */
+val smartContractSupportedClients: Map<String, SmartContractClient> = mapOf(
+    "tech.figure.validationoracle.client.domain.execute" to VOExecuteClient(),
+    "tech.figure.validationoracle.client.domain.query" to VOQueryClient(),
+    "tech.figure.classification.asset.client.domain.execute" to ACExecuteClient(),
+    "tech.figure.classification.asset.client.domain.query" to ACQueryClient(),
+)
+
 @Component
 class SmartContractService : SmartContract, BaseService() {
+
     override fun executeSmartContractTransaction(
         config: ProvenanceConfig,
         signer: Signer,
@@ -87,51 +97,15 @@ class SmartContractService : SmartContract, BaseService() {
         contractAddress: String?,
         pbClient: PbClient,
     ): Any {
-        return when {
-            className.startsWith("tech.figure.validationoracle.client.domain.execute") -> {
-                requireNotNull(contractAddress) { "Your must specify a contract address for this smart contract." }
-                VOClient.getDefault(
-                    contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
-                        contractAddress
-                    ),
-                    pbClient = pbClient,
-                    objectMapper = VOObjectMapperUtil.getObjectMapper()
-                )
-            }
-            className.startsWith("tech.figure.validationoracle.client.domain.query") -> {
-                requireNotNull(contractAddress) { "Your must specify a contract address for this smart contract." }
-                DefaultVOQuerier(
-                    contractIdentifier = tech.figure.validationoracle.client.client.base.ContractIdentifier.Address(
-                        contractAddress
-                    ),
-                    pbClient = pbClient,
-                    objectMapper = ACObjectMapperUtil.getObjectMapper()
-                )
-            }
-            className.startsWith("tech.figure.classification.asset.client.domain.execute") -> {
-                ACClient.getDefault(
-                    contractIdentifier = when {
-                        contractName != null -> ContractIdentifier.Name(contractName)
-                        contractAddress != null -> ContractIdentifier.Address(contractAddress)
-                        else -> throw IllegalArgumentException("You must specify either a contractName or contractAddress.")
-                    },
-                    pbClient = pbClient,
-                    objectMapper = ACObjectMapperUtil.getObjectMapper(),
-                )
-            }
-            className.startsWith("tech.figure.classification.asset.client.domain.query") -> {
-                DefaultACQuerier(
-                    contractIdentifier = when {
-                        contractName != null -> ContractIdentifier.Name(contractName)
-                        contractAddress != null -> ContractIdentifier.Address(contractAddress)
-                        else -> throw IllegalArgumentException("You must specify either a contractName or contractAddress.")
-                    },
-                    pbClient = pbClient,
-                    objectMapper = ACObjectMapperUtil.getObjectMapper(),
-                )
-            }
-            else -> throw IllegalStateException("Class $className is an unsupported smart contract client class.")
-        }
+
+        val clientClassName: String = smartContractSupportedClients.keys.filter { cn -> className.startsWith(cn) }
+            .first()
+            .orThrow { throw IllegalStateException("Class $className is an unsupported smart contract client class.") }
+        return smartContractSupportedClients.get(clientClassName)!!.createSmartContractClient(
+            contractName,
+            contractAddress,
+            pbClient
+        )
     }
 
     private fun reflectMethodFromClass(classInstance: Any, methodName: String): KCallable<*> {
