@@ -132,9 +132,9 @@ function build_contract() {
     fi
 
     if [ -z ${CONTRACT_WASM_NAME_ARTIFACT_OVERRIDE+x} ]; then
-        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+        WASM_NAME_ATRTIFACT=$CONTRACT_WASM_NAME
     else
-        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME_ARTIFACT_OVERRIDE
+        WASM_NAME_ATRTIFACT=$CONTRACT_WASM_NAME_ARTIFACT_OVERRIDE
     fi
 
     export FULL_PATH=$(realpath $PATH_TO_CONTRACTS)
@@ -144,7 +144,7 @@ function build_contract() {
         cargo build
         make optimize
         popd > /dev/null
-        cp $PATH_TO_CONTRACTS/artifacts/$WASM_NAME_ATRIFACT service/docker/prov-init/contracts/$CONTRACT_WASM_NAME
+        cp $PATH_TO_CONTRACTS/artifacts/$WASM_NAME_ATRTIFACT service/docker/prov-init/contracts/$CONTRACT_WASM_NAME
     else
         echo "Invalid path. Provide a valid path to the contracts directory you wish to publish."
         exit 1
@@ -163,12 +163,12 @@ function setup() {
 function upload_classification_contract() {
     echo "Uploading asset classification contract to provenance!"
     if [ -z ${CONTRACT_WASM_NAME+x} ]; then
-        WASM_NAME_ATRIFACT="asset_classification_smart_contract.wasm"
+        WASM_NAME_ATRTIFACT="asset_classification_smart_contract.wasm"
     else
-        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+        WASM_NAME_ATRTIFACT=$CONTRACT_WASM_NAME
     fi
 
-    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRIFACT \
+    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRTIFACT \
                      --instantiate-only-address tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
                      --from tp1v5d9uek3qwqh25yrchj20mkgrksdfyyxhnsdag \
                      --chain-id chain-local \
@@ -208,12 +208,12 @@ function upload_classification_contract() {
 function upload_validation_oracle_contract() {
     echo "Uploading validation oracle contract to provenance!"
     if [ -z ${CONTRACT_WASM_NAME+x} ]; then
-        WASM_NAME_ATRIFACT="validation_oracle_smart_contract.wasm"
+        WASM_NAME_ATRTIFACT="validation_oracle_smart_contract.wasm"
     else
-        WASM_NAME_ATRIFACT=$CONTRACT_WASM_NAME
+        WASM_NAME_ATRTIFACT=$CONTRACT_WASM_NAME
     fi
 
-    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRIFACT \
+    upload=$(docker exec provenance provenanced tx wasm store contracts/$WASM_NAME_ATRTIFACT \
                      --instantiate-only-address tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
                      --from tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd \
                      --chain-id chain-local \
