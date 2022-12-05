@@ -417,6 +417,7 @@ class ProvenanceApi {
             }
             POST("/verify", handler::verifyAsset)
             PATCH("/permissions/authz", handler::updateAuthz)
+            GET("/custody", handler::checkCustody)
         }
     }
 }

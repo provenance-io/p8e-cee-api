@@ -1,5 +1,7 @@
 package io.provenance.api.frameworks.web.external.provenance
 
+import io.provenance.api.domain.usecase.provenance.account.GetSigner
+import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.domain.usecase.provenance.contracts.classify.ClassifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.classify.models.ClassifyAssetRequestWrapper
 import io.provenance.api.domain.usecase.provenance.contracts.fees.GetFeesForAsset
@@ -19,16 +21,20 @@ import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.Upd
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.scope.ChangeScopeOwnership
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
+import io.provenance.api.frameworks.web.SuccessResponses
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.query.QueryScopeRequest
 import io.provenance.scope.util.toUuid
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
+import org.springframework.web.reactive.function.server.awaitBodyOrNull
 
 @Component
+@Suppress("TooManyFunctions")
 class ProvenanceHandler(
     private val executeTx: ExecuteTx,
     private val createTx: CreateTx,
@@ -39,7 +45,8 @@ class ProvenanceHandler(
     private val getFees: GetFeesForAsset,
     private val getClassificationStatus: GetClassificationStatus,
     private val updateDataAccess: UpdateScopeDataAccess,
-    private val updateAuthzGrant: UpdateAuthzGrant
+    private val updateAuthzGrant: UpdateAuthzGrant,
+    private val getSigner: GetSigner,
 ) {
     suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
         createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
@@ -120,4 +127,20 @@ class ProvenanceHandler(
             )
         )
     }.foldToServerResponse()
+
+    suspend fun checkCustody(req: ServerRequest): ServerResponse = kotlin.runCatching {
+        getSigner.execute(
+            GetSignerRequest(
+                uuid = req.getUser(),
+                account = req.awaitBodyOrNull() ?: AccountInfo()
+            )
+        )
+    }.fold(
+        onSuccess = {
+            SuccessResponses.ok(true)
+        },
+        onFailure = {
+            SuccessResponses.ok(false)
+        }
+    )
 }
