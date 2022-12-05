@@ -1,18 +1,21 @@
 package io.provenance.api.frameworks.web.internal.objectStore
 
+import com.google.common.util.concurrent.RateLimiter
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
+import io.provenance.api.frameworks.web.misc.rateLimitedCoRouter
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.server.coRouter
 
 private val log = KotlinLogging.logger {}
 
 @Configuration
-class InternalObjectStoreApi {
+class InternalObjectStoreApi(
+    private val rateLimiter: RateLimiter
+) {
     @Bean
-    fun internalObjectStoreApiV1(handler: InternalObjectStoreHandler) = coRouter {
+    fun internalObjectStoreApiV1(handler: InternalObjectStoreHandler) = rateLimitedCoRouter(rateLimiter) {
         logExchange(log)
         Routes.INTERNAL_BASE_V1.nest {
             "/eos".nest {

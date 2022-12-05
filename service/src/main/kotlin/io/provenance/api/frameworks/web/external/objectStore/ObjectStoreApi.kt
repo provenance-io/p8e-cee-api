@@ -1,12 +1,14 @@
 package io.provenance.api.frameworks.web.external.objectStore
 
+import com.google.common.util.concurrent.RateLimiter
 import io.provenance.api.domain.usecase.objectStore.replication.models.EnableReplicationRequest
-import io.provenance.api.frameworks.web.Routes
-import io.provenance.api.frameworks.web.logging.logExchange
-import io.provenance.api.models.eos.store.StoreProtoRequest
-import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerGetFileResponse
 import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerStoreFileRequestWrapper
+import io.provenance.api.frameworks.web.Routes
+import io.provenance.api.frameworks.web.logging.logExchange
+import io.provenance.api.frameworks.web.misc.rateLimitedCoRouter
+import io.provenance.api.models.eos.store.StoreProtoRequest
+import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -14,20 +16,21 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import java.util.UUID
 import mu.KotlinLogging
 import org.springdoc.core.annotations.RouterOperation
 import org.springdoc.core.annotations.RouterOperations
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.reactive.function.server.coRouter
-import java.util.UUID
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.RequestMethod
 
 private val log = KotlinLogging.logger {}
 
 @Configuration
-class ObjectStoreApi {
+class ObjectStoreApi(
+    private val rateLimiter: RateLimiter
+) {
     @Bean
     @RouterOperations(
         RouterOperation(
@@ -190,7 +193,7 @@ class ObjectStoreApi {
             )
         )
     )
-    fun externalObjectStoreApiV1(handler: ObjectStoreHandler) = coRouter {
+    fun externalObjectStoreApiV1(handler: ObjectStoreHandler) = rateLimitedCoRouter(rateLimiter) {
         logExchange(log)
         Routes.EXTERNAL_BASE_V1.nest {
             "/eos".nest {
