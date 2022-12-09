@@ -18,6 +18,7 @@ import io.provenance.scope.objectstore.client.OsClient
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.security.PublicKey
+import mu.KotlinLogging
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Component
 import tech.figure.asset.v1beta1.AssetOuterClassBuilders
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
+
+private val log = KotlinLogging.logger {}
 
 @Component
 class StoreFile(
@@ -51,7 +54,11 @@ class StoreFile(
 
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), keyConfig))
         val file = args.request.getAsType<FilePart>("file")
-        var message: Any = ByteArrayInputStream(file.awaitAllBytes())
+        val fileBytes = file.awaitAllBytes()
+        log.info {
+            "File size: ${fileBytes.size / 1000000} MB"
+        }
+        var message: Any = ByteArrayInputStream(fileBytes)
 
         OsClient(
             URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()),
