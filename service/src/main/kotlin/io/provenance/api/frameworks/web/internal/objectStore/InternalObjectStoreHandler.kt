@@ -12,15 +12,12 @@ import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.eos.get.GetFileRequest
 import io.provenance.api.models.eos.get.GetProtoRequest
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
 import org.springframework.web.reactive.function.server.awaitMultipartData
 import org.springframework.web.reactive.function.server.queryParamOrNull
-
-private val log = KotlinLogging.logger {}
 
 @Component
 class InternalObjectStoreHandler(
