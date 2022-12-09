@@ -7,5 +7,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class RateLimiterConfig {
     @Bean
-    fun rateLimiter() = RateLimiter.create(5.0)
+    fun rateLimiter(
+        rateLimiterProps: RateLimiterProps
+    ) = RateLimiter.create(rateLimiterProps.permitsPerSecond)
 }
