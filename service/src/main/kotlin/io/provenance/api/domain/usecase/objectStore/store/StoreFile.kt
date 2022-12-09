@@ -54,11 +54,7 @@ class StoreFile(
 
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), keyConfig))
         val file = args.request.getAsType<FilePart>("file")
-        val fileBytes = file.awaitAllBytes()
-        log.info {
-            "File size: ${fileBytes.size / 1000000} MB"
-        }
-        var message: Any = ByteArrayInputStream(fileBytes)
+        var message: Any = ByteArrayInputStream(file.awaitAllBytes())
 
         OsClient(
             URI.create(args.request.getAsType<FormFieldPart>("objectStoreAddress").value()),

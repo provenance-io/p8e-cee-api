@@ -30,37 +30,18 @@ class InternalObjectStoreHandler(
     private val getFile: GetFile,
 ) {
     suspend fun storeProto(req: ServerRequest): ServerResponse = runCatching {
-        logMem()
         storeProto.execute(StoreProtoRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun storeFile(req: ServerRequest): ServerResponse = runCatching {
-        logMem()
         storeFile.execute(StoreFileRequestWrapper(req.getUser(), req.awaitMultipartData().toSingleValueMap()))
     }.foldToServerResponse()
 
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
-        logMem()
         getProto.execute(GetProtoRequestWrapper(req.getUser(), GetProtoRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), req.queryParam("type").get())))
     }.foldToServerResponse()
 
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
-        logMem()
         getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false)))
     }.foldToServerResponse()
-
-    private fun logMem() {
-        val usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
-        val freeMemory = Runtime.getRuntime().freeMemory()
-        val totalMemory = Runtime.getRuntime().totalMemory()
-        val maxMemory = Runtime.getRuntime().maxMemory()
-
-        log.info {
-            "Storing file with mem usage: \n" +
-                "used memory: ${usedMemory / 1000000} MB\n" +
-                "free memory: ${freeMemory / 1000000} MB\n" +
-                "total memory: ${totalMemory / 1000000} MB\n" +
-                "max memory: ${maxMemory / 1000000} MB"
-        }
-    }
 }
