@@ -1,6 +1,7 @@
 package io.provenance.api.frameworks.web.internal.objectStore
 
 import com.google.common.util.concurrent.RateLimiter
+import io.provenance.api.frameworks.config.RateLimiterProps
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
 import io.provenance.api.frameworks.web.misc.rateLimitedCoRouter
@@ -12,10 +13,11 @@ private val log = KotlinLogging.logger {}
 
 @Configuration
 class InternalObjectStoreApi(
-    private val rateLimiter: RateLimiter
+    private val rateLimiter: RateLimiter,
+    private val rateLimiterProps: RateLimiterProps
 ) {
     @Bean
-    fun internalObjectStoreApiV1(handler: InternalObjectStoreHandler) = rateLimitedCoRouter(rateLimiter) {
+    fun internalObjectStoreApiV1(handler: InternalObjectStoreHandler) = rateLimitedCoRouter(rateLimiter, rateLimiterProps) {
         logExchange(log)
         Routes.INTERNAL_BASE_V1.nest {
             "/eos".nest {
