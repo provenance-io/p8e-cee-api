@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.RateLimiter
 import io.provenance.api.domain.usecase.objectStore.replication.models.EnableReplicationRequest
 import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerGetFileResponse
 import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerStoreFileRequestWrapper
+import io.provenance.api.frameworks.config.RateLimiterProps
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
 import io.provenance.api.frameworks.web.misc.rateLimitedCoRouter
@@ -29,7 +30,8 @@ private val log = KotlinLogging.logger {}
 
 @Configuration
 class ObjectStoreApi(
-    private val rateLimiter: RateLimiter
+    private val rateLimiter: RateLimiter,
+    private val rateLimiterProps: RateLimiterProps,
 ) {
     @Bean
     @RouterOperations(
@@ -193,7 +195,7 @@ class ObjectStoreApi(
             )
         )
     )
-    fun externalObjectStoreApiV1(handler: ObjectStoreHandler) = rateLimitedCoRouter(rateLimiter) {
+    fun externalObjectStoreApiV1(handler: ObjectStoreHandler) = rateLimitedCoRouter(rateLimiter, rateLimiterProps) {
         logExchange(log)
         Routes.EXTERNAL_BASE_V1.nest {
             "/eos".nest {
