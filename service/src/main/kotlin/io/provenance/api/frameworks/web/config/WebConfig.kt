@@ -17,5 +17,4 @@ class WebConfig(
         // Enable support for serializing protos to JSON in API responses
         configurer.defaultCodecs().jackson2JsonEncoder(Jackson2JsonEncoder(objectMapper))
     }
-
 }

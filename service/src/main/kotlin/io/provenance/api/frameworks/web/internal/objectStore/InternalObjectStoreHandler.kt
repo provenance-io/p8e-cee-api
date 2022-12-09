@@ -39,11 +39,13 @@ class InternalObjectStoreHandler(
         val totalMemory = Runtime.getRuntime().totalMemory()
         val maxMemory = Runtime.getRuntime().maxMemory()
 
-        log.info { "Storing file with mem usage: \n" +
-            "used memory: ${usedMemory / 1000000} MB\n" +
-            "free memory: ${freeMemory / 1000000} MB\n" +
-            "total memory: ${totalMemory / 1000000} MB\n" +
-            "max memory: ${maxMemory / 1000000} MB" }
+        log.info {
+            "Storing file with mem usage: \n" +
+                "used memory: ${usedMemory / 1000000} MB\n" +
+                "free memory: ${freeMemory / 1000000} MB\n" +
+                "total memory: ${totalMemory / 1000000} MB\n" +
+                "max memory: ${maxMemory / 1000000} MB"
+        }
         storeFile.execute(StoreFileRequestWrapper(req.getUser(), req.awaitMultipartData().toSingleValueMap()))
     }.foldToServerResponse()
 
