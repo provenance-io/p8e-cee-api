@@ -56,7 +56,7 @@ class StoreFile(
         val file = args.request.getAsType<FilePart>("file")
         val fileBytes = file.awaitAllBytes()
         log.info {
-            "File size: ${fileBytes.size / 1000} MB"
+            "File size: ${fileBytes.size / 1000000} MB"
         }
         var message: Any = ByteArrayInputStream(fileBytes)
 
