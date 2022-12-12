@@ -23,9 +23,9 @@ RUN gradle clean build --no-daemon
 
 FROM openjdk:11-jre
 
-ADD service/build/libs/*.jar /p8e-cee-api.jar
+ADD service/build/libs/*.jar /app/p8e-cee-api.jar
 ADD service/docker/service-configure /configure
 
 EXPOSE 8080/tcp
 
-ENTRYPOINT /configure /p8e-cee-api.jar
+ENTRYPOINT /configure /app/p8e-cee-api.jar
