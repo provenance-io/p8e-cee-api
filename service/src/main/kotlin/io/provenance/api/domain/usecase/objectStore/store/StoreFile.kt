@@ -36,11 +36,10 @@ class StoreFile(
         val (keyConfig, additionalAudiences, objectStoreAddress, storeRawBytes, id, file) = getParams(args.request)
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), keyConfig))
 
-        lateinit var result: StoreProtoResponse
         OsClient(URI.create(objectStoreAddress), objectStoreConfig.timeoutMs).use { osClient ->
             val bytes = file.awaitAllBytes()
             ByteArrayInputStream(bytes).use { message ->
-                result = objectStore.store(
+                return objectStore.store(
                     osClient,
                     if (!storeRawBytes)
                         AssetOuterClassBuilders.Asset {
@@ -57,8 +56,6 @@ class StoreFile(
                 )
             }
         }
-
-        return result
     }
 
     private fun getParams(request: Map<String, Part>): Args {
