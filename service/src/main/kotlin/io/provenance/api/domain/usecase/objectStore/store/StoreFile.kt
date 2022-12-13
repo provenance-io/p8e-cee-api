@@ -18,6 +18,7 @@ import io.provenance.scope.objectstore.client.OsClient
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.security.PublicKey
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
@@ -37,24 +38,25 @@ class StoreFile(
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), keyConfig))
 
         OsClient(URI.create(objectStoreAddress), objectStoreConfig.timeoutMs).use { osClient ->
-            val bytes = file.awaitAllBytes()
-            ByteArrayInputStream(bytes).use { message ->
-                return objectStore.store(
-                    osClient,
-                    if (!storeRawBytes)
-                        AssetOuterClassBuilders.Asset {
-                            idBuilder.value = id
-                            type = FileNFT.ASSET_TYPE
-                            description = file.filename()
-                            putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
-                            putKv(FileNFT.KEY_BYTES, bytes.toProtoAny())
-                            putKv(FileNFT.KEY_SIZE, bytes.size.toString().toProtoAny())
-                            putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
-                        } else message,
-                    originator.encryptionPublicKey() as PublicKey,
-                    additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
-                )
-            }
+            return file.awaitAllBytes().map { bytes ->
+                ByteArrayInputStream(bytes).use { message ->
+                    return@map objectStore.store(
+                        osClient,
+                        if (!storeRawBytes)
+                            AssetOuterClassBuilders.Asset {
+                                idBuilder.value = id
+                                type = FileNFT.ASSET_TYPE
+                                description = file.filename()
+                                putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
+                                putKv(FileNFT.KEY_BYTES, bytes.toProtoAny())
+                                putKv(FileNFT.KEY_SIZE, bytes.size.toString().toProtoAny())
+                                putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
+                            } else message,
+                        originator.encryptionPublicKey() as PublicKey,
+                        additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
+                    )
+                }
+            }.awaitSingle()
         }
     }
 

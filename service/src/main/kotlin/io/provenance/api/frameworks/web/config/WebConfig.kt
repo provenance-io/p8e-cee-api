@@ -22,11 +22,7 @@ class WebConfig(
 
         val partReader = DefaultPartHttpMessageReader()
         partReader.setMaxHeadersSize(16 * 1024 * 1024)
-        partReader.isEnableLoggingRequestDetails = true
-
         val multipartReader = MultipartHttpMessageReader(partReader)
-        multipartReader.isEnableLoggingRequestDetails = true
-
         configurer.defaultCodecs().multipartReader(multipartReader)
     }
 }
