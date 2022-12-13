@@ -1,7 +1,6 @@
 package io.provenance.api.frameworks.web.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import mu.KotlinLogging
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.codec.ServerCodecConfigurer
 import org.springframework.http.codec.json.Jackson2JsonEncoder
@@ -9,8 +8,6 @@ import org.springframework.http.codec.multipart.DefaultPartHttpMessageReader
 import org.springframework.http.codec.multipart.MultipartHttpMessageReader
 import org.springframework.web.reactive.config.EnableWebFlux
 import org.springframework.web.reactive.config.WebFluxConfigurer
-
-private val log = KotlinLogging.logger {}
 
 @Configuration
 @EnableWebFlux
