@@ -20,7 +20,7 @@ class InternalObjectStoreApi(
     fun internalObjectStoreApiV1(handler: InternalObjectStoreHandler) = rateLimitedCoRouter(rateLimiter, rateLimiterProps) {
         logExchange(log)
         Routes.INTERNAL_BASE_V1.nest {
-            "/eos".nest {
+            "/off".nest {
                 POST("", handler::storeProto)
                 GET("", handler::getProto)
                 POST("/file", handler::storeFile)
