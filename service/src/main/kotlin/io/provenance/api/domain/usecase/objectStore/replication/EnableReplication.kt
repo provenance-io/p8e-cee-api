@@ -2,7 +2,7 @@ package io.provenance.api.domain.usecase.objectStore.replication
 
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.objectStore.replication.models.EnableReplicationRequest
-import io.provenance.api.frameworks.config.ObjectStoreConfig
+import io.provenance.api.frameworks.config.ObjectStoreProperties
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.ProtoJsonUtil.toJson
@@ -13,7 +13,7 @@ import java.net.URI
 
 @Component
 class EnableReplication(
-    private val objectStoreConfig: ObjectStoreConfig,
+    private val objectStoreProperties: ObjectStoreProperties,
 ) : AbstractUseCase<EnableReplicationRequest, Unit>() {
 
     private val log = KotlinLogging.logger { }
@@ -21,7 +21,7 @@ class EnableReplication(
     override suspend fun execute(args: EnableReplicationRequest) {
         val publicKeyResponse = OsClient(
             URI.create(args.sourceObjectStoreAddress),
-            objectStoreConfig.timeoutMs,
+            objectStoreProperties.timeoutMs,
         ).use { osClientReplicatingFrom ->
             osClientReplicatingFrom.createPublicKey(
                 args.targetSigningPublicKey.toJavaPublicKey(),

@@ -6,4 +6,5 @@ import java.util.UUID
 data class StoreProtoRequestWrapper(
     val uuid: UUID,
     val request: StoreProtoRequest,
+    val useObjectStoreGateway: Boolean = false
 )

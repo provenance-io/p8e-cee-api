@@ -29,19 +29,95 @@ class ObjectStoreHandler(
     private val enableReplication: EnableReplication,
 ) {
     suspend fun storeProto(req: ServerRequest): ServerResponse = runCatching {
-        storeProto.execute(StoreProtoRequestWrapper(req.getUser(), req.awaitBody()))
+        storeProto.execute(
+            StoreProtoRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun storeProtoV2(req: ServerRequest): ServerResponse = runCatching {
+        storeProto.execute(
+            StoreProtoRequestWrapper(
+                req.getUser(),
+                req.awaitBody(),
+                true
+            )
+        )
     }.foldToServerResponse()
 
     suspend fun storeFile(req: ServerRequest): ServerResponse = runCatching {
-        storeFile.execute(StoreFileRequestWrapper(req.getUser(), req.awaitMultipartData().toSingleValueMap()))
+        storeFile.execute(
+            StoreFileRequestWrapper(
+                req.getUser(),
+                req.awaitMultipartData().toSingleValueMap(),
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun storeFileV2(req: ServerRequest): ServerResponse = runCatching {
+        storeFile.execute(
+            StoreFileRequestWrapper(
+                req.getUser(),
+                req.awaitMultipartData().toSingleValueMap(),
+                true
+            )
+        )
     }.foldToServerResponse()
 
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
-        getProto.execute(GetProtoRequestWrapper(req.getUser(), GetProtoRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), req.queryParam("type").get())))
+        getProto.execute(
+            GetProtoRequestWrapper(
+                req.getUser(),
+                GetProtoRequest(
+                    req.queryParam("hash").get(),
+                    req.queryParam("objectStoreAddress").get(),
+                    req.queryParam("type").get()
+                )
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun getProtoV2(req: ServerRequest): ServerResponse = runCatching {
+        getProto.execute(
+            GetProtoRequestWrapper(
+                req.getUser(),
+                GetProtoRequest(
+                    req.queryParam("hash").get(),
+                    req.queryParam("objectStoreAddress").get(),
+                    req.queryParam("type").get()
+                ),
+                true
+            )
+        )
     }.foldToServerResponse()
 
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
-        getFile.execute(GetFileRequestWrapper(req.getUser(), GetFileRequest(req.queryParam("hash").get(), req.queryParam("objectStoreAddress").get(), rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false)))
+        getFile.execute(
+            GetFileRequestWrapper(
+                req.getUser(),
+                GetFileRequest(
+                    req.queryParam("hash").get(),
+                    req.queryParam("objectStoreAddress").get(),
+                    rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false
+                ),
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun getFileV2(req: ServerRequest): ServerResponse = runCatching {
+        getFile.execute(
+            GetFileRequestWrapper(
+                req.getUser(),
+                GetFileRequest(
+                    req.queryParam("hash").get(),
+                    req.queryParam("objectStoreAddress").get(),
+                    rawBytes = req.queryParamOrNull("rawBytes")?.toBoolean() ?: false
+                ),
+                true
+            )
+        )
     }.foldToServerResponse()
 
     suspend fun enableReplication(req: ServerRequest): ServerResponse = runCatching {

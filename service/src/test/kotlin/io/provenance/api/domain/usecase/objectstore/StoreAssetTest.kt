@@ -1,6 +1,5 @@
 package io.provenance.api.domain.usecase.objectstore
 
-import com.google.protobuf.Message
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
@@ -11,10 +10,11 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.common.originator.EntityManager
+import io.provenance.api.domain.usecase.objectStore.store.StoreObject
 import io.provenance.api.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.cee.parsers.MessageParser
-import io.provenance.api.frameworks.config.ObjectStoreConfig
+import io.provenance.api.frameworks.config.ObjectStoreProperties
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoResponse
@@ -23,6 +23,7 @@ import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.core.Originator
 import io.provenance.scope.encryption.util.toJavaPublicKey
+import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.toUuid
 import java.security.PublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -37,8 +38,9 @@ val REQUEST_UUID = "11141790-6de2-4d11-b3ad-9a1e16a8b3aa".toUuid()
 
 class StoreAssetTest : FunSpec({
 
-    val mockObjectStoreConfig = mockk<ObjectStoreConfig>()
+    val mockObjectStoreProperties = mockk<ObjectStoreProperties>()
     val mockObjectStore = mockk<ObjectStore>()
+    val mockStoreObject = mockk<StoreObject>()
     val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<Originator>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
@@ -46,14 +48,13 @@ class StoreAssetTest : FunSpec({
     val mockParser = mockk<MessageParser>()
 
     val storeAsset = StoreProto(
-        mockObjectStore,
-        mockObjectStoreConfig,
-        mockEntityManager,
         mockParser,
+        mockStoreObject,
+        mockEntityManager,
     )
 
     beforeTest {
-        every { mockObjectStoreConfig.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
+        every { mockObjectStoreProperties.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
 
         coEvery { mockEntityManager.getEntity(any()) } returns mockOriginator
 
@@ -71,7 +72,7 @@ class StoreAssetTest : FunSpec({
     test("happy path") {
         val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
-        every { mockObjectStore.store(any(), any<Message>(), any(), any()) } returns storeAssetResponse
+        every { mockObjectStore.store(any<OsClient>(), any(), any(), any(), any(), any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
@@ -98,9 +99,11 @@ class StoreAssetTest : FunSpec({
 
         verify {
             mockObjectStore.store(
+                any<OsClient>(),
                 any(),
-                any<Message>(),
                 mockOriginatorPublicKey,
+                any(),
+                any(),
                 any()
             )
         }

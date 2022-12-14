@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 @Component
 class UpdateScopeDataAccess(
     private val provenanceService: ProvenanceService,
-    private val getSigner: GetSigner
+    private val getSigner: GetSigner,
 ) : AbstractUseCase<UpdateScopeDataAccessRequestWrapper, TxResponse>() {
     override suspend fun execute(args: UpdateScopeDataAccessRequestWrapper): TxResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
@@ -43,6 +43,7 @@ class UpdateScopeDataAccess(
             }
         }.toTxBody()
 
-        return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer).toTxResponse()
+        return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer).toTxResponse().also {
+        }
     }
 }

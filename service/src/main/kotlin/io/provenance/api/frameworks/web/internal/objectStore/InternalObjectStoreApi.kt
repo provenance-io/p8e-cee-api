@@ -27,5 +27,14 @@ class InternalObjectStoreApi(
                 GET("/file", handler::getFile)
             }
         }
+
+        Routes.INTERNAL_BASE_V2.nest {
+            "/eos".nest {
+                POST("", handler::storeProtoV2)
+                GET("", handler::getProtoV2)
+                POST("/file", handler::storeFileV2)
+                GET("/file", handler::getFileV2)
+            }
+        }
     }
 }
