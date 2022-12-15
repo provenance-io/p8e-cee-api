@@ -5,5 +5,5 @@ import java.util.UUID
 
 data class UpdateScopeDataAccessRequestWrapper(
     val uuid: UUID,
-    val request: UpdateScopeDataAccessRequest,
+    val request: UpdateScopeDataAccessRequest
 )

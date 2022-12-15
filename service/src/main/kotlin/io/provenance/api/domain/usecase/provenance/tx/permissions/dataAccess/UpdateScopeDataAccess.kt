@@ -1,9 +1,12 @@
 package io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess
 
 import io.provenance.api.domain.usecase.AbstractUseCase
+import io.provenance.api.domain.usecase.objectStore.store.CreateGatewayJwt
+import io.provenance.api.domain.usecase.objectStore.store.models.CreateGatewayJwtRequest
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.ProvenanceService
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
@@ -14,12 +17,17 @@ import io.provenance.metadata.v1.MsgAddScopeDataAccessRequest
 import io.provenance.metadata.v1.MsgDeleteScopeDataAccessRequest
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString
+import java.net.URI
 import org.springframework.stereotype.Component
+import tech.figure.objectstore.gateway.client.ClientConfig
+import tech.figure.objectstore.gateway.client.GatewayClient
 
 @Component
 class UpdateScopeDataAccess(
     private val provenanceService: ProvenanceService,
     private val getSigner: GetSigner,
+    private val provenanceProperties: ProvenanceProperties,
+    private val createGatewayJwt: CreateGatewayJwt
 ) : AbstractUseCase<UpdateScopeDataAccessRequestWrapper, TxResponse>() {
     override suspend fun execute(args: UpdateScopeDataAccessRequestWrapper): TxResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
@@ -44,6 +52,20 @@ class UpdateScopeDataAccess(
         }.toTxBody()
 
         return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer).toTxResponse().also {
+            args.request.changes.map { it.address }.forEach { grantee ->
+                args.request.objectStoreConfig?.let {
+                    GatewayClient(
+                        ClientConfig(
+                            URI.create(it.objectStoreUrl),
+                            provenanceProperties.mainnet
+                        )
+                    ).grantScopePermission(
+                        MetadataAddress.forScope(args.request.scopeUuid).toString(),
+                        grantee,
+                        createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
+                    )
+                }
+            }
         }
     }
 }
