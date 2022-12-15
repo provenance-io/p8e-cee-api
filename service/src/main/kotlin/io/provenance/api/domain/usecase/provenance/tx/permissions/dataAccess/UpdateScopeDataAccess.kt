@@ -8,9 +8,12 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.ProvenanceService
+import io.provenance.api.frameworks.provenance.extensions.isSuccess
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.DataAccessChangeType
+import io.provenance.api.models.p8e.tx.permissions.dataAccess.DataAccessUpdate
+import io.provenance.api.util.toPrettyJson
 import io.provenance.client.protobuf.extensions.toAny
 import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.metadata.v1.MsgAddScopeDataAccessRequest
@@ -27,45 +30,92 @@ class UpdateScopeDataAccess(
     private val provenanceService: ProvenanceService,
     private val getSigner: GetSigner,
     private val provenanceProperties: ProvenanceProperties,
-    private val createGatewayJwt: CreateGatewayJwt
+    private val createGatewayJwt: CreateGatewayJwt,
 ) : AbstractUseCase<UpdateScopeDataAccessRequestWrapper, TxResponse>() {
     override suspend fun execute(args: UpdateScopeDataAccessRequestWrapper): TxResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
-        val messages = args.request.changes.map {
-            when (it.type) {
-                DataAccessChangeType.ADD -> {
-                    MsgAddScopeDataAccessRequest.newBuilder()
-                        .setScopeId(MetadataAddress.forScope(args.request.scopeUuid).bytes.toByteString())
-                        .addDataAccess(it.address)
-                        .addAllSigners(listOf(signer.address()))
-                        .build().toAny()
-                }
-                DataAccessChangeType.REMOVE -> {
-                    MsgDeleteScopeDataAccessRequest.newBuilder()
-                        .setScopeId(MetadataAddress.forScope(args.request.scopeUuid).bytes.toByteString())
-                        .addDataAccess(it.address)
-                        .addAllSigners(listOf(signer.address()))
-                        .build().toAny()
-                }
+        val messages = runActionForChange(args.request.changes,
+            {
+                MsgAddScopeDataAccessRequest.newBuilder()
+                    .setScopeId(MetadataAddress.forScope(args.request.scopeUuid).bytes.toByteString())
+                    .addDataAccess(it.address)
+                    .addAllSigners(listOf(signer.address()))
+                    .build().toAny()
+            },
+            {
+                MsgDeleteScopeDataAccessRequest.newBuilder()
+                    .setScopeId(MetadataAddress.forScope(args.request.scopeUuid).bytes.toByteString())
+                    .addDataAccess(it.address)
+                    .addAllSigners(listOf(signer.address()))
+                    .build().toAny()
             }
-        }.toTxBody()
+        ).toTxBody()
 
-        return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer).toTxResponse().also {
-            args.request.changes.map { it.address }.forEach { grantee ->
-                args.request.objectStoreConfig?.let {
+        return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer)
+            .takeIf { it.isSuccess() }?.let {
+                args.request.objectStoreConfig?.let { osConfig ->
+                    val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
                     GatewayClient(
                         ClientConfig(
-                            URI.create(it.objectStoreUrl),
+                            URI.create(osConfig.objectStoreUrl),
                             provenanceProperties.mainnet
                         )
-                    ).grantScopePermission(
-                        MetadataAddress.forScope(args.request.scopeUuid).toString(),
-                        grantee,
-                        createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
-                    )
+                    ).use { client ->
+                        runActionForChange(args.request.changes, { change ->
+                            client.grantScopePermission(
+                                MetadataAddress.forScope(args.request.scopeUuid).toString(),
+                                change.address,
+                                jwt
+                            )
+                        },
+                            { change ->
+                                client.revokeScopePermission(
+                                    MetadataAddress.forScope(args.request.scopeUuid).toString(),
+                                    change.address,
+                                    jwt
+                                )
+                            }
+                        )
+                    }
+
+                    it.toTxResponse()
+                }
+
+            } ?: throw IllegalStateException("Failed to transact against provenance when updating scope permissions!")
+
+    }
+
+    private inline fun <reified T> runActionForChange(changes: List<DataAccessUpdate>, addAction: (change: DataAccessUpdate) -> T, removeAction: (change: DataAccessUpdate) -> T): List<T> {
+        val errors = mutableListOf<Throwable>()
+
+        val result = changes.map { change ->
+            when (change.type) {
+                DataAccessChangeType.ADD -> {
+                    runCatching {
+                        addAction(change)
+                    }
+                        .fold(
+                            onSuccess = { result -> result },
+                            onFailure = { error -> errors.add(error) }
+                        )
+                }
+                DataAccessChangeType.REMOVE -> {
+                    runCatching {
+                        removeAction(change)
+                    }
+                        .fold(
+                            onSuccess = { result -> result },
+                            onFailure = { error -> errors.add(error) }
+                        )
                 }
             }
         }
+
+        if (errors.any()) {
+            throw IllegalStateException("Failed to run action for scope change: ${errors.toPrettyJson()}")
+        }
+
+        return result.filterIsInstance<T>()
     }
 }
