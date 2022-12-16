@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Primary
         ObjectStoreProperties::class,
         VaultProperties::class,
         ProvenanceProperties::class,
-        RateLimiterProps::class,
     ]
 )
 class AppConfig {
