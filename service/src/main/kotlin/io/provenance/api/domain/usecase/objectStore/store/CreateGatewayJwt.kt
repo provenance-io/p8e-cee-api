@@ -13,7 +13,7 @@ import tech.figure.objectstore.gateway.client.GatewayJwt
 @Component
 class CreateGatewayJwt(
     private val entityManager: EntityManager
-): AbstractUseCase<CreateGatewayJwtRequest, GatewayJwt.KeyPairJwt>() {
+) : AbstractUseCase<CreateGatewayJwtRequest, GatewayJwt.KeyPairJwt>() {
     override suspend fun execute(args: CreateGatewayJwtRequest): GatewayJwt.KeyPairJwt {
         val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.keyManagementConfig))
 

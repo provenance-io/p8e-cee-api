@@ -15,8 +15,8 @@ import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.time.Duration
-import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
+import org.apache.commons.codec.binary.Base64
 import org.springframework.stereotype.Component
 import tech.figure.objectstore.gateway.client.GatewayClient
 import tech.figure.objectstore.gateway.client.GatewayJwt
@@ -28,19 +28,19 @@ class ObjectStoreService(
     // Retrieve the asset as a byte array and decrypt using the provided keypair
     override fun <T> retrieveAndDecrypt(
         client: T,
-        hash: ByteArray,
+        hash: String,
         publicKey: PublicKey,
         privateKey: PrivateKey,
     ): ByteArray =
         when (client) {
             is OsClient -> {
-                val future = client.get(hash, publicKey)
+                val future = client.get(decodeBase64(hash), publicKey)
                 val res: DIMEInputStream = future.get(osConfig.timeoutMs, TimeUnit.MILLISECONDS)
                 res.getDecryptedPayload(DirectKeyRef(publicKey, privateKey)).readAllBytes()
             }
             is GatewayClient -> {
                 client.getObject(
-                    hash.toString(),
+                    Base64.encodeBase64String(decodeBase64(hash)),
                     GatewayJwt.KeyPairJwt(KeyPair(publicKey, privateKey)),
                     Duration.ofMillis(osConfig.timeoutMs)
                 ).`object`.objectBytes.toByteArray()
@@ -62,13 +62,6 @@ class ObjectStoreService(
             }
 
             is GatewayClient -> {
-//                client.adminPutDataStorageAccount(
-//                    "tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl",
-//                    true,
-//                    Duration.ofMillis(10000)
-//                ).curl
-                    val jwt = GatewayJwt.KeyPairJwt(KeyPair(publicKey, privateKey)).createJwt(false, OffsetDateTime.now().plusDays(1))
-                println(jwt)
                 client.putObject(
                     message,
                     type,
@@ -78,5 +71,10 @@ class ObjectStoreService(
                 ).toModel()
             }
             else -> throw IllegalArgumentException("Unsupported client type while storing object!")
+        }
+
+    private fun decodeBase64(string: String): ByteArray =
+        string.replace(' ', '+').let {
+            Base64.decodeBase64(it)
         }
 }

@@ -78,7 +78,7 @@ class StoreFile(
         }
 
         request["type"]?.let {
-          type = request.getAsType<FormFieldPart>("type").value()
+            type = request.getAsType<FormFieldPart>("type").value()
         }
 
         val objectStoreAddress = request.getAsType<FormFieldPart>("objectStoreAddress").value()

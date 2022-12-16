@@ -7,8 +7,6 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreObjectRequ
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.cee.parsers.MessageParser
 import io.provenance.api.models.eos.store.StoreProtoResponse
-import io.provenance.scope.encryption.util.toHex
-import io.provenance.scope.objectstore.util.toHex
 import java.security.PrivateKey
 import java.security.PublicKey
 import org.springframework.stereotype.Component
@@ -27,9 +25,6 @@ class StoreProto(
 
         val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
-
-        println((originator.encryptionPublicKey() as PublicKey).toHex())
-        println((originator.encryptionPrivateKey() as PrivateKey).toHex())
 
         return storeObject.execute(
             StoreObjectRequest(

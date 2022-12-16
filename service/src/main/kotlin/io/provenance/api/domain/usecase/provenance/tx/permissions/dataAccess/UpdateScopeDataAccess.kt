@@ -8,7 +8,7 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.ProvenanceService
-import io.provenance.api.frameworks.provenance.extensions.isSuccess
+import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.DataAccessChangeType
@@ -35,7 +35,8 @@ class UpdateScopeDataAccess(
     override suspend fun execute(args: UpdateScopeDataAccessRequestWrapper): TxResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
-        val messages = runActionForChange(args.request.changes,
+        val messages = runActionForChange(
+            args.request.changes,
             {
                 MsgAddScopeDataAccessRequest.newBuilder()
                     .setScopeId(MetadataAddress.forScope(args.request.scopeUuid).bytes.toByteString())
@@ -53,7 +54,7 @@ class UpdateScopeDataAccess(
         ).toTxBody()
 
         return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer)
-            .takeIf { it.isSuccess() }?.let {
+            .takeIf { !it.isError() }?.let {
                 args.request.objectStoreConfig?.let { osConfig ->
                     val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
                     GatewayClient(
@@ -62,7 +63,8 @@ class UpdateScopeDataAccess(
                             provenanceProperties.mainnet
                         )
                     ).use { client ->
-                        runActionForChange(args.request.changes, { change ->
+                        runActionForChange(
+                            args.request.changes, { change ->
                             client.grantScopePermission(
                                 MetadataAddress.forScope(args.request.scopeUuid).toString(),
                                 change.address,
@@ -78,12 +80,10 @@ class UpdateScopeDataAccess(
                             }
                         )
                     }
-
-                    it.toTxResponse()
                 }
 
+                it.toTxResponse()
             } ?: throw IllegalStateException("Failed to transact against provenance when updating scope permissions!")
-
     }
 
     private inline fun <reified T> runActionForChange(changes: List<DataAccessUpdate>, addAction: (change: DataAccessUpdate) -> T, removeAction: (change: DataAccessUpdate) -> T): List<T> {

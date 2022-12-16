@@ -13,6 +13,7 @@ import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.eos.get.GetFileRequest
 import io.provenance.api.models.eos.get.GetProtoRequest
+import io.provenance.api.models.eos.store.toModel
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -44,7 +45,7 @@ class ObjectStoreHandler(
                 req.awaitBody(),
                 true
             )
-        )
+        ).toModel()
     }.foldToServerResponse()
 
     suspend fun storeFile(req: ServerRequest): ServerResponse = runCatching {
@@ -63,7 +64,7 @@ class ObjectStoreHandler(
                 req.awaitMultipartData().toSingleValueMap(),
                 true
             )
-        )
+        ).toModel()
     }.foldToServerResponse()
 
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
