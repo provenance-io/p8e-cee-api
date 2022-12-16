@@ -56,14 +56,14 @@ class UpdateScopeDataAccess(
         return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer)
             .takeIf { !it.isError() }?.let {
                 args.request.objectStoreConfig?.let { osConfig ->
-                    val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
                     GatewayClient(
                         ClientConfig(
                             URI.create(osConfig.objectStoreUrl),
                             provenanceProperties.mainnet
                         )
                     )
-                }.use { client ->
+                }?.use { client ->
+                    val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
                     runActionForChange(
                         args.request.changes, { change ->
                             client.grantScopePermission(
