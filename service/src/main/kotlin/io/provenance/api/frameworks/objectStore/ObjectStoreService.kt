@@ -23,7 +23,7 @@ import tech.figure.objectstore.gateway.client.GatewayJwt
 
 @Component
 class ObjectStoreService(
-    private val osConfig: ObjectStoreProperties,
+    private val objectStoreProperties: ObjectStoreProperties,
 ) : ObjectStore {
     // Retrieve the asset as a byte array and decrypt using the provided keypair
     override fun <T> retrieveAndDecrypt(
@@ -35,14 +35,14 @@ class ObjectStoreService(
         when (client) {
             is OsClient -> {
                 val future = client.get(decodeBase64(hash), publicKey)
-                val res: DIMEInputStream = future.get(osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+                val res: DIMEInputStream = future.get(objectStoreProperties.timeoutMs, TimeUnit.MILLISECONDS)
                 res.getDecryptedPayload(DirectKeyRef(publicKey, privateKey)).readAllBytes()
             }
             is GatewayClient -> {
                 client.getObject(
                     Base64.encodeBase64String(decodeBase64(hash)),
                     GatewayJwt.KeyPairJwt(KeyPair(publicKey, privateKey)),
-                    Duration.ofMillis(osConfig.timeoutMs)
+                    Duration.ofMillis(objectStoreProperties.timeoutMs)
                 ).`object`.objectBytes.toByteArray()
             }
             else -> throw IllegalArgumentException("Unsupported client type while retrieving object!")
@@ -58,7 +58,7 @@ class ObjectStoreService(
                     message.size.toLong(),
                     additionalAudiences,
                     type?.let { mapOf("type" to type) } ?: mapOf()
-                ).get(osConfig.timeoutMs, TimeUnit.MILLISECONDS).toModel()
+                ).get(objectStoreProperties.timeoutMs, TimeUnit.MILLISECONDS).toModel()
             }
 
             is GatewayClient -> {
@@ -66,7 +66,7 @@ class ObjectStoreService(
                     message,
                     type,
                     GatewayJwt.KeyPairJwt(KeyPair(publicKey, privateKey)),
-                    Duration.ofMillis(osConfig.timeoutMs),
+                    Duration.ofMillis(objectStoreProperties.timeoutMs),
                     additionalAudiences.toList()
                 ).toModel()
             }
