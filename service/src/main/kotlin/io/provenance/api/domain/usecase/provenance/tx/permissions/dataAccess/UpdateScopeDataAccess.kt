@@ -66,21 +66,21 @@ class UpdateScopeDataAccess(
                     val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.uuid, args.request.account.keyManagementConfig))
                     runActionForChange(
                         args.request.changes, { change ->
-                            client.grantScopePermission(
+                        client.grantScopePermission(
+                            MetadataAddress.forScope(args.request.scopeUuid).toString(),
+                            change.address,
+                            jwt
+                        )
+                    },
+                        { change ->
+                            client.revokeScopePermission(
                                 MetadataAddress.forScope(args.request.scopeUuid).toString(),
                                 change.address,
                                 jwt
                             )
-                        },
-                            { change ->
-                                client.revokeScopePermission(
-                                    MetadataAddress.forScope(args.request.scopeUuid).toString(),
-                                    change.address,
-                                    jwt
-                                )
-                            }
-                        )
-                    }
+                        }
+                    )
+                }
 
                 it.toTxResponse()
             } ?: throw IllegalStateException("Failed to transact against provenance when updating scope permissions!")
