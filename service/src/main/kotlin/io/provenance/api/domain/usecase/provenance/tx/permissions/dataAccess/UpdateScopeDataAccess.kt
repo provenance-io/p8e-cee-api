@@ -62,9 +62,10 @@ class UpdateScopeDataAccess(
                             URI.create(osConfig.objectStoreUrl),
                             provenanceProperties.mainnet
                         )
-                    ).use { client ->
-                        runActionForChange(
-                            args.request.changes, { change ->
+                    )
+                }.use { client ->
+                    runActionForChange(
+                        args.request.changes, { change ->
                             client.grantScopePermission(
                                 MetadataAddress.forScope(args.request.scopeUuid).toString(),
                                 change.address,
@@ -80,7 +81,6 @@ class UpdateScopeDataAccess(
                             }
                         )
                     }
-                }
 
                 it.toTxResponse()
             } ?: throw IllegalStateException("Failed to transact against provenance when updating scope permissions!")
