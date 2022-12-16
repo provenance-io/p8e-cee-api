@@ -93,7 +93,7 @@ class StoreFile(
             ?: throw IllegalArgumentException("Failed to retrieve and cast provided argument.")
 
     data class Args(
-        val keyConfig: AccountInfo?,
+        val account: AccountInfo?,
         val permissions: PermissionInfo?,
         val objectStoreAddress: String,
         val storeRawBytes: Boolean,
