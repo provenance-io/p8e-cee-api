@@ -4,10 +4,10 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.verify
 import io.provenance.api.domain.objectStore.ObjectStore
 import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.objectStore.store.StoreObject
@@ -25,6 +25,7 @@ import io.provenance.core.Originator
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.toUuid
+import java.security.PrivateKey
 import java.security.PublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import tech.figure.asset.v1beta1.Asset
@@ -40,10 +41,11 @@ class StoreAssetTest : FunSpec({
 
     val mockObjectStoreProperties = mockk<ObjectStoreProperties>()
     val mockObjectStore = mockk<ObjectStore>()
-    val mockStoreObject = mockk<StoreObject>()
+    val mockStoreObject = mockk<StoreObject>(relaxed = true)
     val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<Originator>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
+    val mockOriginatorPrivateKey = mockk<PrivateKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
     val mockParser = mockk<MessageParser>()
 
@@ -73,8 +75,10 @@ class StoreAssetTest : FunSpec({
         val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
         every { mockObjectStore.store(any<OsClient>(), any(), any(), any(), any(), any()) } returns storeAssetResponse
+        coEvery { mockStoreObject.execute(any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
+        every { mockOriginator.encryptionPrivateKey() } returns mockOriginatorPrivateKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
         // Execute enable replication code
@@ -97,13 +101,8 @@ class StoreAssetTest : FunSpec({
 
         assertEquals(response, storeAssetResponse)
 
-        verify {
-            mockObjectStore.store(
-                any<OsClient>(),
-                any(),
-                mockOriginatorPublicKey,
-                any(),
-                any(),
+        coVerify {
+            mockStoreObject.execute(
                 any()
             )
         }
