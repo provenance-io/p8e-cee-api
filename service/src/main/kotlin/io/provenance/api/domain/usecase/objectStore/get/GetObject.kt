@@ -11,7 +11,6 @@ import io.provenance.scope.objectstore.client.OsClient
 import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
-import org.apache.commons.codec.binary.Base64
 import org.springframework.stereotype.Component
 import tech.figure.objectstore.gateway.client.ClientConfig
 import tech.figure.objectstore.gateway.client.GatewayClient
@@ -36,11 +35,6 @@ class GetObject(
         else
             OsClient(URI.create(args.objectStoreAddress), objectStoreProperties.timeoutMs)
 
-        return objectStore.retrieveAndDecrypt(client, decodeBase64(args.hash), publicKey, privateKey)
+        return objectStore.retrieveAndDecrypt(client, args.hash, publicKey, privateKey)
     }
-
-    private fun decodeBase64(string: String): ByteArray =
-        string.replace(' ', '+').let {
-            Base64.decodeBase64(it)
-        }
 }
