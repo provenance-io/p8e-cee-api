@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Primary
 @EnableConfigurationProperties(
     value = [
         ServiceProps::class,
-        ObjectStoreConfig::class,
+        ObjectStoreProperties::class,
         VaultProperties::class,
         ProvenanceProperties::class,
     ]

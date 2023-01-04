@@ -6,7 +6,6 @@ import io.provenance.api.domain.usecase.objectStore.store.models.SwaggerStoreFil
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
 import io.provenance.api.models.eos.store.StoreProtoRequest
-import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -54,7 +53,7 @@ class ObjectStoreApi {
                     ApiResponse(
                         responseCode = "200",
                         description = "successful operation",
-                        content = [Content(schema = Schema(implementation = StoreProtoResponse::class))]
+                        content = [Content(schema = Schema(implementation = String::class))]
                     )
                 ]
             )
@@ -84,7 +83,7 @@ class ObjectStoreApi {
                     ApiResponse(
                         responseCode = "200",
                         description = "successful operation",
-                        content = [Content(schema = Schema(implementation = StoreProtoResponse::class))]
+                        content = [Content(schema = Schema(implementation = String::class))]
                     )
                 ],
             )
@@ -200,6 +199,15 @@ class ObjectStoreApi {
                 GET("", handler::getProto)
             }
             POST("/config/replication/enable", handler::enableReplication)
+        }
+
+        Routes.EXTERNAL_BASE_V2.nest {
+            "/eos".nest {
+                POST("/file", handler::storeFileV2)
+                GET("/file", handler::getFileV2)
+                POST("", handler::storeProtoV2)
+                GET("", handler::getProtoV2)
+            }
         }
     }
 }

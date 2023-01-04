@@ -12,7 +12,6 @@ import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
-import tech.figure.classification.asset.client.domain.model.AssetDefinition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -28,6 +27,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.reactive.function.server.coRouter
+import tech.figure.classification.asset.client.domain.model.AssetDefinition
 
 private val log = KotlinLogging.logger {}
 

@@ -6,4 +6,5 @@ import java.util.UUID
 data class GetFileRequestWrapper(
     val uuid: UUID,
     val request: GetFileRequest,
+    val useObjectStoreGateway: Boolean = false
 )

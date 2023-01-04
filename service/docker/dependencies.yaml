@@ -79,6 +79,40 @@ services:
             - IPC_LOCK
         entrypoint: vault server -dev
 
+    object-store-gateway:
+        image: figuretechnologies/object-store-gateway:3.2.0
+        container_name: p8e-cee-local-object-store-gateway
+        networks:
+            - p8e-network
+        depends_on:
+            - object-store-1
+            - object-store-2
+            - provenance
+        environment:
+            - EVENT_STREAM_WEBSOCKET_URI=ws://host.docker.internal:26657
+            - EVENT_STREAM_EPOCH_HEIGHT=1
+            - EVENT_STREAM_ENABLED=true
+            - EVENT_STREAM_BLOCK_HEIGHT_TRACKING_UUID=f83b43fe-b536-11ec-b558-0bfb50e52d23
+            - OBJECTSTORE_URI=grpc://host.docker.internal:5001
+            - OBJECTSTORE_PRIVATE_KEYS=0A201AD27E627DD0A6A5816D293C41DF801D3E7BA868EEC0F433FDA581D71E38016E
+            - OBJECTSTORE_MASTER_KEY=0A201AD27E627DD0A6A5816D293C41DF801D3E7BA868EEC0F433FDA581D71E38016E
+            - PROVENANCE_MAIN_NET=false
+            - PROVENANCE_CHAIN_ID=chain-local
+            - PROVENANCE_CHANNEL_URI=http://provenance:9090
+            - DB_TYPE=memory
+            - DB_NAME=object-store-gateway
+            - DB_USERNAME=user
+            - DB_PASSWORD=pass
+            - DB_HOST=memory
+            - DB_PORT=
+            - DB_SCHEMA=object-store-gateway
+            - DB_CONNECTION_POOL_SIZE=1
+            - DB_BASELINE_ON_MIGRATE=false
+            - DB_REPAIR_FLYWAY_CHECKSUMS=false
+            - SERVER_PORT=8091
+        ports:
+            - "16549:8080" # All GRPC requests should be made on port 16549 to ensure other local apps can still stand up on port 8080
+            - "8091:8091"
 volumes:
     postgres-cee:
     provenance:

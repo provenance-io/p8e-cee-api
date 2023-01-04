@@ -11,7 +11,7 @@ import io.mockk.mockkStatic
 import io.provenance.objectstore.proto.PublicKeys
 import io.provenance.api.domain.usecase.objectStore.replication.EnableReplication
 import io.provenance.api.domain.usecase.objectStore.replication.models.EnableReplicationRequest
-import io.provenance.api.frameworks.config.ObjectStoreConfig
+import io.provenance.api.frameworks.config.ObjectStoreProperties
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import java.security.PublicKey
@@ -26,8 +26,8 @@ const val OBECT_STORE_TIMEOUT_CONFIG = 2000L
 class EnableReplicationTest : FunSpec({
 
     val createResponseUUID = UUID.randomUUID()
-    val mockObjectStoreConfig = mockkClass(ObjectStoreConfig::class)
-    val enableReplication = EnableReplication(mockObjectStoreConfig)
+    val mockObjectStoreProperties = mockkClass(ObjectStoreProperties::class)
+    val enableReplication = EnableReplication(mockObjectStoreProperties)
 
     val publicKeyResponse = PublicKeys.PublicKeyResponse
         .newBuilder()
@@ -37,7 +37,7 @@ class EnableReplicationTest : FunSpec({
         .build()
 
     beforeTest {
-        every { mockObjectStoreConfig.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
+        every { mockObjectStoreProperties.timeoutMs } answers { OBECT_STORE_TIMEOUT_CONFIG }
 
         //  Add mockk constructor monitor on OsClient for source system replicating, so that we can
         //    verify later that createPublicKey() is called on this instantiated source system OsClient

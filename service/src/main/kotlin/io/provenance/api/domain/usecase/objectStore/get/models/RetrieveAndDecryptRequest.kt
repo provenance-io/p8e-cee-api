@@ -8,4 +8,5 @@ data class RetrieveAndDecryptRequest(
     val objectStoreAddress: String,
     val hash: String,
     val keyManagementConfig: KeyManagementConfig?,
+    val useObjectStoreGateway: Boolean = false
 )

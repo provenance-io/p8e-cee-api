@@ -65,6 +65,7 @@ dependencies {
         Dependencies.OpenApi.KotlinSupport,
         Dependencies.AssetClassification.Client,
         Dependencies.AssetClassification.Verifier,
+        Dependencies.P8eScope.OsGateway,
 
     ).forEach { dep ->
         dep.implementation(this)

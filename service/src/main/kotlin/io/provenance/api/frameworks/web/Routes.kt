@@ -8,6 +8,8 @@ object Routes {
     const val INTERNAL_BASE = "$CONTEXT/internal/api"
     const val SECURE_BASE_V1 = "$SECURE_BASE/v1"
     const val EXTERNAL_BASE_V1 = "$EXTERNAL_BASE/v1"
+    const val EXTERNAL_BASE_V2 = "$EXTERNAL_BASE/v2"
     const val INTERNAL_BASE_V1 = "$INTERNAL_BASE/v1"
+    const val INTERNAL_BASE_V2 = "$INTERNAL_BASE/v2"
     const val DOCS_BASE = "$CONTEXT/secure/docs"
 }

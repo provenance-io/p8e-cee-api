@@ -5,5 +5,6 @@ import java.util.UUID
 
 data class GetProtoRequestWrapper(
     val uuid: UUID,
-    val request: GetProtoRequest
+    val request: GetProtoRequest,
+    val useObjectStoreGateway: Boolean = false,
 )

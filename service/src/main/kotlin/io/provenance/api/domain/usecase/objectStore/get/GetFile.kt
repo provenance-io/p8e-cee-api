@@ -13,10 +13,18 @@ import tech.figure.proto.util.FileNFT
 
 @Component
 class GetFile(
-    private val retrieveAndDecrypt: RetrieveAndDecrypt,
+    private val getObject: GetObject,
 ) : AbstractUseCase<GetFileRequestWrapper, Any>() {
     override suspend fun execute(args: GetFileRequestWrapper): Any {
-        retrieveAndDecrypt.execute(RetrieveAndDecryptRequest(args.uuid, args.request.objectStoreAddress, args.request.hash, args.request.accountInfo.keyManagementConfig)).let {
+        getObject.execute(
+            RetrieveAndDecryptRequest(
+                args.uuid,
+                args.request.objectStoreAddress,
+                args.request.hash,
+                args.request.accountInfo.keyManagementConfig,
+                args.useObjectStoreGateway
+            )
+        ).let {
             if (args.request.rawBytes) {
                 return it
             } else {
