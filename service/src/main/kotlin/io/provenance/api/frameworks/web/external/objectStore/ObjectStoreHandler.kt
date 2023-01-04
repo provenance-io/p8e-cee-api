@@ -7,9 +7,11 @@ import io.provenance.api.domain.usecase.objectStore.get.models.GetProtoRequestWr
 import io.provenance.api.domain.usecase.objectStore.permissions.RegisterObjectAccess
 import io.provenance.api.domain.usecase.objectStore.permissions.RegisterScopeObjectsAccess
 import io.provenance.api.domain.usecase.objectStore.permissions.RevokeObjectAccess
+import io.provenance.api.domain.usecase.objectStore.permissions.RevokeScopeObjectsAccess
 import io.provenance.api.domain.usecase.objectStore.permissions.model.RegisterObjectAccessRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.permissions.model.RegisterScopeObjectsAccessRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.permissions.model.RevokeObjectAccessRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.permissions.model.RevokeScopeObjectsAccessRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.replication.EnableReplication
 import io.provenance.api.domain.usecase.objectStore.store.StoreFile
 import io.provenance.api.domain.usecase.objectStore.store.StoreProto
@@ -37,7 +39,8 @@ class ObjectStoreHandler(
     private val enableReplication: EnableReplication,
     private val registerScopeObjectsAccess: RegisterScopeObjectsAccess,
     private val revokeObjectAccess: RevokeObjectAccess,
-    private val registerObjectAccess: RegisterObjectAccess
+    private val registerObjectAccess: RegisterObjectAccess,
+    private val revokeScopeObjectsAccess: RevokeScopeObjectsAccess
 ) {
     suspend fun storeProto(req: ServerRequest): ServerResponse = runCatching {
         storeProto.execute(
@@ -156,6 +159,15 @@ class ObjectStoreHandler(
     suspend fun registerScopeObjectAccess(req: ServerRequest): ServerResponse = runCatching {
         registerScopeObjectsAccess.execute(
             RegisterScopeObjectsAccessRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun revokeScopeObjectsAccess(req: ServerRequest): ServerResponse = runCatching {
+        revokeScopeObjectsAccess.execute(
+            RevokeScopeObjectsAccessRequestWrapper(
                 req.getUser(),
                 req.awaitBody()
             )

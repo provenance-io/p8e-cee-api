@@ -1,7 +1,7 @@
 package io.provenance.api.domain.usecase.objectStore.permissions
 
 import io.provenance.api.domain.usecase.AbstractUseCase
-import io.provenance.api.domain.usecase.objectStore.permissions.model.RegisterScopeObjectsAccessRequestWrapper
+import io.provenance.api.domain.usecase.objectStore.permissions.model.RevokeScopeObjectsAccessRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.CreateGatewayJwt
 import io.provenance.api.domain.usecase.objectStore.store.models.CreateGatewayJwtRequest
 import io.provenance.api.frameworks.config.ProvenanceProperties
@@ -12,12 +12,12 @@ import tech.figure.objectstore.gateway.client.ClientConfig
 import tech.figure.objectstore.gateway.client.GatewayClient
 
 @Component
-class RegisterScopeObjectsAccess(
-    private val provenanceProperties: ProvenanceProperties,
-    private val provenanceService: ProvenanceService,
+class RevokeScopeObjectsAccess(
     private val createGatewayJwt: CreateGatewayJwt,
-) : AbstractUseCase<RegisterScopeObjectsAccessRequestWrapper, Unit>() {
-    override suspend fun execute(args: RegisterScopeObjectsAccessRequestWrapper) {
+    private val provenanceProperties: ProvenanceProperties,
+    private val provenanceService: ProvenanceService
+) : AbstractUseCase<RevokeScopeObjectsAccessRequestWrapper, Unit>() {
+    override suspend fun execute(args: RevokeScopeObjectsAccessRequestWrapper) {
         val jwt = createGatewayJwt.execute(
             CreateGatewayJwtRequest(
                 args.uuid,
@@ -29,7 +29,7 @@ class RegisterScopeObjectsAccess(
         GatewayClient(ClientConfig(URI(args.request.gatewayUri), provenanceProperties.mainnet)).use { client ->
             scope.recordsList.forEach {
                 val hash = it.record.outputsList.first().hash
-                client.registerExistingObject(
+                client.revokeObjectPermissions(
                     hash,
                     args.request.grantee,
                     jwt
