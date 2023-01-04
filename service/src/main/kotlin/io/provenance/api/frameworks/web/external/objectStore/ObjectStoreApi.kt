@@ -208,10 +208,11 @@ class ObjectStoreApi {
                 POST("", handler::storeProtoV2)
                 GET("", handler::getProtoV2)
                 "/permissions".nest {
-                    POST("/grant", handler::registerObjectAccess)
-                    POST("/revoke", handler::revokeObjectAccess)
+                    "/object".nest {
+                        POST("/grant", handler::registerObjectAccess)
+                        POST("/revoke", handler::revokeObjectAccess)
+                    }
                     "/scope".nest {
-
                         POST("/grant", handler::registerScopeObjectAccess)
                         POST("/revoke", handler::revokeScopeObjectsAccess)
                     }
