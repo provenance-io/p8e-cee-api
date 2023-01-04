@@ -42,7 +42,7 @@ object Versions {
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
     const val AssetClassification = "3.4.3"
-    const val OsGateway = "3.2.1"
+    const val OsGateway = "3.3.0"
 }
 
 object Plugins { // please keep this sorted in sections

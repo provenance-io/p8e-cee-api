@@ -207,6 +207,11 @@ class ObjectStoreApi {
                 GET("/file", handler::getFileV2)
                 POST("", handler::storeProtoV2)
                 GET("", handler::getProtoV2)
+                "/permissions".nest {
+                    POST("/grant", handler::registerObjectAccess)
+                    POST("/revoke", handler::revokeObjectAccess)
+                    POST("/scope", handler::registerScopeObjectAccess)
+                }
             }
         }
     }
