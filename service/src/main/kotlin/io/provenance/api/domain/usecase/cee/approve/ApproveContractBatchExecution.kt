@@ -74,8 +74,6 @@ class ApproveContractBatchExecution(
             }
         }
 
-        return responses
-
         return ApproveContractExecutionBatchResponse(
             responses,
             errors

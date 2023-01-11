@@ -11,8 +11,6 @@ import io.provenance.api.models.cee.submit.SubmitContractBatchErrorResponse
 import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResponseWrapper
 import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResultResponse
 import io.provenance.api.util.toPrettyJson
-import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResultResponse
-import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
 import io.provenance.scope.sdk.extensions.mergeInto
