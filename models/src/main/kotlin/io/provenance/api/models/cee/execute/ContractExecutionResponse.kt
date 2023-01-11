@@ -25,5 +25,5 @@ data class ContractExecutionErrorResponse(
 data class ContractExecutionBatchResponse(
     val completed: List<ContractExecutionResponse>,
     val pending: List<ContractExecutionResponse>,
-    val errors: List<ContractExecutionErrorResponse>
+    val failed: List<ContractExecutionErrorResponse>
 )
