@@ -10,6 +10,8 @@ import io.provenance.api.domain.usecase.provenance.account.models.GetSignerReque
 import io.provenance.api.frameworks.provenance.SingleTx
 import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.api.models.cee.execute.ContractExecutionResponse
+import io.provenance.api.models.cee.execute.MultipartyContractExecutionResponse
+import io.provenance.api.models.cee.execute.SinglePartyContractExecutionResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
@@ -33,9 +35,7 @@ class ExecuteContract(
                 is SignedResult -> {
                     provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
-                            ContractExecutionResponse(
-                                false,
-                                null,
+                            SinglePartyContractExecutionResponse(
                                 TxResponse(
                                     pbResponse.txhash,
                                     pbResponse.gasWanted.toString(),
@@ -48,10 +48,8 @@ class ExecuteContract(
                 }
                 is FragmentResult -> {
                     client.requestAffiliateExecution(result.envelopeState)
-                    ContractExecutionResponse(
-                        true,
-                        Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
-                        null,
+                    MultipartyContractExecutionResponse(
+                        Base64.getEncoder().encodeToString(result.envelopeState.toByteArray())
                     )
                 }
                 else -> throw ContractExecutionException("Contract execution result was not of an expected type.")

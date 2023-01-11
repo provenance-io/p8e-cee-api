@@ -6,9 +6,9 @@ import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractBatchExe
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.BatchTx
-import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
-import io.provenance.api.models.p8e.TxResponse
+import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResultResponse
+import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.SignedResult
 import io.provenance.scope.sdk.extensions.mergeInto
@@ -19,14 +19,13 @@ import org.springframework.stereotype.Component
 class SubmitContractBatchExecutionResult(
     private val provenanceService: Provenance,
     private val getSigner: GetSigner,
-) : AbstractUseCase<SubmitContractBatchExecutionResultRequestWrapper, List<TxResponse>>() {
+) : AbstractUseCase<SubmitContractBatchExecutionResultRequestWrapper, List<SubmitContractBatchExecutionResultResponse>>() {
 
     private val log = KotlinLogging.logger { }
 
-    override suspend fun execute(args: SubmitContractBatchExecutionResultRequestWrapper): List<TxResponse> {
+    override suspend fun execute(args: SubmitContractBatchExecutionResultRequestWrapper): List<SubmitContractBatchExecutionResultResponse> {
         val signedResults = mutableListOf<SignedResult>()
-        val response = mutableListOf<TxResponse>()
-        val errors = mutableListOf<Throwable>()
+        val response = mutableListOf<SubmitContractBatchExecutionResultResponse>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
         args.request.submission.forEach {
@@ -36,7 +35,7 @@ class SubmitContractBatchExecutionResult(
                 is SignedResult -> {
                     signedResults.add(result)
                 }
-                else -> throw IllegalStateException("Received a execution result which was not a signed result.")
+                else -> response.add(SubmitContractBatchExecutionResultResponse(null, "Received a execution result which was not a signed result."))
             }
         }
 
@@ -46,7 +45,7 @@ class SubmitContractBatchExecutionResult(
 
                 provenanceService.buildContractTx(args.request.provenance, BatchTx(resultCollection)).let { tx ->
                     provenanceService.executeTransaction(args.request.provenance, tx, signer).let { pbResponse ->
-                        response.add(pbResponse.toTxResponse())
+                        response.add(SubmitContractBatchExecutionResultResponse(pbResponse.toTxResponse()))
                     }
                 }
             }.fold(
@@ -54,13 +53,14 @@ class SubmitContractBatchExecutionResult(
                     log.info("Successfully processed batch $index of ${resultCollection.size}")
                 },
                 onFailure = {
-                    errors.add(it)
+                    response.add(
+                        SubmitContractBatchExecutionResultResponse(
+                            null,
+                            it.toPrettyJson()
+                        )
+                    )
                 }
             )
-        }
-
-        if (errors.any()) {
-            throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
         }
 
         return response
