@@ -10,9 +10,9 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
-import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
+import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
 import java.util.Base64
@@ -28,7 +28,6 @@ class ApproveContractBatchExecution(
     private val log = KotlinLogging.logger { }
 
     override suspend fun execute(args: ApproveContractBatchRequestWrapper): List<ApproveContractExecutionResponse> {
-        val errors = mutableListOf<Throwable>()
         val responses = mutableListOf<ApproveContractExecutionResponse>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
@@ -61,14 +60,10 @@ class ApproveContractBatchExecution(
                         log.info("Successfully processed batch $index of ${chunked.size}")
                     },
                     onFailure = {
-                        errors.add(it)
+                        responses.add(ApproveContractExecutionResponse(null, null, it.toPrettyJson()))
                     }
                 )
             }
-        }
-
-        if (errors.any()) {
-            throw ContractExecutionBatchException(errors.joinToString(limit = 20) { it.message.toString() })
         }
 
         return responses
