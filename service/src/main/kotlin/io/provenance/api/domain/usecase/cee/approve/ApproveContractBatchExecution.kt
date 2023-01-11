@@ -11,6 +11,8 @@ import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequ
 import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
+import io.provenance.api.models.cee.approve.ApproveContractExecutionBatchResponse
+import io.provenance.api.models.cee.approve.ApproveContractExecutionErrorResponse
 import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
 import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
@@ -24,11 +26,12 @@ class ApproveContractBatchExecution(
     private val createClient: CreateClient,
     private val provenance: Provenance,
     private val getSigner: GetSigner,
-) : AbstractUseCase<ApproveContractBatchRequestWrapper, List<ApproveContractExecutionResponse>>() {
+) : AbstractUseCase<ApproveContractBatchRequestWrapper, ApproveContractExecutionBatchResponse>() {
     private val log = KotlinLogging.logger { }
 
-    override suspend fun execute(args: ApproveContractBatchRequestWrapper): List<ApproveContractExecutionResponse> {
+    override suspend fun execute(args: ApproveContractBatchRequestWrapper): ApproveContractExecutionBatchResponse {
         val responses = mutableListOf<ApproveContractExecutionResponse>()
+        val errors = mutableListOf<ApproveContractExecutionErrorResponse>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
         createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
@@ -60,12 +63,20 @@ class ApproveContractBatchExecution(
                         log.info("Successfully processed batch $index of ${chunked.size}")
                     },
                     onFailure = {
-                        responses.add(ApproveContractExecutionResponse(null, null, it.toPrettyJson()))
+                        errors.add(
+                            ApproveContractExecutionErrorResponse(
+                                "Tx Execution Exception",
+                                it.toPrettyJson()
+                            )
+                        )
                     }
                 )
             }
         }
 
-        return responses
+        return ApproveContractExecutionBatchResponse(
+            responses,
+            errors
+        )
     }
 }

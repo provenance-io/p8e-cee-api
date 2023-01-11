@@ -7,6 +7,8 @@ import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.BatchTx
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
+import io.provenance.api.models.cee.submit.SubmitContractBatchErrorResponse
+import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResponseWrapper
 import io.provenance.api.models.cee.submit.SubmitContractBatchExecutionResultResponse
 import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
@@ -19,13 +21,14 @@ import org.springframework.stereotype.Component
 class SubmitContractBatchExecutionResult(
     private val provenanceService: Provenance,
     private val getSigner: GetSigner,
-) : AbstractUseCase<SubmitContractBatchExecutionResultRequestWrapper, List<SubmitContractBatchExecutionResultResponse>>() {
+) : AbstractUseCase<SubmitContractBatchExecutionResultRequestWrapper, SubmitContractBatchExecutionResponseWrapper>() {
 
     private val log = KotlinLogging.logger { }
 
-    override suspend fun execute(args: SubmitContractBatchExecutionResultRequestWrapper): List<SubmitContractBatchExecutionResultResponse> {
+    override suspend fun execute(args: SubmitContractBatchExecutionResultRequestWrapper): SubmitContractBatchExecutionResponseWrapper {
         val signedResults = mutableListOf<SignedResult>()
         val response = mutableListOf<SubmitContractBatchExecutionResultResponse>()
+        val errors = mutableListOf<SubmitContractBatchErrorResponse>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
         args.request.submission.forEach {
@@ -53,9 +56,9 @@ class SubmitContractBatchExecutionResult(
                     log.info("Successfully processed batch $index of ${resultCollection.size}")
                 },
                 onFailure = {
-                    response.add(
-                        SubmitContractBatchExecutionResultResponse(
-                            null,
+                    errors.add(
+                        SubmitContractBatchErrorResponse(
+                            "Tx Execution Exception",
                             it.toPrettyJson()
                         )
                     )
@@ -63,6 +66,9 @@ class SubmitContractBatchExecutionResult(
             )
         }
 
-        return response
+        return SubmitContractBatchExecutionResponseWrapper(
+            response,
+            errors
+        )
     }
 }
