@@ -4,5 +4,6 @@ import io.provenance.api.models.p8e.TxResponse
 
 data class ApproveContractExecutionResponse(
     val envelopeStateBase64EncodedByteArray: String?,
-    val tx: TxResponse
+    val tx: TxResponse?,
+    val error: String? = null
 )
