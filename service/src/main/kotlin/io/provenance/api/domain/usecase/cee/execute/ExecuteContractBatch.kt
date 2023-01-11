@@ -9,6 +9,7 @@ import io.provenance.api.domain.usecase.provenance.account.GetSigner
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.provenance.BatchTx
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
+import io.provenance.api.models.cee.execute.ContractExecutionBatchResponse
 import io.provenance.api.models.cee.execute.ContractExecutionErrorResponse
 import io.provenance.api.models.cee.execute.ContractExecutionResponse
 import io.provenance.api.models.cee.execute.MultipartyContractExecutionResponse
@@ -27,12 +28,14 @@ class ExecuteContractBatch(
     private val provenanceService: Provenance,
     private val getSigner: GetSigner,
     private val contractUtilities: ContractUtilities,
-) : AbstractUseCase<ExecuteContractBatchRequestWrapper, List<ContractExecutionResponse>>() {
+) : AbstractUseCase<ExecuteContractBatchRequestWrapper, ContractExecutionBatchResponse>() {
 
     private val log = KotlinLogging.logger { }
 
-    override suspend fun execute(args: ExecuteContractBatchRequestWrapper): List<ContractExecutionResponse> {
-        val responses = mutableListOf<ContractExecutionResponse>()
+    override suspend fun execute(args: ExecuteContractBatchRequestWrapper): ContractExecutionBatchResponse {
+        val completed = mutableListOf<ContractExecutionResponse>()
+        val pending = mutableListOf<ContractExecutionResponse>()
+        val errors = mutableListOf<ContractExecutionErrorResponse>()
         val results = mutableListOf<ExecutionResult>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
         contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
@@ -53,8 +56,8 @@ class ExecuteContractBatch(
                         results.add(it)
                     },
                     onFailure = {
-                        responses.add(
-                            ContractExecutionErrorResponse(it.toPrettyJson())
+                        errors.add(
+                            ContractExecutionErrorResponse("Contract Execution Exception", it.toPrettyJson())
                         )
                     }
                 )
@@ -65,7 +68,7 @@ class ExecuteContractBatch(
                 runCatching {
                     provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(it)).let { tx ->
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
-                            responses.add(
+                            completed.add(
                                 SinglePartyContractExecutionResponse(
                                     pbResponse.toTxResponse()
                                 )
@@ -77,8 +80,8 @@ class ExecuteContractBatch(
                         log.info("Successfully processed batch $index of ${chunkedSignedResult.size}")
                     },
                     onFailure = {
-                        responses.add(
-                            ContractExecutionErrorResponse(it.toPrettyJson())
+                        errors.add(
+                            ContractExecutionErrorResponse("Signed Tx Execution Exception", it.toPrettyJson())
                         )
                     }
                 )
@@ -89,7 +92,7 @@ class ExecuteContractBatch(
                 runCatching {
                     chunk.forEach { result ->
                         client.requestAffiliateExecution(result.envelopeState)
-                        responses.add(
+                        pending.add(
                             MultipartyContractExecutionResponse(
                                 Base64.getEncoder().encodeToString(result.envelopeState.toByteArray())
                             )
@@ -100,14 +103,18 @@ class ExecuteContractBatch(
                         log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
                     },
                     onFailure = {
-                        responses.add(
-                            ContractExecutionErrorResponse(it.toPrettyJson())
+                        errors.add(
+                            ContractExecutionErrorResponse("Fragment Tx Execution Exception", it.toPrettyJson())
                         )
                     }
                 )
             }
 
-            return responses
+            return ContractExecutionBatchResponse(
+                completed,
+                pending,
+                errors
+            )
         }
     }
 }

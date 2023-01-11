@@ -18,5 +18,12 @@ data class MultipartyContractExecutionResponse(
 ) : ContractExecutionResponse(error = error, multiparty = true)
 
 data class ContractExecutionErrorResponse(
-    override val error: String
+    val type: String? = null,
+    override val error: String,
 ) : ContractExecutionResponse(error = error)
+
+data class ContractExecutionBatchResponse(
+    val completed: List<ContractExecutionResponse>,
+    val pending: List<ContractExecutionResponse>,
+    val errors: List<ContractExecutionErrorResponse>
+)
