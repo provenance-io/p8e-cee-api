@@ -5,7 +5,7 @@ import java.util.UUID
 data class ApproveContractExecutionErrorResponse(
     val type: String,
     val error: String,
-    val associatedScopeUuids: List<UUID>
+    val scopeUuids: List<UUID>
 )
 
 data class ApproveContractExecutionBatchResponse(
