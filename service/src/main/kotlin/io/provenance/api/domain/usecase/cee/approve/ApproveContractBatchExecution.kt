@@ -62,7 +62,7 @@ class ApproveContractBatchExecution(
                             ApproveContractExecutionResponse(
                                 Base64.getEncoder().encodeToString(executions.first.toByteArray()),
                                 broadcast.toTxResponse(),
-                                it.map { UUID.nameUUIDFromBytes(it.first.result.scopeOrNull()?.scope?.scope?.scopeId?.toByteArray()) }
+                                it.map { UUID.fromString(it.first.result.scopeOrNull()?.scope?.scopeIdInfo?.scopeUuid) }
                             )
                         )
                     }
@@ -75,7 +75,7 @@ class ApproveContractBatchExecution(
                             ApproveContractExecutionErrorResponse(
                                 "Tx Execution Exception",
                                 error.toPrettyJson(),
-                                it.map { UUID.nameUUIDFromBytes(it.first.result.scopeOrNull()?.scope?.scope?.scopeId?.toByteArray()) }
+                                it.map { UUID.fromString(it.first.result.scopeOrNull()?.scope?.scopeIdInfo?.scopeUuid) }
                             )
                         )
                     }

@@ -36,7 +36,7 @@ class SubmitContractBatchExecutionResult(
         args.request.submission.forEach {
             val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()
             val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(it.state).build()
-            val scopeUuid = UUID.nameUUIDFromBytes(envelope.scopeOrNull()?.scope?.scope?.scopeId?.toByteArray())
+            val scopeUuid = UUID.fromString(envelope.scopeOrNull()?.scope?.scopeIdInfo?.scopeUuid)
             when (val result = envelope.mergeInto(state)) {
                 is SignedResult -> {
                     signedResults.add(Pair(scopeUuid, result))
