@@ -1,8 +1,11 @@
 package io.provenance.api.models.cee.approve
 
+import java.util.UUID
+
 data class ApproveContractExecutionErrorResponse(
     val type: String,
-    val error: String
+    val error: String,
+    val associatedScopeUuids: List<UUID>
 )
 
 data class ApproveContractExecutionBatchResponse(

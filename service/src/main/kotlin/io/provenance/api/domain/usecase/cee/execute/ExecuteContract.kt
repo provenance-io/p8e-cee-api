@@ -36,12 +36,13 @@ class ExecuteContract(
                     provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
                             SinglePartyContractExecutionResponse(
-                                TxResponse(
+                                metadata = TxResponse(
                                     pbResponse.txhash,
                                     pbResponse.gasWanted.toString(),
                                     pbResponse.gasUsed.toString(),
                                     pbResponse.height.toString(),
-                                )
+                                ),
+                                associatedScopeUuids = listOf(args.request.scope.scopeUuid)
                             )
                         }
                     }
@@ -49,7 +50,8 @@ class ExecuteContract(
                 is FragmentResult -> {
                     client.requestAffiliateExecution(result.envelopeState)
                     MultipartyContractExecutionResponse(
-                        Base64.getEncoder().encodeToString(result.envelopeState.toByteArray())
+                        envelopeState = Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
+                        associatedScopeUuids = listOf(args.request.scope.scopeUuid)
                     )
                 }
                 else -> throw ContractExecutionException("Contract execution result was not of an expected type.")

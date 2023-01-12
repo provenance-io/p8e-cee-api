@@ -17,7 +17,9 @@ import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
 import io.provenance.api.util.toPrettyJson
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
+import io.provenance.scope.util.scopeOrNull
 import java.util.Base64
+import java.util.UUID
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -56,17 +58,24 @@ class ApproveContractBatchExecution(
 
                     it.forEach { executions ->
                         client.respondWithApproval(executions.first, broadcast.txhash)
-                        responses.add(ApproveContractExecutionResponse(Base64.getEncoder().encodeToString(executions.first.toByteArray()), broadcast.toTxResponse()))
+                        responses.add(
+                            ApproveContractExecutionResponse(
+                                Base64.getEncoder().encodeToString(executions.first.toByteArray()),
+                                broadcast.toTxResponse(),
+                                it.map { UUID.nameUUIDFromBytes(it.first.result.scopeOrNull()?.scope?.scope?.scopeId?.toByteArray()) }
+                            )
+                        )
                     }
                 }.fold(
                     onSuccess = {
                         log.info("Successfully processed batch $index of ${chunked.size}")
                     },
-                    onFailure = {
+                    onFailure = { error ->
                         errors.add(
                             ApproveContractExecutionErrorResponse(
                                 "Tx Execution Exception",
-                                it.toPrettyJson()
+                                error.toPrettyJson(),
+                                it.map { UUID.nameUUIDFromBytes(it.first.result.scopeOrNull()?.scope?.scope?.scopeId?.toByteArray()) }
                             )
                         )
                     }
