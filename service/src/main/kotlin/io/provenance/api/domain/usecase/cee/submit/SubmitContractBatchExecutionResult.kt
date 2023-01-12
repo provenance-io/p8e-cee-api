@@ -60,7 +60,7 @@ class SubmitContractBatchExecutionResult(
                         response.add(
                             SubmitContractBatchExecutionResultResponse(
                                 tx = pbResponse.toTxResponse(),
-                                associatedScopeUuids = pair.map { it.first }
+                                scopeUuids = pair.map { it.first }
                             )
                         )
                     }

@@ -6,13 +6,13 @@ import java.util.UUID
 data class SubmitContractBatchExecutionResultResponse(
     val tx: TxResponse?,
     val error: String? = null,
-    val associatedScopeUuids: List<UUID>,
+    val scopeUuids: List<UUID>,
 )
 
 data class SubmitContractBatchErrorResponse(
     val type: String,
     val error: String,
-    val associatedScopeUuids: List<UUID>,
+    val scopeUuids: List<UUID>,
 )
 
 data class SubmitContractBatchExecutionResponseWrapper(

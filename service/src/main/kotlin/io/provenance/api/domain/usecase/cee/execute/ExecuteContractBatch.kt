@@ -73,7 +73,7 @@ class ExecuteContractBatch(
                             completed.add(
                                 SinglePartyContractExecutionResponse(
                                     metadata = pbResponse.toTxResponse(),
-                                    associatedScopeUuids = chunk.map { it.first }
+                                    scopeUuids = chunk.map { it.first }
                                 )
                             )
                         }
@@ -99,7 +99,7 @@ class ExecuteContractBatch(
                         pending.add(
                             MultipartyContractExecutionResponse(
                                 envelopeState = Base64.getEncoder().encodeToString(fragment.envelopeState.toByteArray()),
-                                associatedScopeUuids = listOf(result.first)
+                                scopeUuids = listOf(result.first)
                             )
                         )
                     }.fold(

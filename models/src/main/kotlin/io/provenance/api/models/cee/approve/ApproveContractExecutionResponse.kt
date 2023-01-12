@@ -6,5 +6,5 @@ import java.util.UUID
 data class ApproveContractExecutionResponse(
     val envelopeStateBase64EncodedByteArray: String?,
     val tx: TxResponse?,
-    val associatedScopeUuids: List<UUID>
+    val scopeUuids: List<UUID>
 )

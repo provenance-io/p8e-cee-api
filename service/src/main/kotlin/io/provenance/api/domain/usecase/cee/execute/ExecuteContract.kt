@@ -42,7 +42,7 @@ class ExecuteContract(
                                     pbResponse.gasUsed.toString(),
                                     pbResponse.height.toString(),
                                 ),
-                                associatedScopeUuids = listOf(args.request.scope.scopeUuid)
+                                scopeUuids = listOf(args.request.scope.scopeUuid)
                             )
                         }
                     }
@@ -51,7 +51,7 @@ class ExecuteContract(
                     client.requestAffiliateExecution(result.envelopeState)
                     MultipartyContractExecutionResponse(
                         envelopeState = Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
-                        associatedScopeUuids = listOf(args.request.scope.scopeUuid)
+                        scopeUuids = listOf(args.request.scope.scopeUuid)
                     )
                 }
                 else -> throw ContractExecutionException("Contract execution result was not of an expected type.")
