@@ -19,6 +19,7 @@ import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.FragmentResult
 import io.provenance.scope.sdk.SignedResult
 import java.util.Base64
+import java.util.UUID
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -36,7 +37,7 @@ class ExecuteContractBatch(
         val completed = mutableListOf<ContractExecutionResponse>()
         val pending = mutableListOf<ContractExecutionResponse>()
         val errors = mutableListOf<ContractExecutionErrorResponse>()
-        val results = mutableListOf<ExecutionResult>()
+        val results = mutableListOf<Pair<UUID, ExecutionResult>>()
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
         contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
 
@@ -52,25 +53,27 @@ class ExecuteContractBatch(
                 runCatching {
                     contractService.executeContract(client, it)
                 }.fold(
-                    onSuccess = {
-                        results.add(it)
+                    onSuccess = { result ->
+                        results.add(Pair(it.scopeUuid, result))
                     },
-                    onFailure = {
+                    onFailure = { error ->
                         errors.add(
-                            ContractExecutionErrorResponse("Contract Execution Exception", it.toPrettyJson())
+                            ContractExecutionErrorResponse("Contract Execution Exception", error.toPrettyJson(), listOf(it.scopeUuid))
                         )
                     }
                 )
             }
 
-            val chunkedSignedResult = results.filterIsInstance(SignedResult::class.java).chunked(args.request.chunkSize)
-            chunkedSignedResult.forEachIndexed { index, it ->
+            val chunkedSignedResult = results.filter { SignedResult::class.java.isInstance(it.second) }.chunked(args.request.chunkSize)
+            chunkedSignedResult.forEachIndexed { index, chunk ->
+                val executions = chunk.map { it.second as SignedResult }
                 runCatching {
-                    provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(it)).let { tx ->
+                    provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(executions)).let { tx ->
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
                             completed.add(
                                 SinglePartyContractExecutionResponse(
-                                    pbResponse.toTxResponse()
+                                    metadata = pbResponse.toTxResponse(),
+                                    scopeUuids = chunk.map { it.first }
                                 )
                             )
                         }
@@ -79,35 +82,37 @@ class ExecuteContractBatch(
                     onSuccess = {
                         log.info("Successfully processed batch $index of ${chunkedSignedResult.size}")
                     },
-                    onFailure = {
+                    onFailure = { error ->
                         errors.add(
-                            ContractExecutionErrorResponse("Signed Tx Execution Exception", it.toPrettyJson())
+                            ContractExecutionErrorResponse("Signed Tx Execution Exception", error.toPrettyJson(), chunk.map { it.first })
                         )
                     }
                 )
             }
 
-            val chunkedFragResult = results.filterIsInstance(FragmentResult::class.java).chunked(args.request.chunkSize)
+            val chunkedFragResult = results.filter { FragmentResult::class.java.isInstance(it.second) }.chunked(args.request.chunkSize)
             chunkedFragResult.forEachIndexed { index, chunk ->
-                runCatching {
-                    chunk.forEach { result ->
-                        client.requestAffiliateExecution(result.envelopeState)
+                chunk.forEach { result ->
+                    runCatching {
+                        val fragment = result.second as FragmentResult
+                        client.requestAffiliateExecution(fragment.envelopeState)
                         pending.add(
                             MultipartyContractExecutionResponse(
-                                Base64.getEncoder().encodeToString(result.envelopeState.toByteArray())
+                                envelopeState = Base64.getEncoder().encodeToString(fragment.envelopeState.toByteArray()),
+                                scopeUuids = listOf(result.first)
                             )
                         )
-                    }
-                }.fold(
-                    onSuccess = {
-                        log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
-                    },
-                    onFailure = {
-                        errors.add(
-                            ContractExecutionErrorResponse("Fragment Tx Execution Exception", it.toPrettyJson())
-                        )
-                    }
-                )
+                    }.fold(
+                        onSuccess = {
+                            log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
+                        },
+                        onFailure = {
+                            errors.add(
+                                ContractExecutionErrorResponse("Fragment Tx Execution Exception", it.toPrettyJson(), listOf(result.first))
+                            )
+                        }
+                    )
+                }
             }
 
             return ContractExecutionBatchResponse(

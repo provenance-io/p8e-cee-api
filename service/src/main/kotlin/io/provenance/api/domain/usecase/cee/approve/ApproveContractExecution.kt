@@ -14,7 +14,9 @@ import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.cee.approve.ApproveContractExecutionResponse
 import io.provenance.scope.contract.proto.Envelopes
 import io.provenance.scope.sdk.FragmentResult
+import io.provenance.scope.util.scopeOrNull
 import java.util.Base64
+import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
@@ -36,7 +38,13 @@ class ApproveContractExecution(
                 }
 
                 client.respondWithApproval(result.envelopeState, tx.txhash)
-                return ApproveContractExecutionResponse(Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()), tx.toTxResponse())
+                return ApproveContractExecutionResponse(
+                    Base64.getEncoder().encodeToString(result.envelopeState.toByteArray()),
+                    tx.toTxResponse(),
+                    listOf(
+                        UUID.fromString(envelope.scopeOrNull()?.scope?.scopeIdInfo?.scopeUuid)
+                    )
+                )
             } else throw ContractExecutionException("Attempted to approve an envelope that did not result in a fragment. Only non-approved envelopes should be sent!")
         }
     }
