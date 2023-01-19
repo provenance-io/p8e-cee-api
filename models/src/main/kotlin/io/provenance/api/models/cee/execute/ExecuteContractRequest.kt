@@ -7,6 +7,6 @@ data class ExecuteContractRequest(
     val scope: ScopeInfo,
     val config: ExecuteContractConfig,
     val records: Map<String, Any>,
-    val participants: List<Participant> = emptyList(),
+    val additionalParticipants: List<Participant> = emptyList(),
     val permissions: PermissionInfo? = null,
 )

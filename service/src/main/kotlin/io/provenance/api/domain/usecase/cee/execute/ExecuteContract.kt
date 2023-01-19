@@ -28,8 +28,8 @@ class ExecuteContract(
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.participants, args.request.config).use { client ->
-            val session = contractUtilities.createSession(args.uuid, client, args.request.permissions, args.request.participants, args.request.config, args.request.records, listOf(args.request.scope)).single()
+        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.additionalParticipants, args.request.config).use { client ->
+            val session = contractUtilities.createSession(args.uuid, client, args.request.permissions, args.request.additionalParticipants, args.request.config, args.request.records, listOf(args.request.scope)).single()
 
             return when (val result = contractService.executeContract(client, session)) {
                 is SignedResult -> {
