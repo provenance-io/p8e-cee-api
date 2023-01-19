@@ -30,11 +30,12 @@ class GetObject(
         val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
             ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
 
-        val client = if (args.useObjectStoreGateway)
+        if (args.useObjectStoreGateway) {
             GatewayClient(ClientConfig(URI.create(args.objectStoreAddress), provenanceProperties.mainnet))
-        else
+        } else {
             OsClient(URI.create(args.objectStoreAddress), objectStoreProperties.timeoutMs)
-
-        return objectStore.retrieveAndDecrypt(client, args.hash, publicKey, privateKey)
+        }.use { client ->
+            return objectStore.retrieveAndDecrypt(client, args.hash, publicKey, privateKey)
+        }
     }
 }
