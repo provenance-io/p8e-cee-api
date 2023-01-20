@@ -2,7 +2,6 @@ package io.provenance.api.models.cee.execute
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
 import io.provenance.api.models.p8e.TxResponse
 import java.util.UUID
 
@@ -18,25 +17,19 @@ sealed class ContractExecutionResponse(
     val multiparty: Boolean? = null,
 )
 
-@JsonTypeName("single")
 data class SinglePartyContractExecutionResponse(
-    val type: String = "single",
     val metadata: TxResponse?,
     override val error: String? = null,
     override val scopeUuids: List<UUID>
 ) : ContractExecutionResponse(error = error, multiparty = false, scopeUuids = scopeUuids)
 
-@JsonTypeName("multi")
 data class MultipartyContractExecutionResponse(
-    val type: String = "multi",
     val envelopeState: String?,
     override val error: String? = null,
     override val scopeUuids: List<UUID>
 ) : ContractExecutionResponse(error = error, multiparty = true, scopeUuids = scopeUuids)
 
-@JsonTypeName("error")
 data class ContractExecutionErrorResponse(
-    val type: String = "error",
     val errorType: String? = null,
     override val error: String,
     override val scopeUuids: List<UUID>
