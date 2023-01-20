@@ -25,7 +25,6 @@ class GetSigner(
     override suspend fun execute(args: GetSignerRequest): Signer {
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
 
-
         return (originator.signingPublicKey() as PublicKey).let { public ->
             (originator.signingPrivateKey() as PrivateKey).let { private ->
                 object : Signer {

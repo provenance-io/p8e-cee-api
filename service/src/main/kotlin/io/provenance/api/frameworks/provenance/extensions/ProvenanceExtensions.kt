@@ -63,4 +63,3 @@ fun Set<AudienceKeyPair>.toMessageSet(isMainnet: Boolean): Set<String> = map {
 fun Message.toAny(typeUrlPrefix: String = ""): Any = Any.pack(this, typeUrlPrefix)
 
 fun Iterable<Message>.toAny(typeUrlPrefix: String = ""): List<Any> = this.map { msg -> Any.pack(msg, typeUrlPrefix) }
-

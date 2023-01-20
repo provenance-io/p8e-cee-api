@@ -1,6 +1,5 @@
 package io.provenance.api.domain.usecase.provenance.tx.scope
 
-
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.common.errors.NotFoundError
