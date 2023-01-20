@@ -13,7 +13,6 @@ class ContractExecutionResponseTest : FunSpec({
 
         test("SinglePartyContractExecutionResponse") {
             val response = SinglePartyContractExecutionResponse(
-                type = "single",
                 metadata = TxResponse(
                     hash = "hash",
                     gasWanted = "2",
@@ -32,7 +31,6 @@ class ContractExecutionResponseTest : FunSpec({
 
         test("ContractExecutionErrorResponse") {
             val response = ContractExecutionErrorResponse(
-                type = "single",
                 errorType = "error type",
                 error = "error",
                 scopeUuids = listOf(UUID.randomUUID(), UUID.randomUUID())
@@ -46,7 +44,6 @@ class ContractExecutionResponseTest : FunSpec({
 
         test("MultipartyContractExecutionResponse") {
             val response = MultipartyContractExecutionResponse(
-                type = "multi",
                 envelopeState = "envelope",
                 error = null,
                 scopeUuids = emptyList()
