@@ -1,6 +1,5 @@
 package io.provenance.api.models.cee.execute
 
-import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.provenance.api.models.p8e.TxResponse
@@ -31,7 +30,6 @@ data class MultipartyContractExecutionResponse(
 ) : ContractExecutionResponse(error = error, multiparty = true, scopeUuids = scopeUuids)
 
 data class ContractExecutionErrorResponse(
-    @JsonAlias("type")
     val errorType: String? = null,
     override val error: String,
     override val scopeUuids: List<UUID>
