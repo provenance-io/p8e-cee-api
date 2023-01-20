@@ -1,11 +1,11 @@
 package io.provenance.api.frameworks.cee
 
 import com.google.protobuf.Message
+import io.provenance.api.domain.cee.ContractService
+import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.core.KeyType
 import io.provenance.core.Originator
 import io.provenance.metadata.v1.ScopeResponse
-import io.provenance.api.domain.cee.ContractService
-import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
 import io.provenance.scope.contract.proto.Envelopes.Envelope
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.contract.spec.P8eContract
@@ -14,12 +14,11 @@ import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.Session
-import mu.KotlinLogging
-import org.springframework.stereotype.Component
-import java.lang.IllegalArgumentException
 import java.security.PublicKey
 import java.util.UUID
 import kotlin.reflect.full.isSubclassOf
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
 
 @Component
 class P8eContractService : ContractService {
@@ -51,7 +50,7 @@ class P8eContractService : ContractService {
                 client
                     .newSession(contractClass, scopeSpec)
                     .setScopeUuid(scopeUuid)
-                    .configureSession(records, sessionUuid, participants, audiences)
+                    .configureSession(records, sessionUuid, participants?.filter { it.key != client.affiliate.partyType }, audiences)
                     .also { session ->
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
                     }
@@ -59,7 +58,7 @@ class P8eContractService : ContractService {
             else ->
                 client
                     .newSession(contractClass, scope)
-                    .configureSession(records, sessionUuid, participants, audiences)
+                    .configureSession(records, sessionUuid, participants?.filter { it.key != client.affiliate.partyType }, audiences)
                     .also { session ->
                         log.info("[L: ${session.scopeUuid}, S: ${session.sessionUuid}] ${contractClass.simpleName} has been setup.")
                     }

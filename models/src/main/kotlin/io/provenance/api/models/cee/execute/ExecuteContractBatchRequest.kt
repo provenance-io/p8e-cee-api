@@ -6,7 +6,7 @@ import io.provenance.api.models.p8e.PermissionInfo
 data class ExecuteContractBatchRequest(
     val config: ExecuteContractConfig,
     val records: Map<String, Any>,
-    val participants: List<Participant> = emptyList(),
+    val additionalParticipants: List<Participant> = emptyList(),
     val permissions: PermissionInfo?,
     val chunkSize: Int = 25,
     val scopes: List<ScopeInfo> = emptyList(),
