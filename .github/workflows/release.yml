@@ -83,7 +83,7 @@ jobs:
           tags: ${{ steps.ci-release-create-outputs.outputs.tags }}
 
       - name: Install gpg secret key
-        if: github.event.inputs.publishToMaven == true
+        if: github.event.inputs.publishToMaven == true || github.event_name == 'release'
         run: |
           export GPG_TTY=$(tty)
           echo -n "${{ secrets.OSSRH_GPG_SECRET_KEY }}" | base64 --decode | gpg --batch --import
@@ -91,7 +91,7 @@ jobs:
           echo -n "${{ secrets.OSSRH_GPG_SECRET_KEY }}" | base64 --decode > $GITHUB_WORKSPACE/release.gpg
 
       - name: Publish to Maven Central
-        if: github.event.inputs.publishToMaven == true
+        if: github.event.inputs.publishToMaven == true || github.event_name == 'release'
         run: |
           ./gradlew publishToSonatype -Pversion=${{ steps.ci-release-create-outputs.outputs.version }} $(if [ "${{github.event.release.prerelease}}" = "true" ]; then echo 'closeSonatypeStagingRepository'; else echo 'closeAndReleaseSonatypeStagingRepository'; fi) \
           -Psigning.keyId=B7D30ABE -Psigning.password="${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}" -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/release.gpg \
