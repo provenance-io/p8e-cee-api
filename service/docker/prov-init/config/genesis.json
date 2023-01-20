@@ -48,63 +48,63 @@
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "1",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "2",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "3",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "4",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp138jtpz5zxa6yc33s0fk2jy9vahqcuvvtwnrzge",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "5",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1pz4tt4j802j2y3avs5mwy9uyyxtx7k5r8qlehw",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "6",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1he6rfnxyx2ssqyknq4ayzf5j46dp29pqt6z708",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "7",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1f99dgtxxjmgczjsuc48utq4lkk0uhx6eqfqju0",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "8",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
           "address": "tp1c87ujqlc7wvstate9qcfu7tglesy3m7tnfwfrm",
           "pub_key": null,
-          "account_number": "0",
+          "account_number": "9",
           "sequence": "0"
         },
         {
@@ -112,7 +112,7 @@
           "base_account": {
             "address": "tp1pr93cqdh4kfnmrknhwa87a5qrwxw9k3dhkszp0",
             "pub_key": null,
-            "account_number": "0",
+            "account_number": "10",
             "sequence": "0"
           },
           "manager": "",
@@ -136,6 +136,9 @@
           "allow_governance_control": true
         }
       ]
+    },
+    "authz": {
+      "authorization": []
     },
     "bank": {
       "params": {
@@ -235,7 +238,8 @@
         }
       ],
       "supply": [],
-      "denom_metadata": []
+      "denom_metadata": [],
+      "send_enabled": []
     },
     "capability": {
       "index": "1",
@@ -268,6 +272,9 @@
     },
     "evidence": {
       "evidence": []
+    },
+    "feegrant": {
+      "allowances": []
     },
     "genutil": {
       "gen_txs": [
@@ -326,7 +333,8 @@
               "gas_limit": "200000",
               "payer": "",
               "granter": ""
-            }
+            },
+            "tip": null
           },
           "signatures": [
             "yt2uHkBflyJO5tf5Js7iNLsF2CNbc6AKOgkqtdFxMN0D5nOeKjsie8j4ZsOYfbMfIJMbP+7gptd/U5qwjo4/aw=="
@@ -357,6 +365,16 @@
         "veto_threshold": "0.334000000000000000"
       }
     },
+    "group": {
+      "group_seq": "0",
+      "groups": [],
+      "group_members": [],
+      "group_policy_seq": "0",
+      "group_policies": [],
+      "proposal_seq": "0",
+      "proposals": [],
+      "votes": []
+    },
     "ibc": {
       "client_genesis": {
         "clients": [],
@@ -374,7 +392,10 @@
       "connection_genesis": {
         "connections": [],
         "client_connection_paths": [],
-        "next_connection_sequence": "0"
+        "next_connection_sequence": "0",
+        "params": {
+          "max_expected_time_per_block": "30000000000"
+        }
       },
       "channel_genesis": {
         "channels": [],
@@ -387,11 +408,30 @@
         "next_channel_sequence": "0"
       }
     },
+    "interchainaccounts": {
+      "controller_genesis_state": {
+        "active_channels": [],
+        "interchain_accounts": [],
+        "ports": [],
+        "params": {
+          "controller_enabled": true
+        }
+      },
+      "host_genesis_state": {
+        "active_channels": [],
+        "interchain_accounts": [],
+        "port": "icahost",
+        "params": {
+          "host_enabled": true,
+          "allow_messages": []
+        }
+      }
+    },
     "marker": {
       "params": {
         "max_total_supply": "100000000000",
         "enable_governance": true,
-        "unrestricted_denom_regex": "[a-zA-Z][a-zA-Z0-9\\-\\.]{2,64}"
+        "unrestricted_denom_regex": "[a-zA-Z][a-zA-Z0-9\\-\\.]{7,83}"
       },
       "markers": []
     },
@@ -421,6 +461,17 @@
         "goal_bonded": "1.000000000000000000",
         "blocks_per_year": "6311520"
       }
+    },
+    "msgfees": {
+      "params": {
+        "floor_gas_price": {
+          "denom": "nhash",
+          "amount": "1905"
+        },
+        "nhash_per_usd_mil": "25000000",
+        "conversion_fee_denom": "nhash"
+      },
+      "msg_fees": []
     },
     "name": {
       "params": {
@@ -453,6 +504,12 @@
       ]
     },
     "params": null,
+    "reward": {
+      "reward_program_id": "1",
+      "reward_programs": [],
+      "claim_period_reward_distributions": [],
+      "reward_account_states": []
+    },
     "slashing": {
       "params": {
         "signed_blocks_window": "100",
@@ -470,7 +527,8 @@
         "max_validators": 100,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "nhash"
+        "bond_denom": "nhash",
+        "min_commission_rate": "0.000000000000000000"
       },
       "last_total_power": "0",
       "last_validator_powers": [],
@@ -494,10 +552,9 @@
       "params": {
         "code_upload_access": {
           "permission": "Everybody",
-          "address": ""
+          "addresses": []
         },
-        "instantiate_default_permission": "Everybody",
-        "max_wasm_code_size": "614400"
+        "instantiate_default_permission": "Everybody"
       },
       "codes": [],
       "contracts": [],

@@ -51,18 +51,21 @@ services:
             - ./object-store-2:/mnt/data
 
     provenance:
-        image: provenanceio/provenance:v1.11.1
+        image: provenanceio/provenance:v1.13.1
         container_name: provenance
-        command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
+        command: bash -c "cp -rn /home/provenance_seed/* /provenance && /usr/bin/provenanced -t --home /provenance start"
         networks:
             - p8e-network
         ports:
             - "1317:1317"
             - "9090:9090"
             - "26657:26657"
+        environment:
+            - ID=dev
+            - PIO_HOME=/provenance
         volumes:
             - ./prov-init:/home/provenance_seed:ro
-            - provenance:/home/provenance
+            - provenance:/provenance
 
     vault:
         image: vault:latest

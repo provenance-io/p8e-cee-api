@@ -35,7 +35,7 @@ object Versions {
     const val KmsConnector = "0.3.0"
     const val LoanPackage = "0.6.1"
     const val Grpc = "1.45.0"
-    const val ProvenanceProto = "1.11.1"
+    const val ProvenanceProto = "1.13.1"
     const val Reflections = "0.9.10"
     const val NexusPublishing = "1.1.0"
     const val BouncyCastle = "1.70"
