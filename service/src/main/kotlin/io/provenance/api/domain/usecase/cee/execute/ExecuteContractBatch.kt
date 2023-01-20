@@ -58,7 +58,11 @@ class ExecuteContractBatch(
                     },
                     onFailure = { error ->
                         errors.add(
-                            ContractExecutionErrorResponse("Contract Execution Exception", error.toPrettyJson(), listOf(it.scopeUuid))
+                            ContractExecutionErrorResponse(
+                                errorType = "Contract Execution Exception",
+                                error = error.toPrettyJson(),
+                                scopeUuids = listOf(it.scopeUuid)
+                            )
                         )
                     }
                 )
@@ -84,7 +88,11 @@ class ExecuteContractBatch(
                     },
                     onFailure = { error ->
                         errors.add(
-                            ContractExecutionErrorResponse("Signed Tx Execution Exception", error.toPrettyJson(), chunk.map { it.first })
+                            ContractExecutionErrorResponse(
+                                errorType = "Signed Tx Execution Exception",
+                                error = error.toPrettyJson(),
+                                scopeUuids = chunk.map { it.first }
+                            )
                         )
                     }
                 )
@@ -108,7 +116,11 @@ class ExecuteContractBatch(
                         },
                         onFailure = {
                             errors.add(
-                                ContractExecutionErrorResponse("Fragment Tx Execution Exception", it.toPrettyJson(), listOf(result.first))
+                                ContractExecutionErrorResponse(
+                                    errorType = "Fragment Tx Execution Exception",
+                                    error = it.toPrettyJson(),
+                                    scopeUuids = listOf(result.first)
+                                )
                             )
                         }
                     )
