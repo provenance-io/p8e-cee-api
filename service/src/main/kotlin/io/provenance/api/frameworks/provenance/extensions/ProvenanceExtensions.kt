@@ -2,6 +2,7 @@
 package io.provenance.api.frameworks.provenance.extensions
 
 import com.google.protobuf.Any
+import com.google.protobuf.Message
 import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.base.abci.v1beta1.Abci.TxResponse
@@ -39,6 +40,12 @@ fun Iterable<Any>.toTxBody(pbClient: PbClient) =
         .addAllMessages(this)
         .build()
 
+fun Any.toTxBody(pbClient: PbClient) =
+    TxOuterClass.TxBody.newBuilder()
+        .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
+        .addMessages(this)
+        .build()
+
 fun Abci.TxResponse.toTxResponse() = io.provenance.api.models.p8e.TxResponse(this.txhash, this.gasWanted.toString(), this.gasUsed.toString(), this.height.toString())
 
 fun getCurrentHeight(pbClient: PbClient): Long = pbClient.tendermintService
@@ -52,3 +59,8 @@ fun getBaseAccount(pbClient: PbClient, address: String): Auth.BaseAccount = pbCl
 fun Set<AudienceKeyPair>.toMessageSet(isMainnet: Boolean): Set<String> = map {
     it.signingKey.toJavaPublicKey().getAddress(isMainnet)
 }.toSet()
+
+fun Message.toAny(typeUrlPrefix: String = ""): Any = Any.pack(this, typeUrlPrefix)
+
+fun Iterable<Message>.toAny(typeUrlPrefix: String = ""): List<Any> = this.map { msg -> Any.pack(msg, typeUrlPrefix) }
+

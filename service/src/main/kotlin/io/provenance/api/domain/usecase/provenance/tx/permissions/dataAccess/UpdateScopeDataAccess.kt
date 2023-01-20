@@ -15,7 +15,6 @@ import io.provenance.api.models.p8e.tx.permissions.dataAccess.DataAccessChangeTy
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.DataAccessUpdate
 import io.provenance.api.util.toPrettyJson
 import io.provenance.client.protobuf.extensions.toAny
-import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.metadata.v1.MsgAddScopeDataAccessRequest
 import io.provenance.metadata.v1.MsgDeleteScopeDataAccessRequest
 import io.provenance.scope.util.MetadataAddress
@@ -51,7 +50,7 @@ class UpdateScopeDataAccess(
                     .addAllSigners(listOf(signer.address()))
                     .build().toAny()
             }
-        ).toTxBody()
+        )
 
         return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer)
             .takeIf { !it.isError() }?.let {

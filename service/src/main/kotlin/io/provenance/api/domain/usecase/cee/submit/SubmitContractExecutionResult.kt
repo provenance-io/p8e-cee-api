@@ -26,7 +26,7 @@ class SubmitContractExecutionResult(
 
         return when (val result = envelope.mergeInto(state)) {
             is SignedResult -> {
-                provenanceService.buildContractTx(args.request.provenance, SingleTx(result)).let {
+                provenanceService.buildContractTx(SingleTx(result)).let {
                     provenanceService.executeTransaction(args.request.provenance, it, signer).let { pbResponse ->
                         TxResponse(pbResponse.txhash, pbResponse.gasWanted.toString(), pbResponse.gasUsed.toString(), pbResponse.height.toString())
                     }

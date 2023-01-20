@@ -11,8 +11,6 @@ import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetSt
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.domain.usecase.provenance.query.QueryScope
-import io.provenance.api.domain.usecase.provenance.tx.create.CreateTx
-import io.provenance.api.domain.usecase.provenance.tx.create.models.CreateTxRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.execute.ExecuteTx
 import io.provenance.api.domain.usecase.provenance.tx.execute.models.ExecuteTxRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.UpdateAuthzGrant
@@ -37,7 +35,6 @@ import org.springframework.web.reactive.function.server.awaitBodyOrNull
 @Suppress("TooManyFunctions")
 class ProvenanceHandler(
     private val executeTx: ExecuteTx,
-    private val createTx: CreateTx,
     private val queryScope: QueryScope,
     private val changeScopeOwnership: ChangeScopeOwnership,
     private val classifyAsset: ClassifyAsset,
@@ -48,10 +45,6 @@ class ProvenanceHandler(
     private val updateAuthzGrant: UpdateAuthzGrant,
     private val getSigner: GetSigner,
 ) {
-    suspend fun generateTx(req: ServerRequest): ServerResponse = runCatching {
-        createTx.execute(CreateTxRequestWrapper(req.getUser(), req.awaitBody()))
-    }.foldToServerResponse()
-
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
         executeTx.execute(ExecuteTxRequestWrapper(req.getUser(), req.awaitBody()))
     }.foldToServerResponse()

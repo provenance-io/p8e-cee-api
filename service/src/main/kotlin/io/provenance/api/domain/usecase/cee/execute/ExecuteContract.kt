@@ -33,7 +33,7 @@ class ExecuteContract(
 
             return when (val result = contractService.executeContract(client, session)) {
                 is SignedResult -> {
-                    provenanceService.buildContractTx(args.request.config.provenanceConfig, SingleTx(result)).let {
+                    provenanceService.buildContractTx(SingleTx(result)).let {
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, it, signer).let { pbResponse ->
                             SinglePartyContractExecutionResponse(
                                 metadata = TxResponse(
