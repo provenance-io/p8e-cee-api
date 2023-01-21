@@ -11,7 +11,6 @@ import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.tx.permissions.authz.AuthzChangeType
 import io.provenance.client.protobuf.extensions.toAny
-import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.scope.contract.proto.Envelopes
 import java.util.Base64
 import org.springframework.stereotype.Component
@@ -34,7 +33,7 @@ class UpdateAuthzGrant(
                         client.revokeScopeUpdate(Envelopes.EnvelopeState.newBuilder().mergeFrom(Base64.getDecoder().decode(change.envelopeState)).build()).map { it.toAny() }
                     }
                 }
-            }.toTxBody()
+            }
         }
 
         return provenanceService.executeTransaction(args.request.provenanceConfig, messages, signer).toTxResponse()

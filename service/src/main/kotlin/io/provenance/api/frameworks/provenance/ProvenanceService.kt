@@ -4,7 +4,6 @@ import com.google.protobuf.Any
 import cosmos.auth.v1beta1.Auth
 import cosmos.base.abci.v1beta1.Abci
 import cosmos.tx.v1beta1.ServiceOuterClass
-import cosmos.tx.v1beta1.TxOuterClass
 import io.grpc.Metadata
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
 import io.grpc.stub.AbstractStub
@@ -17,7 +16,6 @@ import io.provenance.api.frameworks.provenance.extensions.isError
 import io.provenance.api.frameworks.provenance.extensions.toTxBody
 import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.ProvenanceConfig
-import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.SmartContractConfig
 import io.provenance.client.grpc.BaseReqSigner
@@ -29,7 +27,6 @@ import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.scope.contract.proto.Contracts
 import io.provenance.scope.sdk.SignedResult
 import java.net.URI
-import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Component
@@ -54,37 +51,35 @@ object ProvenanceConst {
 class ProvenanceService : Provenance {
     private val cachedSequenceMap = ConcurrentHashMap<String, CachedAccountSequence>()
 
-    override fun buildContractTx(config: ProvenanceConfig, tx: ProvenanceTx): TxOuterClass.TxBody =
-        PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-            return when (tx) {
-                is SingleTx -> {
-                    when (val error = tx.getErrorResult()) {
-                        null -> {
-                            val messages = tx.value.messages.map { Any.pack(it, "") }
-                            messages.toTxBody(pbClient)
-                        }
-                        else -> throw ContractTxException(error.result.errorMessage)
+    override fun buildContractTx(tx: ProvenanceTx): Iterable<Any> =
+        when (tx) {
+            is SingleTx -> {
+                when (val error = tx.getErrorResult()) {
+                    null -> {
+                        tx.value.messages.map { Any.pack(it, "") }
                     }
+                    else -> throw ContractTxException(error.result.errorMessage)
                 }
-                is BatchTx -> {
-                    when (val error = tx.getErrorResult()) {
-                        emptyList<Contracts.ConsiderationProto?>() -> {
-                            val messages = tx.value.flatMap { it.messages.map { Any.pack(it, "") } }
-                            messages.toTxBody(pbClient)
-                        }
-                        else -> throw ContractTxException("Tx Batch operation failed: $error")
+            }
+            is BatchTx -> {
+                when (val error = tx.getErrorResult()) {
+                    emptyList<Contracts.ConsiderationProto?>() -> {
+                        tx.value.flatMap { it.messages.map { Any.pack(it, "") } }
                     }
+                    else -> throw ContractTxException("Tx Batch operation failed: $error")
                 }
             }
         }
 
-    override fun executeTransaction(config: ProvenanceConfig, tx: TxOuterClass.TxBody, signer: Signer): Abci.TxResponse =
+    override fun executeTransaction(config: ProvenanceConfig, messages: Iterable<Any>, signer: Signer): Abci.TxResponse =
         tryAction(config, signer) { pbClient, account, offset ->
             val baseSigner = BaseReqSigner(
                 signer,
                 account = account,
                 sequenceOffset = offset
             )
+
+            val tx = messages.toTxBody(pbClient)
 
             val result = pbClient.estimateAndBroadcastTx(
                 txBody = tx,
@@ -98,24 +93,6 @@ class ProvenanceService : Provenance {
             }
             result
         }.txResponse
-
-    override fun onboard(chainId: String, nodeEndpoint: String, signer: Signer, storeTxBody: TxBody): TxResponse =
-        tryAction(ProvenanceConfig(chainId, nodeEndpoint), signer) { pbClient, _, _ ->
-            val txBody = TxOuterClass.TxBody.newBuilder().also { txBodyBuilder ->
-                txBodyBuilder.addAllMessages(
-                    storeTxBody.base64.map { tx ->
-                        Any.parseFrom(Base64.getDecoder().decode(tx))
-                    }
-                )
-            }.build()
-
-            pbClient.estimateAndBroadcastTx(
-                txBody = txBody,
-                signers = listOf(BaseReqSigner(signer)),
-                mode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_SYNC,
-                gasAdjustment = 1.5
-            )
-        }.txResponse.toTxResponse()
 
     @Suppress("DEPRECATION")
     override fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long?): ScopeResponse =

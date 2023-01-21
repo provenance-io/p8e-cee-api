@@ -55,7 +55,7 @@ class SubmitContractBatchExecutionResult(
         chunked.forEachIndexed { index, pair ->
             val results = pair.map { it.second }
             runCatching {
-                provenanceService.buildContractTx(args.request.provenance, BatchTx(results)).let { tx ->
+                provenanceService.buildContractTx(BatchTx(results)).let { tx ->
                     provenanceService.executeTransaction(args.request.provenance, tx, signer).let { pbResponse ->
                         response.add(
                             SubmitContractBatchExecutionResultResponse(

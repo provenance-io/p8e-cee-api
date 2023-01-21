@@ -2,13 +2,11 @@ package io.provenance.api.frameworks.web.external.provenance
 
 import io.provenance.api.frameworks.web.Routes
 import io.provenance.api.frameworks.web.logging.logExchange
-import io.provenance.api.models.p8e.TxBody
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.api.models.p8e.contracts.ClassifyAssetRequest
 import io.provenance.api.models.p8e.contracts.VerifyAssetRequest
 import io.provenance.api.models.p8e.query.QueryScopeResponse
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
-import io.provenance.api.models.p8e.tx.CreateTxRequest
 import io.provenance.api.models.p8e.tx.ExecuteTxRequest
 import io.provenance.api.models.p8e.tx.permissions.authz.UpdateAuthzRequest
 import io.provenance.api.models.p8e.tx.permissions.dataAccess.UpdateScopeDataAccessRequest
@@ -35,35 +33,6 @@ private val log = KotlinLogging.logger {}
 class ProvenanceApi {
     @Bean
     @RouterOperations(
-        RouterOperation(
-            path = "${Routes.EXTERNAL_BASE_V1}/p8e/tx/generate",
-            method = arrayOf(RequestMethod.POST),
-            produces = ["application/json"],
-            operation = Operation(
-                tags = ["Provenance"],
-                operationId = "generate",
-                method = "POST",
-                parameters = [
-                    Parameter(
-                        name = "x-uuid",
-                        required = true,
-                        `in` = ParameterIn.HEADER,
-                        schema = Schema(implementation = UUID::class),
-                    ),
-                ],
-                requestBody = RequestBody(
-                    required = true,
-                    content = [Content(schema = Schema(implementation = CreateTxRequest::class))]
-                ),
-                responses = [
-                    ApiResponse(
-                        responseCode = "200",
-                        description = "successful operation",
-                        content = [Content(schema = Schema(implementation = TxBody::class))]
-                    )
-                ]
-            )
-        ),
         RouterOperation(
             path = "${Routes.EXTERNAL_BASE_V1}/p8e/tx/execute",
             method = arrayOf(RequestMethod.POST),
@@ -402,7 +371,6 @@ class ProvenanceApi {
         logExchange(log)
         "${Routes.EXTERNAL_BASE_V1}/p8e".nest {
             "/tx".nest {
-                POST("/generate", handler::generateTx)
                 POST("/execute", handler::executeTx)
             }
             "/classify".nest {

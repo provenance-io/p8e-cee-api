@@ -10,8 +10,7 @@ import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOw
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.api.frameworks.provenance.extensions.toAny
 import io.provenance.api.frameworks.provenance.extensions.toMessageSet
-import io.provenance.api.frameworks.provenance.extensions.toModel
-import io.provenance.api.frameworks.provenance.extensions.toTxBody
+import io.provenance.api.frameworks.provenance.extensions.toTxResponse
 import io.provenance.api.models.p8e.TxResponse
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.MsgWriteScopeRequest
@@ -69,11 +68,10 @@ class ChangeScopeOwnership(
             addSigners(signer.address())
         }.build()
 
-        return provenance.onboard(
-            args.request.provenanceConfig.chainId,
-            args.request.provenanceConfig.nodeEndpoint,
+        return provenance.executeTransaction(
+            args.request.provenanceConfig,
+            listOf(message.toAny()),
             signer,
-            message.toAny().toTxBody().toModel(),
-        )
+        ).toTxResponse()
     }
 }

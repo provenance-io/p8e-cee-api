@@ -72,7 +72,7 @@ class ExecuteContractBatch(
             chunkedSignedResult.forEachIndexed { index, chunk ->
                 val executions = chunk.map { it.second as SignedResult }
                 runCatching {
-                    provenanceService.buildContractTx(args.request.config.provenanceConfig, BatchTx(executions)).let { tx ->
+                    provenanceService.buildContractTx(BatchTx(executions)).let { tx ->
                         provenanceService.executeTransaction(args.request.config.provenanceConfig, tx, signer).let { pbResponse ->
                             completed.add(
                                 SinglePartyContractExecutionResponse(

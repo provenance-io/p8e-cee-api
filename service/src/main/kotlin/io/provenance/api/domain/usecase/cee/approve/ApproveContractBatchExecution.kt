@@ -2,7 +2,6 @@ package io.provenance.api.domain.usecase.cee.approve
 
 import com.google.protobuf.Any
 import cosmos.authz.v1beta1.Tx
-import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.api.domain.provenance.Provenance
 import io.provenance.api.domain.usecase.AbstractUseCase
 import io.provenance.api.domain.usecase.cee.approve.models.ApproveContractBatchRequestWrapper
@@ -53,8 +52,7 @@ class ApproveContractBatchExecution(
             chunked.forEachIndexed { index, it ->
                 runCatching {
                     val messages = it.flatMap { grantList -> grantList.second.map { grant -> Any.pack(grant, "") } }
-                    val txBody = TxOuterClass.TxBody.newBuilder().addAllMessages(messages).build()
-                    val broadcast = provenance.executeTransaction(args.request.provenanceConfig, txBody, signer)
+                    val broadcast = provenance.executeTransaction(args.request.provenanceConfig, messages, signer)
 
                     it.forEach { executions ->
                         client.respondWithApproval(executions.first, broadcast.txhash)
