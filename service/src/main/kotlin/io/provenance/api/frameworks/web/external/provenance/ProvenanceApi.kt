@@ -382,6 +382,9 @@ class ProvenanceApi {
                 GET("/query", handler::queryScope)
                 POST("/ownership", handler::changeScopeOwnership)
                 PATCH("/data", handler::updateDataAccess)
+                "/batch".nest {
+                    POST("/ownership", handler::changeScopeOwnershipBatch)
+                }
             }
             POST("/verify", handler::verifyAsset)
             PATCH("/permissions/authz", handler::updateAuthz)

@@ -29,7 +29,7 @@ class ChangeScopeOwnershipTest(
                             newValueOwner = null,
                             newDataAccess = null,
                         )
-                    )
+                    ).toBatchWrapper()
                 )
             }.let { exception ->
                 exception.message shouldContain "Must request at least one change to the scope"
