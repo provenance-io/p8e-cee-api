@@ -32,7 +32,7 @@ class ChangeScopeOwnership(
 
         val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
 
-        val messages = args.request.scopeIds.map {
+        val messages = args.request.scopeIds.distinct().map {
             val scopeResponse = provenance.getScope(args.request.provenanceConfig, it)
                 .takeIf { response -> response.scope.isSet() }
                 ?: throw NotFoundError("No scope found")
