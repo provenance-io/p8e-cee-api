@@ -22,7 +22,7 @@ jobs:
   linting:
     name: Linting
     runs-on: ubuntu-latest
-    if: github.event.inputs.linting == true || github.event.pull_request.draft == false
+    if: inputs.linting || github.event.pull_request.draft == false
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
