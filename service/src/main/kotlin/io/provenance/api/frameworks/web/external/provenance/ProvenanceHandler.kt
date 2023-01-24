@@ -18,6 +18,7 @@ import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.models.U
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.UpdateScopeDataAccess
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.scope.ChangeScopeOwnership
+import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipBatchRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
 import io.provenance.api.frameworks.web.SuccessResponses
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
@@ -64,6 +65,15 @@ class ProvenanceHandler(
     suspend fun changeScopeOwnership(req: ServerRequest): ServerResponse = runCatching {
         changeScopeOwnership.execute(
             ChangeScopeOwnershipRequestWrapper(
+                req.getUser(),
+                req.awaitBody(),
+            ).toBatchWrapper()
+        )
+    }.foldToServerResponse()
+
+    suspend fun changeScopeOwnershipBatch(req: ServerRequest): ServerResponse = runCatching {
+        changeScopeOwnership.execute(
+            ChangeScopeOwnershipBatchRequestWrapper(
                 req.getUser(),
                 req.awaitBody(),
             )
