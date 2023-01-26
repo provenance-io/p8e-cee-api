@@ -148,20 +148,22 @@ class ProvenanceService : Provenance {
 
     fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
-            val account = getBaseAccount(pbClient, signer.address())
-            val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
+            synchronized(this) {
+                val account = getBaseAccount(pbClient, signer.address())
+                val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
 
-            runCatching {
-                action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
-            }.fold(
-                onSuccess = {
-                    return it
-                },
-                onFailure = {
-                    cachedOffset.getAndDecrement(account.sequence)
-                    throw it
-                }
-            )
+                runCatching {
+                    action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
+                }.fold(
+                    onSuccess = {
+                        return it
+                    },
+                    onFailure = {
+                        cachedOffset.getAndDecrement(account.sequence)
+                        throw it
+                    }
+                )
+            }
         }
     }
 }
