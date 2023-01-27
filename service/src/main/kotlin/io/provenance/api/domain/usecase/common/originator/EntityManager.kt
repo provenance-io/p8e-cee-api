@@ -26,11 +26,11 @@ class EntityManager(
 
     fun getEntity(args: KeyManagementConfigWrapper): KeyEntity {
         val config = args.config ?: KeyManagementConfig(
-           pluginSpec = VaultSpec(
-               args.entity,
-               "${vaultProperties.address}/${args.entity}",
-               vaultProperties.tokenPath,
-           )
+            pluginSpec = VaultSpec(
+                args.entity,
+                "${vaultProperties.address}/${args.entity}",
+                vaultProperties.tokenPath,
+            )
         )
 
         val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
