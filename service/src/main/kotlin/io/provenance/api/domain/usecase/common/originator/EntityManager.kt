@@ -7,12 +7,12 @@ import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.account.Participant
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.core.KeyType
-import io.provenance.core.Originator
-import io.provenance.core.OriginatorManager
+import io.provenance.core.KeyEntityManager
 import io.provenance.core.Plugin
+import io.provenance.entity.KeyEntity
+import io.provenance.entity.KeyType
 import io.provenance.plugins.vault.VaultSpec
-import java.io.File
+import io.provenance.scope.objectstore.util.toHex
 import java.util.UUID
 import kotlin.reflect.full.createInstance
 import org.springframework.stereotype.Component
@@ -22,18 +22,20 @@ class EntityManager(
     private val vaultProperties: VaultProperties,
     private val provenanceProperties: ProvenanceProperties
 ) {
-    private var manager: OriginatorManager = OriginatorManager()
-    private var tokenMap = mutableMapOf<KeyManagementConfig, String>()
+    private var manager = KeyEntityManager()
 
-    fun getEntity(args: KeyManagementConfigWrapper): Originator {
-
+    fun getEntity(args: KeyManagementConfigWrapper): KeyEntity {
         val config = args.config ?: KeyManagementConfig(
-            vaultProperties.address,
-            vaultProperties.tokenPath,
+           pluginSpec = VaultSpec(
+               args.entity,
+               "${vaultProperties.address}/${args.entity}",
+               vaultProperties.tokenPath,
+           )
         )
 
-        val token = fetchToken(config)
-        return manager.get(args.entity, VaultSpec(args.entity, "${config.address}/${args.entity}", token))
+        val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
+        manager.register(plugin)
+        return manager.get(args.entity, config.pluginSpec)
     }
 
     fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
@@ -48,8 +50,8 @@ class EntityManager(
             val originator = getEntity(KeyManagementConfigWrapper(uuid.toString(), config))
             additionalAudiences.add(
                 AudienceKeyPair(
-                    originator.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
-                    originator.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
+                    originator.publicKey(KeyType.ENCRYPTION).toHex(),
+                    originator.publicKey(KeyType.SIGNING).toHex(),
                 )
             )
         }
@@ -78,39 +80,18 @@ class EntityManager(
         addresses.map {
             getEntity(KeyManagementConfigWrapper(it, keyManagementConfig)).let { entity ->
                 AudienceKeyPair(
-                    entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
-                    entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
+                    entity.publicKey(KeyType.ENCRYPTION).toHex(),
+                    entity.publicKey(KeyType.SIGNING).toHex()
                 )
             }
         }.toSet()
-
-    @Suppress("UnsafeCallOnNullableType")
-    private fun fetchToken(config: KeyManagementConfig): String {
-
-        if (tokenMap.containsKey(config)) {
-            return tokenMap[config]!!
-        }
-
-        val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
-        manager.register(plugin)
-
-        val tokenPath = if (File(config.tokenPath).exists()) {
-            File(config.tokenPath)
-        } else {
-            File(System.getProperty("user.home")).resolve(config.tokenPath)
-        }
-
-        tokenMap[config] = tokenPath.readText(Charsets.UTF_8)
-
-        return tokenMap[config]!!
-    }
 
     private fun getMemberKeyPair(audience: DefaultAudience, keyManagementConfig: KeyManagementConfig): AudienceKeyPair =
         provenanceProperties.members.firstOrNull { it.name == audience }?.let {
             val entity = getEntity(KeyManagementConfigWrapper(it.id, keyManagementConfig))
             AudienceKeyPair(
-                entity.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString(),
-                entity.keys[KeyType.SIGNING_PUBLIC_KEY].toString(),
+                entity.publicKey(KeyType.ENCRYPTION).toHex(),
+                entity.publicKey(KeyType.SIGNING).toHex(),
             )
-        } ?: throw IllegalStateException("Failed to find requested aud")
+        } ?: throw IllegalStateException("Failed to find requested audience")
 }

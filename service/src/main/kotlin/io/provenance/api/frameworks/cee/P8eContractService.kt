@@ -3,14 +3,13 @@ package io.provenance.api.frameworks.cee
 import com.google.protobuf.Message
 import io.provenance.api.domain.cee.ContractService
 import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionException
-import io.provenance.core.KeyType
-import io.provenance.core.Originator
+import io.provenance.entity.KeyEntity
+import io.provenance.entity.KeyType
 import io.provenance.metadata.v1.ScopeResponse
 import io.provenance.scope.contract.proto.Envelopes.Envelope
 import io.provenance.scope.contract.proto.Specifications
 import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.contract.spec.P8eScopeSpecification
-import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ExecutionResult
 import io.provenance.scope.sdk.Session
@@ -34,7 +33,7 @@ class P8eContractService : ContractService {
         records: Map<String, Message>,
         scopeUuid: UUID,
         sessionUuid: UUID?,
-        participants: Map<Specifications.PartyType, Originator>?,
+        participants: Map<Specifications.PartyType, KeyEntity>?,
         scope: ScopeResponse?,
         scopeSpecification: String,
         audiences: Set<PublicKey>
@@ -84,15 +83,15 @@ class P8eContractService : ContractService {
             }
         )
 
-    private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, Originator>?, audiences: Set<PublicKey>): Session =
+    private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, KeyEntity>?, audiences: Set<PublicKey>): Session =
         this.setSessionUuid(sessionUuid ?: UUID.randomUUID())
             .also { records.forEach { record -> it.addProposedRecord(record.key, record.value) } }
             .also {
                 participants?.forEach { participant ->
                     it.addParticipant(
                         participant.key,
-                        participant.value.keys[KeyType.SIGNING_PUBLIC_KEY].toString().toJavaPublicKey(),
-                        participant.value.keys[KeyType.ENCRYPTION_PUBLIC_KEY].toString().toJavaPublicKey()
+                        participant.value.publicKey(KeyType.SIGNING),
+                        participant.value.publicKey(KeyType.ENCRYPTION),
                     )
                 }
             }

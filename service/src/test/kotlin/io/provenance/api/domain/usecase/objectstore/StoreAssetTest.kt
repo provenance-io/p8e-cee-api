@@ -21,11 +21,10 @@ import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.core.Originator
+import io.provenance.entity.KeyEntity
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.toUuid
-import java.security.PrivateKey
 import java.security.PublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import tech.figure.asset.v1beta1.Asset
@@ -43,9 +42,8 @@ class StoreAssetTest : FunSpec({
     val mockObjectStore = mockk<ObjectStore>()
     val mockStoreObject = mockk<StoreObject>(relaxed = true)
     val mockEntityManager = mockk<EntityManager>()
-    val mockOriginator = mockk<Originator>()
+    val mockOriginator = mockk<KeyEntity>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
-    val mockOriginatorPrivateKey = mockk<PrivateKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
     val mockParser = mockk<MessageParser>()
 
@@ -74,11 +72,10 @@ class StoreAssetTest : FunSpec({
     test("happy path") {
         val storeAssetResponse = StoreProtoResponse("HASH", "URI", "BUCKET", "NAME")
 
-        every { mockObjectStore.store(any<OsClient>(), any(), any(), any(), any(), any()) } returns storeAssetResponse
+        every { mockObjectStore.store(any<OsClient>(), any(), any(), any(), any()) } returns storeAssetResponse
         coEvery { mockStoreObject.execute(any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
-        every { mockOriginator.encryptionPublicKey() } returns mockOriginatorPublicKey
-        every { mockOriginator.encryptionPrivateKey() } returns mockOriginatorPrivateKey
+        every { mockOriginator.publicKey(any()) } returns mockOriginatorPublicKey
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
         // Execute enable replication code
@@ -109,7 +106,7 @@ class StoreAssetTest : FunSpec({
     }
 
     test("exception when public key is not set") {
-        every { mockOriginator.encryptionPublicKey() } returns FakeKey()
+        every { mockOriginator.publicKey(any()) } returns FakeKey()
         every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
@@ -131,7 +128,7 @@ class StoreAssetTest : FunSpec({
     }
 })
 
-class FakeKey : java.security.Key {
+class FakeKey : PublicKey {
     override fun getAlgorithm(): String {
         TODO("Not yet implemented")
     }

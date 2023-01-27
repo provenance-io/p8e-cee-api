@@ -1,10 +1,10 @@
 package io.provenance.api.domain.objectStore
 
 import io.provenance.api.models.eos.store.StoreProtoResponse
-import java.security.PrivateKey
+import io.provenance.scope.encryption.model.KeyRef
 import java.security.PublicKey
 
 interface ObjectStore {
-    fun <T> retrieveAndDecrypt(client: T, hash: String, publicKey: PublicKey, privateKey: PrivateKey): ByteArray
-    fun <T> store(client: T, message: ByteArray, publicKey: PublicKey, privateKey: PrivateKey, additionalAudiences: Set<PublicKey>, type: String?): StoreProtoResponse
+    fun <T> retrieveAndDecrypt(client: T, hash: String, keyRef: KeyRef): ByteArray
+    fun <T> store(client: T, message: ByteArray, keyRef: KeyRef, additionalAudiences: Set<PublicKey>, type: String?): StoreProtoResponse
 }

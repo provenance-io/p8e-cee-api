@@ -7,13 +7,8 @@ import io.provenance.api.domain.usecase.common.originator.models.KeyManagementCo
 import io.provenance.api.domain.usecase.provenance.account.models.GetSignerRequest
 import io.provenance.api.frameworks.config.ProvenanceProperties
 import io.provenance.client.grpc.Signer
-import io.provenance.hdwallet.common.hashing.sha256
-import io.provenance.hdwallet.ec.extensions.toECPrivateKey
-import io.provenance.hdwallet.signer.BCECSigner
-import io.provenance.scope.encryption.util.getAddress
+import io.provenance.entity.KeyType
 import io.provenance.scope.util.toByteString
-import java.security.PrivateKey
-import java.security.PublicKey
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
 import org.springframework.stereotype.Component
 
@@ -22,25 +17,17 @@ class GetSigner(
     private val entityManager: EntityManager,
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<GetSignerRequest, Signer>() {
-    override suspend fun execute(args: GetSignerRequest): Signer {
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
+    override suspend fun execute(args: GetSignerRequest): Signer =
+        entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig)).let {
+            object : Signer {
+                override fun address(): String = it.address(KeyType.SIGNING, provenanceProperties.mainnet)
 
-        return (originator.signingPublicKey() as PublicKey).let { public ->
-            (originator.signingPrivateKey() as PrivateKey).let { private ->
-                object : Signer {
-                    override fun address(): String = public.getAddress(provenanceProperties.mainnet)
+                override fun pubKey(): Keys.PubKey =
+                    Keys.PubKey.newBuilder()
+                        .setKey((it.publicKey(KeyType.SIGNING) as BCECPublicKey).q.getEncoded(true).toByteString())
+                        .build()
 
-                    override fun pubKey(): Keys.PubKey =
-                        Keys.PubKey.newBuilder()
-                            .setKey((public as BCECPublicKey).q.getEncoded(true).toByteString())
-                            .build()
-
-                    override fun sign(data: ByteArray): ByteArray =
-                        BCECSigner().sign(private.toECPrivateKey(), data.sha256())
-                            .encodeAsBTC()
-                            .toByteArray()
-                }
+                override fun sign(data: ByteArray): ByteArray = it.sign(KeyType.SIGNING, data)
             }
         }
-    }
 }
