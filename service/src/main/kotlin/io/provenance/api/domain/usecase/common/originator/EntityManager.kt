@@ -11,9 +11,8 @@ import io.provenance.core.KeyEntityManager
 import io.provenance.core.Plugin
 import io.provenance.entity.KeyEntity
 import io.provenance.entity.KeyType
-import io.provenance.plugins.vault.VaultSpec
+import io.provenance.plugins.vault.VaultConfig
 import io.provenance.scope.objectstore.util.toHex
-import java.util.UUID
 import kotlin.reflect.full.createInstance
 import org.springframework.stereotype.Component
 
@@ -26,8 +25,7 @@ class EntityManager(
 
     fun getEntity(args: KeyManagementConfigWrapper): KeyEntity {
         val config = args.config ?: KeyManagementConfig(
-            pluginSpec = VaultSpec(
-                args.entity,
+            pluginConfig = VaultConfig(
                 "${vaultProperties.address}/${args.entity}",
                 vaultProperties.tokenPath,
             )
@@ -35,34 +33,35 @@ class EntityManager(
 
         val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
         manager.register(plugin)
-        return manager.get(args.entity, config.pluginSpec)
+        return manager.get(args.entity, config.pluginConfig)
     }
 
     fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
-
         val additionalAudiences: MutableSet<AudienceKeyPair> = mutableSetOf()
-        val config = keyManagementConfig ?: KeyManagementConfig(
-            vaultProperties.address,
-            vaultProperties.tokenPath,
-        )
 
-        fun getEntityKeys(uuid: UUID) {
-            val originator = getEntity(KeyManagementConfigWrapper(uuid.toString(), config))
+        // Populate participants into the audience list
+        participants.forEach { participant ->
+            val keyEntity = getEntity(KeyManagementConfigWrapper(participant.uuid.toString(), keyManagementConfig))
+
             additionalAudiences.add(
                 AudienceKeyPair(
-                    originator.publicKey(KeyType.ENCRYPTION).toHex(),
-                    originator.publicKey(KeyType.SIGNING).toHex(),
+                    keyEntity.publicKey(KeyType.ENCRYPTION).toHex(),
+                    keyEntity.publicKey(KeyType.SIGNING).toHex(),
                 )
             )
         }
 
-        participants.forEach { participant ->
-            getEntityKeys(participant.uuid)
-        }
-
+        // Populate the audiences into the audience list
         permissions?.audiences?.forEach {
             it.uuid?.let { entity ->
-                getEntityKeys(entity)
+                val keyEntity = getEntity(KeyManagementConfigWrapper(entity.toString(), keyManagementConfig))
+
+                additionalAudiences.add(
+                    AudienceKeyPair(
+                        keyEntity.publicKey(KeyType.ENCRYPTION).toHex(),
+                        keyEntity.publicKey(KeyType.SIGNING).toHex(),
+                    )
+                )
             } ?: apply {
                 it.keys?.let { keys ->
                     additionalAudiences.add(keys)
@@ -70,8 +69,9 @@ class EntityManager(
             }
         }
 
-        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.PORTFOLIO_MANAGER, config))
-        if (permissions?.permissionDart == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.DART, config))
+        // DART and Portfolio specific permissioning
+        if (permissions?.permissionPortfolioManager == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.PORTFOLIO_MANAGER, keyManagementConfig))
+        if (permissions?.permissionDart == true) additionalAudiences.add(getMemberKeyPair(DefaultAudience.DART, keyManagementConfig))
 
         return additionalAudiences
     }
@@ -86,7 +86,7 @@ class EntityManager(
             }
         }.toSet()
 
-    private fun getMemberKeyPair(audience: DefaultAudience, keyManagementConfig: KeyManagementConfig): AudienceKeyPair =
+    private fun getMemberKeyPair(audience: DefaultAudience, keyManagementConfig: KeyManagementConfig? = null): AudienceKeyPair =
         provenanceProperties.members.firstOrNull { it.name == audience }?.let {
             val entity = getEntity(KeyManagementConfigWrapper(it.id, keyManagementConfig))
             AudienceKeyPair(

@@ -32,7 +32,7 @@ object Versions {
     const val ProvenanceHdWallet = "0.1.15"
     const val ProvenanceClient = "1.1.1"
     const val Unirest = "3.13.6"
-    const val KeyAccessLib = "0.2.19"
+    const val KmsConnector = "0.3.0"
     const val LoanPackage = "0.6.1"
     const val Grpc = "1.45.0"
     const val ProvenanceProto = "1.11.1"
@@ -164,7 +164,7 @@ object Dependencies {
     }
 
     object Provenance {
-        val KeyAccessLib = DependencySpec("io.provenance.originator-key-access-lib:lib", Versions.KeyAccessLib)
+        val KeyAccessLib = DependencySpec("io.provenance.kms-connector:lib", Versions.KmsConnector)
         val ProtoKotlin = DependencySpec("io.provenance:proto-kotlin", Versions.ProvenanceProto)
         val AssetModel = DependencySpec("io.provenance.model:metadata-asset-model", Versions.AssetModel)
         val LoanPackage = DependencySpec("io.provenance.loan-package:contract", Versions.LoanPackage)
