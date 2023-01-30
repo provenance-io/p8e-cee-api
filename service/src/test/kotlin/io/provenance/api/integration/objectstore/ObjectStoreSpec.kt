@@ -11,6 +11,7 @@ import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.util.toPrettyJson
+import io.provenance.plugins.vault.VaultSpec
 import io.provenance.scope.util.toUuid
 import java.util.UUID
 import tech.figure.asset.v1beta1.Asset
@@ -43,8 +44,11 @@ class ObjectStoreSpec(
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
-                                vaultAddress,
-                                "src/test/resources/vault/token.output"
+                                pluginSpec = VaultSpec(
+                                    entities.first().toString(),
+                                    "${vaultAddress}/${entities.first()}",
+                                    "src/test/resources/vault/token.output"
+                                )
                             )
                         )
                     )
@@ -60,8 +64,11 @@ class ObjectStoreSpec(
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
-                                vaultAddress,
-                                "src/test/resources/vault/token.output"
+                                pluginSpec = VaultSpec(
+                                    entities.first().toString(),
+                                    "${vaultAddress}/${entities.first()}",
+                                    "src/test/resources/vault/token.output"
+                                )
                             )
                         )
                     )
