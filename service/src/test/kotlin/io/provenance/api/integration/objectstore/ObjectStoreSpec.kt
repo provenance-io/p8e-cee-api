@@ -45,7 +45,7 @@ class ObjectStoreSpec(
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
                                 pluginConfig = VaultConfig(
-                                    "${vaultAddress}/${entities.first()}",
+                                    "$vaultAddress/${entities.first()}",
                                     "src/test/resources/vault/token.output"
                                 )
                             )
@@ -64,7 +64,7 @@ class ObjectStoreSpec(
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
                                 pluginConfig = VaultConfig(
-                                    "${vaultAddress}/${entities.first()}",
+                                    "$vaultAddress/${entities.first()}",
                                     "src/test/resources/vault/token.output"
                                 )
                             )
