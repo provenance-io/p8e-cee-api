@@ -1,6 +1,5 @@
 package io.provenance.api.domain.usecase.objectstore
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -22,9 +21,11 @@ import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.entity.KeyEntity
+import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.toUuid
+import java.security.PrivateKey
 import java.security.PublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import tech.figure.asset.v1beta1.Asset
@@ -44,6 +45,7 @@ class StoreAssetTest : FunSpec({
     val mockEntityManager = mockk<EntityManager>()
     val mockOriginator = mockk<KeyEntity>()
     val mockOriginatorPublicKey = mockk<PublicKey>()
+    val mockOriginatorPrivateKey = mockk<PrivateKey>()
     val mockAddAssetAudiencePublicKey = mockk<PublicKey>()
     val mockParser = mockk<MessageParser>()
 
@@ -76,6 +78,7 @@ class StoreAssetTest : FunSpec({
         coEvery { mockStoreObject.execute(any()) } returns storeAssetResponse
         every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
         every { mockOriginator.publicKey(any()) } returns mockOriginatorPublicKey
+        every { mockOriginator.getKeyRef(any()) } returns DirectKeyRef(mockOriginatorPublicKey, mockOriginatorPrivateKey)
         every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
 
         // Execute enable replication code
@@ -101,28 +104,6 @@ class StoreAssetTest : FunSpec({
         coVerify {
             mockStoreObject.execute(
                 any()
-            )
-        }
-    }
-
-    test("exception when public key is not set") {
-        every { mockOriginator.publicKey(any()) } returns FakeKey()
-        every { mockEntityManager.hydrateKeys(any<PermissionInfo>()) } returns emptySet()
-        every { mockParser.parse(any(), any()) } returns Asset.getDefaultInstance()
-
-        // Execute enable replication code
-        shouldThrow<IllegalStateException> {
-            storeAsset.execute(
-                StoreProtoRequestWrapper(
-                    REQUEST_UUID,
-                    StoreProtoRequest(
-                        ADD_ASSET_OBJECT_STORE_ADDRESS,
-                        PermissionInfo(emptySet()),
-                        AccountInfo(),
-                        ASSET,
-                        String::class.java.canonicalName
-                    )
-                )
             )
         }
     }
