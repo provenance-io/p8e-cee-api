@@ -18,16 +18,16 @@ class GetSigner(
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<GetSignerRequest, Signer>() {
     override suspend fun execute(args: GetSignerRequest): Signer =
-        entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig)).let {
+        entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig)).let { entity ->
             object : Signer {
-                override fun address(): String = it.address(KeyType.SIGNING, provenanceProperties.mainnet)
+                override fun address(): String = entity.address(KeyType.SIGNING, provenanceProperties.mainnet)
 
                 override fun pubKey(): Keys.PubKey =
                     Keys.PubKey.newBuilder()
-                        .setKey((it.publicKey(KeyType.SIGNING) as BCECPublicKey).q.getEncoded(true).toByteString())
+                        .setKey((entity.publicKey(KeyType.SIGNING) as BCECPublicKey).q.getEncoded(true).toByteString())
                         .build()
 
-                override fun sign(data: ByteArray): ByteArray = it.sign(KeyType.SIGNING, data)
+                override fun sign(data: ByteArray): ByteArray = entity.sign(KeyType.SIGNING, data)
             }
         }
 }
