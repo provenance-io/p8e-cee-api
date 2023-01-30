@@ -5,16 +5,13 @@ import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequ
 import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
 import io.provenance.api.frameworks.config.ProvenanceProperties
-import io.provenance.scope.encryption.model.DirectKeyRef
+import io.provenance.entity.KeyType
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Affiliate
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.ClientConfig
 import io.provenance.scope.sdk.SharedClient
 import java.net.URI
-import java.security.KeyPair
-import java.security.PrivateKey
-import java.security.PublicKey
 import java.util.concurrent.TimeUnit
 import org.springframework.stereotype.Component
 
@@ -26,8 +23,8 @@ class CreateClient(
     override suspend fun execute(args: CreateClientRequest): Client {
         val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
         val affiliate = Affiliate(
-            signingKeyRef = DirectKeyRef(KeyPair(originator.signingPublicKey() as PublicKey, originator.signingPrivateKey() as PrivateKey)),
-            encryptionKeyRef = DirectKeyRef(KeyPair(originator.encryptionPublicKey() as PublicKey, originator.encryptionPrivateKey() as PrivateKey)),
+            signingKeyRef = originator.getKeyRef(KeyType.SIGNING),
+            encryptionKeyRef = originator.getKeyRef(KeyType.ENCRYPTION),
             args.account.partyType,
         )
 

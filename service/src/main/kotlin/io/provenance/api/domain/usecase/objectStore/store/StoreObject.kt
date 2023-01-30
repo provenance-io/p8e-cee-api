@@ -33,8 +33,7 @@ class StoreObject(
             return objectStore.store(
                 client,
                 args.bytes,
-                args.publicKey,
-                args.privateKey,
+                args.keyRef,
                 additionalAudiences.map { it.encryptionKey.toJavaPublicKey() }.toSet(),
                 args.type
             )

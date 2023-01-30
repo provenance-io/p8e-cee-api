@@ -10,8 +10,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.util.awaitAllBytes
-import java.security.PrivateKey
-import java.security.PublicKey
+import io.provenance.entity.KeyType
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
@@ -28,12 +27,7 @@ class StoreFile(
 ) : AbstractUseCase<StoreFileRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse {
         val (account, permissions, objectStoreAddress, storeRawBytes, id, file, type) = getParams(args.request)
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), account?.keyManagementConfig))
-        val publicKey = (originator.encryptionPublicKey() as? PublicKey)
-            ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
-
-        val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
-            ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), account?.keyManagementConfig))
 
         return file.awaitAllBytes().map { bytes ->
             storeObject.executeBlocking(
@@ -51,8 +45,7 @@ class StoreFile(
                     type,
                     objectStoreAddress,
                     args.useObjectStoreGateway,
-                    publicKey,
-                    privateKey,
+                    entity.getKeyRef(KeyType.ENCRYPTION),
                     permissions,
                     account ?: AccountInfo()
                 )

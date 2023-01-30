@@ -21,6 +21,7 @@ dependencies {
         Dependencies.Jackson.Databind,
         Dependencies.AssetClassification.Client,
         Dependencies.AssetClassification.Verifier,
+        Dependencies.Provenance.KeyAccessLib,
     ).forEach { dep ->
         dep.implementation(this)
     }

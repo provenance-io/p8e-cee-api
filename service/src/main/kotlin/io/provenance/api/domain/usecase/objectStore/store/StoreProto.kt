@@ -7,8 +7,7 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreObjectRequ
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.cee.parsers.MessageParser
 import io.provenance.api.models.eos.store.StoreProtoResponse
-import java.security.PrivateKey
-import java.security.PublicKey
+import io.provenance.entity.KeyType
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,12 +18,7 @@ class StoreProto(
 ) : AbstractUseCase<StoreProtoRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreProtoRequestWrapper): StoreProtoResponse {
         val asset = parser.parse(args.request.message, Class.forName(args.request.type))
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.request.account.keyManagementConfig))
-        val publicKey = (originator.encryptionPublicKey() as? PublicKey)
-            ?: throw IllegalStateException("Public key was not present for originator: ${args.uuid}")
-
-        val privateKey = (originator.encryptionPrivateKey() as? PrivateKey)
-            ?: throw IllegalStateException("Private key was not present for originator: ${args.uuid}")
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.request.account.keyManagementConfig))
 
         return storeObject.execute(
             StoreObjectRequest(
@@ -32,8 +26,7 @@ class StoreProto(
                 args.request.type,
                 args.request.objectStoreAddress,
                 args.useObjectStoreGateway,
-                publicKey,
-                privateKey,
+                entity.getKeyRef(KeyType.ENCRYPTION),
                 args.request.permissions,
                 args.request.account,
             )
