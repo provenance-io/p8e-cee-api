@@ -101,7 +101,7 @@ fun Any.toFeeGrantAllowance(): Allowance =
                 .let {
                     FeeGrantAllowedMsgAllowance(it.allowance.toFeeGrantAllowance(), it.allowedMessagesList)
                 }
-        else -> throw IllegalStateException("No valid allowances exist for specified fee grant.")
+        else -> throw IllegalStateException("Invalid feegrant type: ${this.typeUrl}")
     }
 
 fun List<CoinOuterClass.Coin>.toCoinList() = this.map { Coin(it.amount, it.denom) }
