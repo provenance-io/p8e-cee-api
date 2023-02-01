@@ -17,10 +17,10 @@ import io.provenance.api.frameworks.provenance.SingleTx
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.tx.permissions.fees.Allowance
 import io.provenance.api.models.p8e.tx.permissions.fees.Coin
-import io.provenance.api.models.p8e.tx.permissions.fees.get.GetFeeGrantResponse
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantAllowedMsgAllowance
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantBasicAllowance
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantPeriodicAllowance
+import io.provenance.api.models.p8e.tx.permissions.fees.get.GetFeeGrantResponse
 import io.provenance.client.grpc.PbClient
 import io.provenance.client.protobuf.extensions.getBaseAccount
 import io.provenance.scope.contract.proto.Contracts
@@ -78,9 +78,9 @@ fun Message.toAny(typeUrlPrefix: String = ""): Any = Any.pack(this, typeUrlPrefi
 
 fun Iterable<Message>.toAny(typeUrlPrefix: String = ""): List<Any> = this.map { msg -> Any.pack(msg, typeUrlPrefix) }
 
-fun Feegrant.Grant.toModel() = GetFeeGrantResponse(granter, grantee, allowance.toFeegrantAllowance())
+fun Feegrant.Grant.toModel() = GetFeeGrantResponse(granter, grantee, allowance.toFeeGrantAllowance())
 
-fun Any.toFeegrantAllowance(): Allowance? =
+fun Any.toFeeGrantAllowance(): Allowance =
     when {
         this.typeUrl.endsWith("v1beta1.BasicAllowance") ->
             this.unpack(Feegrant.BasicAllowance::class.java)
@@ -99,9 +99,9 @@ fun Any.toFeegrantAllowance(): Allowance? =
         this.typeUrl.endsWith("v1beta1.AllowedMsgAllowance") ->
             this.unpack(Feegrant.AllowedMsgAllowance::class.java)
                 .let {
-                    FeeGrantAllowedMsgAllowance(it.allowance.toFeegrantAllowance()!!, it.allowedMessagesList)
+                    FeeGrantAllowedMsgAllowance(it.allowance.toFeeGrantAllowance(), it.allowedMessagesList)
                 }
-        else -> null.also { logger.error("Invalid feegrant type: ${this.typeUrl}") }
+        else -> throw IllegalStateException("No valid allowances exist for specified fee grant.")
     }
 
 fun List<CoinOuterClass.Coin>.toCoinList() = this.map { Coin(it.amount, it.denom) }
