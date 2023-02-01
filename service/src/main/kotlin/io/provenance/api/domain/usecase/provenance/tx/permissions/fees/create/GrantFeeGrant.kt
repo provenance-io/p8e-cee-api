@@ -39,13 +39,18 @@ class GrantFeeGrant(
 
         val allowanceMsg = when (allowance) {
             is FeeGrantBasicAllowance -> buildBasicAllowance(allowance.spendLimit, allowance.expiration)
-            is FeeGrantPeriodicAllowance -> buildPeriodicAllowance(allowance.periodSpendLimit, allowance.feeGrantBasicAllowance?.spendLimit, allowance.feeGrantBasicAllowance?.expiration)
+            is FeeGrantPeriodicAllowance -> buildPeriodicAllowance(
+                allowance.periodSpendLimit,
+                allowance.feeGrantBasicAllowance?.spendLimit,
+                allowance.feeGrantBasicAllowance?.expiration,
+                allowance.period
+            )
             is FeeGrantAllowedMsgAllowance -> buildAllowedMsgAllowance(allowance.allowedMsgTypes, allowance.allowance)
         }.toAny()
 
         val message = MsgGrantAllowance.newBuilder()
             .setAllowance(allowanceMsg)
-            .setGrantee(args.request.grantee)
+            .setGrantee(args.request.grant.grantee)
             .setGranter(signer.address())
             .build()
             .toAny()
@@ -68,10 +73,11 @@ class GrantFeeGrant(
         periodSpendLimit: List<Coin>,
         totalSpendLimit: List<Coin>?,
         expirationDate: OffsetDateTime?,
+        duration: String,
     ) =
         PeriodicAllowance.newBuilder().apply {
             basic = buildBasicAllowance(totalSpendLimit, expirationDate)
-            period = Duration.newBuilder().build()
+            period = Duration.newBuilder().setSeconds(duration.toLong()).build()
             addAllPeriodSpendLimit(periodSpendLimit.toProtoSpendLimit())
         }.build()
 
@@ -82,11 +88,16 @@ class GrantFeeGrant(
         }.build()
 
     private fun buildAllowance(
-        allowance: Allowance
+        allowance: Allowance,
     ) =
         when (allowance) {
             is FeeGrantBasicAllowance -> buildBasicAllowance(allowance.spendLimit, allowance.expiration)
-            is FeeGrantPeriodicAllowance -> buildPeriodicAllowance(allowance.periodSpendLimit, allowance.feeGrantBasicAllowance?.spendLimit, allowance.feeGrantBasicAllowance?.expiration)
-            else -> throw java.lang.IllegalArgumentException("")
+            is FeeGrantPeriodicAllowance -> buildPeriodicAllowance(
+                allowance.periodSpendLimit,
+                allowance.feeGrantBasicAllowance?.spendLimit,
+                allowance.feeGrantBasicAllowance?.expiration,
+                allowance.period
+            )
+            else -> throw IllegalArgumentException("Inner allowance must not be of type AllowedMsgAllowance!")
         }
 }

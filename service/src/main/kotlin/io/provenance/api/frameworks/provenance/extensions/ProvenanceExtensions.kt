@@ -17,7 +17,7 @@ import io.provenance.api.frameworks.provenance.SingleTx
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.tx.permissions.fees.Allowance
 import io.provenance.api.models.p8e.tx.permissions.fees.Coin
-import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrant
+import io.provenance.api.models.p8e.tx.permissions.fees.get.GetFeeGrantResponse
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantAllowedMsgAllowance
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantBasicAllowance
 import io.provenance.api.models.p8e.tx.permissions.fees.FeeGrantPeriodicAllowance
@@ -78,7 +78,7 @@ fun Message.toAny(typeUrlPrefix: String = ""): Any = Any.pack(this, typeUrlPrefi
 
 fun Iterable<Message>.toAny(typeUrlPrefix: String = ""): List<Any> = this.map { msg -> Any.pack(msg, typeUrlPrefix) }
 
-fun Feegrant.Grant.toModel() = FeeGrant(granter, grantee, allowance.toFeegrantAllowance())
+fun Feegrant.Grant.toModel() = GetFeeGrantResponse(granter, grantee, allowance.toFeegrantAllowance())
 
 fun Any.toFeegrantAllowance(): Allowance? =
     when {
