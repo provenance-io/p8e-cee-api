@@ -17,6 +17,12 @@ import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.UpdateAu
 import io.provenance.api.domain.usecase.provenance.tx.permissions.authz.models.UpdateAuthzRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.UpdateScopeDataAccess
 import io.provenance.api.domain.usecase.provenance.tx.permissions.dataAccess.models.UpdateScopeDataAccessRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.create.GrantFeeGrant
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.create.models.GrantFeeGrantRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.get.GetFeeGrant
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.get.models.GetFeeGrantAllowanceRequestWrapper
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.revoke.RevokeFeeGrant
+import io.provenance.api.domain.usecase.provenance.tx.permissions.fees.revoke.models.RevokeFeeGrantRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.scope.ChangeScopeOwnership
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipBatchRequestWrapper
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
@@ -25,6 +31,7 @@ import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getUser
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.query.QueryScopeRequest
+import io.provenance.api.models.p8e.tx.permissions.fees.get.GetFeeGrantAllowanceRequest
 import io.provenance.scope.util.toUuid
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -45,6 +52,9 @@ class ProvenanceHandler(
     private val updateDataAccess: UpdateScopeDataAccess,
     private val updateAuthzGrant: UpdateAuthzGrant,
     private val getSigner: GetSigner,
+    private val getFeeGrant: GetFeeGrant,
+    private val grantFeeGrant: GrantFeeGrant,
+    private val revokeFeeGrant: RevokeFeeGrant,
 ) {
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
         executeTx.execute(ExecuteTxRequestWrapper(req.getUser(), req.awaitBody()))
@@ -146,4 +156,36 @@ class ProvenanceHandler(
             SuccessResponses.ok(false)
         }
     )
+
+    suspend fun createFeesGrant(req: ServerRequest): ServerResponse = runCatching {
+        grantFeeGrant.execute(
+            GrantFeeGrantRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun revokeFeesGrant(req: ServerRequest): ServerResponse = runCatching {
+        revokeFeeGrant.execute(
+            RevokeFeeGrantRequestWrapper(
+                req.getUser(),
+                req.awaitBody()
+            )
+        )
+    }.foldToServerResponse()
+
+    suspend fun getFeeGrant(req: ServerRequest): ServerResponse = runCatching {
+        getFeeGrant.execute(
+            GetFeeGrantAllowanceRequestWrapper(
+                req.getUser(),
+                GetFeeGrantAllowanceRequest(
+                    nodeEndpoint = req.queryParam("nodeEndpoint").get(),
+                    chainId = req.queryParam("chainId").get(),
+                    granter = req.queryParam("granter").get(),
+                    grantee = req.queryParam("grantee").get(),
+                )
+            )
+        )
+    }.foldToServerResponse()
 }

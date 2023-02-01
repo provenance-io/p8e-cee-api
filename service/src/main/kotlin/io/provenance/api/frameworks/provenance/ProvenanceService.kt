@@ -76,7 +76,7 @@ class ProvenanceService : Provenance {
             val baseSigner = BaseReqSigner(
                 signer,
                 account = account,
-                sequenceOffset = offset
+                sequenceOffset = offset,
             )
 
             val tx = messages.toTxBody(pbClient)
@@ -85,7 +85,8 @@ class ProvenanceService : Provenance {
                 txBody = tx,
                 signers = listOf(baseSigner),
                 gasAdjustment = config.gasAdjustment,
-                mode = config.broadcastMode
+                mode = config.broadcastMode,
+                feeGranter = config.feeGranter
             )
 
             if (result.isError()) {
@@ -146,7 +147,7 @@ class ProvenanceService : Provenance {
             )
         }.txResponse.toTxResponse()
 
-    fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
+    private fun tryAction(config: ProvenanceConfig, signer: Signer, action: (pbClient: PbClient, account: Auth.BaseAccount, offset: Int) -> ServiceOuterClass.BroadcastTxResponse): ServiceOuterClass.BroadcastTxResponse {
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             synchronized(this) {
                 val account = getBaseAccount(pbClient, signer.address())

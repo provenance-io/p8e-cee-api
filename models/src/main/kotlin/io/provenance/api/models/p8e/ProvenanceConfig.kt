@@ -6,5 +6,6 @@ data class ProvenanceConfig(
     val chainId: String,
     val nodeEndpoint: String,
     val gasAdjustment: Double? = 1.5,
-    val broadcastMode: ServiceOuterClass.BroadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK
+    val broadcastMode: ServiceOuterClass.BroadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+    val feeGranter: String? = null,
 )
