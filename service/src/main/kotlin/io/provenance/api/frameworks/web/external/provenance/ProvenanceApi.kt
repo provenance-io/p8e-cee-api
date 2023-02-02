@@ -387,7 +387,14 @@ class ProvenanceApi {
                 }
             }
             POST("/verify", handler::verifyAsset)
-            PATCH("/permissions/authz", handler::updateAuthz)
+            "/permissions".nest {
+                PATCH("/authz", handler::updateAuthz)
+                "/fee".nest {
+                    POST("/grant", handler::createFeesGrant)
+                    GET("/grant", handler::getFeeGrant)
+                    POST("/revoke", handler::revokeFeesGrant)
+                }
+            }
             GET("/custody", handler::checkCustody)
         }
     }
