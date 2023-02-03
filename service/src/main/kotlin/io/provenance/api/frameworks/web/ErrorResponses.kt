@@ -1,5 +1,6 @@
 package io.provenance.api.frameworks.web
 
+import io.provenance.api.domain.usecase.common.errors.ForbiddenError
 import io.provenance.api.domain.usecase.common.errors.NotFoundError
 import io.provenance.api.domain.usecase.common.errors.ServerError
 import io.provenance.api.frameworks.provenance.exceptions.ContractExecutionBatchException
@@ -21,6 +22,9 @@ object ErrorResponses {
     private suspend fun badRequest(cause: Throwable) =
         ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValueAndAwait(cause.localizedMessage)
 
+    private suspend fun forbidden(cause: Throwable) =
+        ServerResponse.status(HttpStatus.FORBIDDEN).bodyValueAndAwait(cause.localizedMessage)
+
     private suspend fun notFound(cause: Throwable) =
         ServerResponse.status(HttpStatus.NOT_FOUND).bodyValueAndAwait(cause.localizedMessage)
 
@@ -35,6 +39,7 @@ object ErrorResponses {
         return when (cause) {
             is NotFoundError -> notFound(cause)
             is IllegalArgumentException -> badRequest(cause)
+            is ForbiddenError -> forbidden(cause)
             is ContractExecutionException -> badRequest(cause)
             is ContractExecutionBatchException -> badRequest(cause)
             is ServerError -> serverError(cause)
