@@ -23,7 +23,7 @@ object Versions {
     const val Mockk = "1.13.4"
     const val Kotest = "5.5.5"
     const val KotestExtensionsArrow = "1.2.+"
-    const val KotestSpring = "1.1.1"
+    const val KotestSpring = "1.1.2"
     const val KotlinFaker = "1.7.1"
     const val SpringMockk = "3.0.1"
     const val Swagger = "1.6.2"
