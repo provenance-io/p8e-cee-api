@@ -41,7 +41,7 @@ object Versions {
     const val BouncyCastle = "1.70"
     const val OpenApi = "1.5.13"
     const val TestContainer = "1.3.3"
-    const val AssetClassification = "3.6.1"
+    const val AssetClassification = "3.7.0"
     const val OsGateway = "3.3.0"
 }
 
