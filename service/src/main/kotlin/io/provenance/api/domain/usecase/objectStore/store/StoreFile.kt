@@ -11,14 +11,16 @@ import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.util.awaitAllBytes
 import io.provenance.entity.KeyType
+import io.provenance.scope.util.toUuid
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
 import org.springframework.stereotype.Component
-import tech.figure.asset.v1beta1.AssetOuterClassBuilders
+import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
+import tech.figure.proto.util.toProtoUUID
 
 @Component
 class StoreFile(
@@ -33,15 +35,15 @@ class StoreFile(
             storeObject.executeBlocking(
                 StoreObjectRequest(
                     if (!storeRawBytes)
-                        AssetOuterClassBuilders.Asset {
-                            idBuilder.value = id
-                            this.type = FileNFT.ASSET_TYPE
-                            description = file.filename()
-                            putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
-                            putKv(FileNFT.KEY_BYTES, bytes.toProtoAny())
-                            putKv(FileNFT.KEY_SIZE, bytes.size.toString().toProtoAny())
-                            putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
-                        }.toByteArray() else bytes,
+                        Asset.newBuilder().also {
+                            it.id = id.toUuid().toProtoUUID()
+                            it.type = FileNFT.ASSET_TYPE
+                            it.description = file.filename()
+                            it.putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
+                            it.putKv(FileNFT.KEY_BYTES, bytes.toProtoAny())
+                            it.putKv(FileNFT.KEY_SIZE, bytes.size.toString().toProtoAny())
+                            it.putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
+                        }.build().toByteArray() else bytes,
                     type,
                     objectStoreAddress,
                     args.useObjectStoreGateway,
