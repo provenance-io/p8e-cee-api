@@ -43,7 +43,6 @@ dependencies {
         Dependencies.P8eScope.OsClient,
         Dependencies.P8eScope.Sdk,
         Dependencies.P8eScope.Util,
-        Dependencies.Provenance.AssetModel,
         Dependencies.Provenance.KeyAccessLib,
         Dependencies.Provenance.HdWallet.HdWallet,
         Dependencies.Provenance.HdWallet.HdWalletBip39,
@@ -69,6 +68,12 @@ dependencies {
 
     ).forEach { dep ->
         dep.implementation(this)
+    }
+
+    implementation(Dependencies.Provenance.AssetModel.toDependencyNotation()) {
+        version {
+            strictly(Versions.AssetModel)
+        }
     }
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
