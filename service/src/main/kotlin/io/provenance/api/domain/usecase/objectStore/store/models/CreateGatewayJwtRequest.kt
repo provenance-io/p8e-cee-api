@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.objectStore.store.models
 
 import io.provenance.api.models.account.KeyManagementConfig
-import java.util.UUID
+import io.provenance.api.models.user.UserID
 
 data class CreateGatewayJwtRequest(
-    val uuid: UUID,
+    val userID: UserID,
     val keyManagementConfig: KeyManagementConfig?
 )

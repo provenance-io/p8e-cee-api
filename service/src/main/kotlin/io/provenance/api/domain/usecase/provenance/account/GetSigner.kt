@@ -18,7 +18,7 @@ class GetSigner(
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<GetSignerRequest, Signer>() {
     override suspend fun execute(args: GetSignerRequest): Signer =
-        entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig)).let { entity ->
+        entityManager.getEntity(KeyManagementConfigWrapper(args.entity, args.account.keyManagementConfig)).let { entity ->
             object : Signer {
                 override fun address(): String = entity.address(KeyType.SIGNING, provenanceProperties.mainnet)
 

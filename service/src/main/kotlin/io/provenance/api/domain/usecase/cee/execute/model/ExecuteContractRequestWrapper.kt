@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.cee.execute.model
 
+import io.provenance.api.models.user.UserID
 import io.provenance.api.models.cee.execute.ExecuteContractRequest
-import java.util.UUID
 
 data class ExecuteContractRequestWrapper(
-    val uuid: UUID,
+    val userID: UserID,
     val request: ExecuteContractRequest,
 )

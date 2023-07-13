@@ -27,9 +27,16 @@ class ExecuteContract(
 ) : AbstractUseCase<ExecuteContractRequestWrapper, ContractExecutionResponse>() {
 
     override suspend fun execute(args: ExecuteContractRequestWrapper): ContractExecutionResponse {
-        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.additionalParticipants, args.request.config).use { client ->
-            val session = contractUtilities.createSession(args.uuid, client, args.request.permissions, args.request.additionalParticipants, args.request.config, args.request.records, listOf(args.request.scope)).single()
+        val signer = getSigner.execute(GetSignerRequest(args.userID, args.request.config.account))
+        contractUtilities.createClient(args.userID, args.request.permissions, args.request.additionalParticipants, args.request.config).use { client ->
+            val session = contractUtilities.createSession(
+                client = client,
+                permissions = args.request.permissions,
+                participants = args.request.additionalParticipants,
+                config = args.request.config,
+                records = args.request.records,
+                scopes = listOf(args.request.scope)
+            ).single()
 
             return when (val result = contractService.executeContract(client, session)) {
                 is SignedResult -> {

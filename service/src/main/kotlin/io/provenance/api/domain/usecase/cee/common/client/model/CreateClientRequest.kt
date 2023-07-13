@@ -1,12 +1,12 @@
 package io.provenance.api.domain.usecase.cee.common.client.model
 
+import io.provenance.api.models.user.UserID
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.ObjectStoreConfig
 import io.provenance.api.models.p8e.AudienceKeyPair
-import java.util.UUID
 
 data class CreateClientRequest(
-    val uuid: UUID,
+    val userID: UserID,
     val account: AccountInfo = AccountInfo(),
     val client: ObjectStoreConfig,
     val affiliates: Set<AudienceKeyPair> = emptySet()

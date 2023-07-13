@@ -29,7 +29,7 @@ class StoreFile(
 ) : AbstractUseCase<StoreFileRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse {
         val (account, permissions, objectStoreAddress, storeRawBytes, id, file, type) = getParams(args.request)
-        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), account?.keyManagementConfig))
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.userID.toString(), account?.keyManagementConfig))
 
         return file.awaitAllBytes().map { bytes ->
             storeObject.executeBlocking(

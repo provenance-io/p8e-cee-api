@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.cee.reject.models
 
+import io.provenance.api.models.user.UserID
 import io.provenance.api.models.cee.reject.RejectContractRequest
-import java.util.UUID
 
 data class RejectContractExecutionRequestWrapper(
-    val uuid: UUID,
+    val userID: UserID,
     val request: RejectContractRequest
 )

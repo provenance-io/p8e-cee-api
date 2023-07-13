@@ -22,8 +22,8 @@ class UpdateAuthzGrant(
     private val getSigner: GetSigner
 ) : AbstractUseCase<UpdateAuthzRequestWrapper, TxResponse>() {
     override suspend fun execute(args: UpdateAuthzRequestWrapper): TxResponse {
-        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
-        val messages = createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
+        val signer = getSigner.execute(GetSignerRequest(args.userID, args.request.account))
+        val messages = createClient.execute(CreateClientRequest(args.userID, args.request.account, args.request.client)).use { client ->
             args.request.changes.flatMap { change ->
                 when (change.type) {
                     AuthzChangeType.ADD -> {

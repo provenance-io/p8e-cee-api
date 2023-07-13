@@ -21,7 +21,12 @@ class CreateClient(
     private val entityManager: EntityManager,
 ) : AbstractUseCase<CreateClientRequest, Client>() {
     override suspend fun execute(args: CreateClientRequest): Client {
-        val originator = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.account.keyManagementConfig))
+        val originator = entityManager.getEntity(
+            KeyManagementConfigWrapper(
+                entity = args.userID.toString(),
+                config = args.account.keyManagementConfig
+            )
+        )
         val affiliate = Affiliate(
             signingKeyRef = originator.getKeyRef(KeyType.SIGNING),
             encryptionKeyRef = originator.getKeyRef(KeyType.ENCRYPTION),

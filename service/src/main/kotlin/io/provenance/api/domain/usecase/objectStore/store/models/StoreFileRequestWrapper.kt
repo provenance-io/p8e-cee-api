@@ -1,11 +1,12 @@
 package io.provenance.api.domain.usecase.objectStore.store.models
 
+import io.provenance.api.models.user.UserID
 import java.util.UUID
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.Part
 
 data class StoreFileRequestWrapper(
-    val uuid: UUID,
+    val userID: UserID,
     val request: Map<String, Part>,
     val useObjectStoreGateway: Boolean = false
 )

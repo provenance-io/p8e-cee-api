@@ -144,7 +144,7 @@ class ProvenanceHandler(
     suspend fun checkCustody(req: ServerRequest): ServerResponse = kotlin.runCatching {
         getSigner.execute(
             GetSignerRequest(
-                uuid = req.getUser(),
+                id = req.getUser(),
                 account = req.awaitBodyOrNull() ?: AccountInfo()
             )
         )

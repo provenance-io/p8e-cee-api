@@ -18,7 +18,7 @@ class StoreProto(
 ) : AbstractUseCase<StoreProtoRequestWrapper, StoreProtoResponse>() {
     override suspend fun execute(args: StoreProtoRequestWrapper): StoreProtoResponse {
         val asset = parser.parse(args.request.message, Class.forName(args.request.type))
-        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.uuid.toString(), args.request.account.keyManagementConfig))
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.userID.toString(), args.request.account.keyManagementConfig))
 
         return storeObject.execute(
             StoreObjectRequest(

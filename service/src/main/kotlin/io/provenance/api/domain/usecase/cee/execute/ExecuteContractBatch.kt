@@ -38,11 +38,10 @@ class ExecuteContractBatch(
         val pending = mutableListOf<ContractExecutionResponse>()
         val errors = mutableListOf<ContractExecutionErrorResponse>()
         val results = mutableListOf<Pair<UUID, ExecutionResult>>()
-        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.config.account))
-        contractUtilities.createClient(args.uuid, args.request.permissions, args.request.additionalParticipants, args.request.config).use { client ->
+        val signer = getSigner.execute(GetSignerRequest(args.userID, args.request.config.account))
+        contractUtilities.createClient(args.userID, args.request.permissions, args.request.additionalParticipants, args.request.config).use { client ->
 
             contractUtilities.createSession(
-                args.uuid,
                 client,
                 args.request.permissions,
                 args.request.additionalParticipants,
