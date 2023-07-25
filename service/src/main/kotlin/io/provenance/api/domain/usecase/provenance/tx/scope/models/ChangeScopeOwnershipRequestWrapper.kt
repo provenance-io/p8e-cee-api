@@ -2,14 +2,14 @@ package io.provenance.api.domain.usecase.provenance.tx.scope.models
 
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipBatchRequest
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
-import io.provenance.api.models.user.UserID
+import io.provenance.api.models.user.EntityID
 
 data class ChangeScopeOwnershipRequestWrapper(
-    val userID: UserID,
+    val entityID: EntityID,
     val request: ChangeScopeOwnershipRequest,
 ) {
     fun toBatchWrapper() = ChangeScopeOwnershipBatchRequestWrapper(
-        userID,
+        entityID,
         ChangeScopeOwnershipBatchRequest(
             request.account,
             request.provenanceConfig,

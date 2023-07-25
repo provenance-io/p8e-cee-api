@@ -18,7 +18,7 @@ class GetFile(
     override suspend fun execute(args: GetFileRequestWrapper): Any {
         getObject.execute(
             RetrieveAndDecryptRequest(
-                args.userID,
+                args.entityID,
                 args.request.objectStoreAddress,
                 args.request.hash,
                 args.request.accountInfo.keyManagementConfig,

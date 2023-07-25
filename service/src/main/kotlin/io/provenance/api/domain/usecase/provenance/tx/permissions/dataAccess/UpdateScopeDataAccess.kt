@@ -32,7 +32,7 @@ class UpdateScopeDataAccess(
     private val createGatewayJwt: CreateGatewayJwt,
 ) : AbstractUseCase<UpdateScopeDataAccessRequestWrapper, TxResponse>() {
     override suspend fun execute(args: UpdateScopeDataAccessRequestWrapper): TxResponse {
-        val signer = getSigner.execute(GetSignerRequest(args.userID, args.request.account))
+        val signer = getSigner.execute(GetSignerRequest(args.entityID, args.request.account))
 
         val messages = runActionForChange(
             args.request.changes,
@@ -62,7 +62,7 @@ class UpdateScopeDataAccess(
                         )
                     )
                 }?.use { client ->
-                    val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.userID, args.request.account.keyManagementConfig))
+                    val jwt = createGatewayJwt.execute(CreateGatewayJwtRequest(args.entityID, args.request.account.keyManagementConfig))
                     runActionForChange(
                         args.request.changes, { change ->
                         client.grantScopePermission(

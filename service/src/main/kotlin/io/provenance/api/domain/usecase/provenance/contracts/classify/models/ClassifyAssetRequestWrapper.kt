@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.provenance.contracts.classify.models
 
-import io.provenance.api.models.user.UserID
+import io.provenance.api.models.user.EntityID
 import io.provenance.api.models.p8e.contracts.ClassifyAssetRequest
 
 data class ClassifyAssetRequestWrapper(
-    val userID: UserID,
+    val entityID: EntityID,
     val request: ClassifyAssetRequest
 )

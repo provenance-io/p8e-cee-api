@@ -9,7 +9,7 @@ import io.provenance.api.domain.usecase.cee.reject.models.RejectContractExecutio
 import io.provenance.api.domain.usecase.cee.submit.SubmitContractExecutionResult
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.frameworks.web.misc.getEntityID
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -23,18 +23,18 @@ class InternalCeeHandler(
     private val submitContract: SubmitContractExecutionResult
 ) {
     suspend fun executeContract(req: ServerRequest): ServerResponse = runCatching {
-        executeContract.execute(ExecuteContractRequestWrapper(req.getUser(), req.awaitBody()))
+        executeContract.execute(ExecuteContractRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun submitContractResult(req: ServerRequest): ServerResponse = runCatching {
-        submitContract.execute(SubmitContractExecutionResultRequestWrapper(req.getUser(), req.awaitBody()))
+        submitContract.execute(SubmitContractExecutionResultRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun approveContractExecution(req: ServerRequest): ServerResponse = runCatching {
-        approveContractExecution.execute(ApproveContractRequestWrapper(req.getUser(), req.awaitBody()))
+        approveContractExecution.execute(ApproveContractRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun rejectContractExecution(req: ServerRequest): ServerResponse = runCatching {
-        rejectContractExecution.execute(RejectContractExecutionRequestWrapper(req.getUser(), req.awaitBody()))
+        rejectContractExecution.execute(RejectContractExecutionRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
 }

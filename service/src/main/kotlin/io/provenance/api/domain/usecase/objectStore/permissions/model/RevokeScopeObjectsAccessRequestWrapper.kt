@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.objectStore.permissions.model
 
 import io.provenance.api.models.eos.permissions.RevokeScopeObjectsAccessRequest
-import io.provenance.api.models.user.UserID
+import io.provenance.api.models.user.EntityID
 
 data class RevokeScopeObjectsAccessRequestWrapper(
-    val userID: UserID,
+    val entityID: EntityID,
     val request: RevokeScopeObjectsAccessRequest
 )

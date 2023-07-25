@@ -18,7 +18,7 @@ class RevokeObjectAccess(
     override suspend fun execute(args: RevokeObjectAccessRequestWrapper) {
         val jwt = createGatewayJwt.execute(
             CreateGatewayJwtRequest(
-                args.userID,
+                args.entityID,
                 args.request.accountInfo.keyManagementConfig
             )
         )

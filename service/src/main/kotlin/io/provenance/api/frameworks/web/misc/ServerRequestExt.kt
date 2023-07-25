@@ -1,7 +1,7 @@
 package io.provenance.api.frameworks.web.misc
 
-import io.provenance.api.models.user.UserAddress
-import io.provenance.api.models.user.UserID
+import io.provenance.api.models.user.Address
+import io.provenance.api.models.user.EntityID
 import io.provenance.api.models.user.UserUUID
 import mu.KotlinLogging
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -20,9 +20,9 @@ suspend inline fun <reified T> ServerRequest.requireBody(): T =
         requireNotNull(awaitBodyOrNull()) { "Failed to parse request body of type ${T::class}" }
     }
 
-fun ServerRequest.getUser(): UserID {
+fun ServerRequest.getEntityID(): EntityID {
     try {
-        return requireNotNull(getUUIDOrNull() ?: getAddressOrNull())
+        return requireNotNull(getAddressOrNull() ?: getUUIDOrNull())
     } catch (exception: IllegalArgumentException) {
         log.error(exception) { "error parsing x-uuid or address header" }
         throw IllegalArgumentException("error parsing x-uuid or address header", exception)
@@ -32,11 +32,11 @@ fun ServerRequest.getUser(): UserID {
 fun ServerRequest.getUUIDOrNull(): UserUUID? = headers().firstHeader("x-uuid")
     ?.let { UserUUID(UUID.fromString(it)) }
 
-fun ServerRequest.getAddressOrNull(): UserAddress? {
+fun ServerRequest.getAddressOrNull(): Address? {
     val address = headers().firstHeader("x-figure-tech-address")?.also {
         log.info { "x-figure-tech-address header = $it" }
     } ?: headers().firstHeader("x-figure-tech-granter-address")?.also {
         log.info { "x-figure-tech-granter-address header = $it" }
     }
-    return address?.let { UserAddress(it) }
+    return address?.let { Address(it) }
 }

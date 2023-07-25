@@ -1,7 +1,7 @@
 package io.provenance.api.domain.usecase.provenance.account.models
 
-import io.provenance.api.models.user.UserAddress
-import io.provenance.api.models.user.UserID
+import io.provenance.api.models.user.Address
+import io.provenance.api.models.user.EntityID
 import io.provenance.api.models.user.UserUUID
 import io.provenance.api.models.account.AccountInfo
 import java.util.UUID
@@ -9,8 +9,8 @@ import java.util.UUID
 sealed interface GetSignerRequest {
 
     companion object {
-        operator fun invoke(id: UserID, account: AccountInfo): GetSignerRequest = when (id) {
-            is UserAddress -> GetSignerByAddressRequest(id.value, account)
+        operator fun invoke(id: EntityID, account: AccountInfo): GetSignerRequest = when (id) {
+            is Address -> GetSignerByAddressRequest(id.value, account)
             is UserUUID -> GetSignerByUUIDRequest(id.value, account)
         }
     }

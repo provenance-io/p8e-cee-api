@@ -32,7 +32,7 @@ class GrantFeeGrant(
         val allowance = args.request.grant.allowance
         val signer = getSigner.execute(
             GetSignerRequest(
-                args.userID,
+                args.entityID,
                 args.request.account
             )
         )
