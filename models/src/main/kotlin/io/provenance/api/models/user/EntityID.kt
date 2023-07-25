@@ -7,13 +7,10 @@ sealed class EntityID {
     companion object {
         @JsonCreator
         @JvmStatic
-        fun of(s: String): EntityID = runCatching { UserUUID(UUID.fromString(s)) }.getOrElse { Address(s) }
-    }
-
-    override fun toString() = when (this) {
-        is Address -> value
-        is UserUUID -> value.toString()
+        fun fromString(string: String): EntityID = runCatching {
+            UserUUID(UUID.fromString(string))
+        }.getOrElse { Address(string) }
     }
 }
-data class UserUUID(val value: UUID) : EntityID()
-data class Address(val value: String) : EntityID()
+data class UserUUID(val value: UUID) : EntityID() { override fun toString(): String = value.toString() }
+data class Address(val value: String) : EntityID() { override fun toString(): String = value }

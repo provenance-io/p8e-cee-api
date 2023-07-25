@@ -20,6 +20,7 @@ import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
+import io.provenance.api.models.user.UserUUID
 import io.provenance.entity.KeyEntity
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
@@ -84,7 +85,7 @@ class StoreAssetTest : FunSpec({
         // Execute enable replication code
         val response = storeAsset.execute(
             StoreProtoRequestWrapper(
-                REQUEST_UUID,
+                UserUUID(REQUEST_UUID),
                 StoreProtoRequest(
                     ADD_ASSET_OBJECT_STORE_ADDRESS,
                     PermissionInfo(

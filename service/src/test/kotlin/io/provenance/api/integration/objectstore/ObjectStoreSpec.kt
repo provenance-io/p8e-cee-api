@@ -10,9 +10,9 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoRequest
+import io.provenance.api.models.user.EntityID
 import io.provenance.api.util.toPrettyJson
 import io.provenance.plugins.vault.VaultConfig
-import io.provenance.scope.util.toUuid
 import java.util.UUID
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.toProtoUUID
@@ -23,8 +23,8 @@ class ObjectStoreSpec(
 ) : IntegrationTestBase({
 
     val entities = listOf(
-        "deadbeef-face-479b-860c-facefaceface".toUuid(),
-        "deadbeef-face-2222-860c-facefaceface".toUuid()
+        EntityID.fromString("deadbeef-face-479b-860c-facefaceface"),
+        EntityID.fromString("deadbeef-face-2222-860c-facefaceface")
     )
 
     "Object Store" should {
