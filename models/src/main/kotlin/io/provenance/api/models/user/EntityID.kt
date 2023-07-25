@@ -11,6 +11,11 @@ sealed class EntityID {
             UserUUID(UUID.fromString(string))
         }.getOrElse { Address(string) }
     }
+
+    override fun toString() = when (this) {
+        is Address -> value
+        is UserUUID -> value.toString()
+    }
 }
 data class UserUUID(val value: UUID) : EntityID() { override fun toString(): String = value.toString() }
 data class Address(val value: String) : EntityID() { override fun toString(): String = value }
