@@ -1,8 +1,8 @@
 package io.provenance.api.frameworks.web.misc
 
-import io.provenance.api.models.user.Address
-import io.provenance.api.models.user.EntityID
-import io.provenance.api.models.user.UserUUID
+import io.provenance.api.models.entity.Address
+import io.provenance.api.models.entity.EntityID
+import io.provenance.api.models.entity.UserUUID
 import mu.KotlinLogging
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBodyOrNull

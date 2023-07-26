@@ -8,7 +8,7 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
-import io.provenance.api.models.user.EntityID
+import io.provenance.api.models.entity.EntityID
 import io.provenance.api.models.account.Participant
 import io.provenance.api.models.cee.ParserConfig
 import io.provenance.api.models.cee.execute.ExecuteContractConfig

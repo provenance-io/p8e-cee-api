@@ -20,7 +20,7 @@ import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.api.models.user.UserUUID
+import io.provenance.api.models.entity.UserUUID
 import io.provenance.entity.KeyEntity
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey

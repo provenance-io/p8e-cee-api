@@ -1,4 +1,4 @@
-package io.provenance.api.models.user
+package io.provenance.api.models.entity
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import java.util.UUID

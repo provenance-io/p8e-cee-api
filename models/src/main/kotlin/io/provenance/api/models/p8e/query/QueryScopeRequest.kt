@@ -1,6 +1,6 @@
 package io.provenance.api.models.p8e.query
 
-import io.provenance.api.models.user.EntityID
+import io.provenance.api.models.entity.EntityID
 import java.util.UUID
 
 data class QueryScopeRequest(

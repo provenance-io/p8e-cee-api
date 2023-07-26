@@ -7,7 +7,7 @@ import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOw
 import io.provenance.api.integration.base.IntegrationTestBase
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
-import io.provenance.api.models.user.UserUUID
+import io.provenance.api.models.entity.UserUUID
 import io.provenance.scope.util.toUuid
 import java.util.UUID
 

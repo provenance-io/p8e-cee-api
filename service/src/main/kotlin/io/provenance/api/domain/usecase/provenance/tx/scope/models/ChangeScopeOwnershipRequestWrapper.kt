@@ -2,7 +2,7 @@ package io.provenance.api.domain.usecase.provenance.tx.scope.models
 
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipBatchRequest
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
-import io.provenance.api.models.user.EntityID
+import io.provenance.api.models.entity.EntityID
 
 data class ChangeScopeOwnershipRequestWrapper(
     val entityID: EntityID,

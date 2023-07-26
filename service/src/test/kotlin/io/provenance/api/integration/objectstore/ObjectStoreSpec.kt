@@ -10,7 +10,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoRequest
-import io.provenance.api.models.user.EntityID
+import io.provenance.api.models.entity.EntityID
 import io.provenance.api.util.toPrettyJson
 import io.provenance.plugins.vault.VaultConfig
 import java.util.UUID
