@@ -19,6 +19,7 @@ class InternalCeeApi {
             POST("/execute", handler::executeContract)
             POST("/submit", handler::submitContractResult)
             POST("/reject", handler::rejectContractExecution)
+            GET("/headers", handler::showHeaders)
         }
     }
 }
