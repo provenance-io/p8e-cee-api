@@ -26,12 +26,12 @@ function up {
   docker-compose -p p8e-contract-execution-environment -f service/docker/dependencies.yaml up --build -d
 
   sleep 2
-  sh service/docker/vault/init-and-unseal.sh 'http://127.0.0.1:8200' 'kv2_originations'
-
-  sleep 2
-
   export VAULT_ADDR="http://127.0.0.1:8200"
   SECRET_PATH=kv2_originations
+  sh service/docker/vault/init-and-unseal.sh $VAULT_ADDR $SECRET_PATH
+
+  until vault status; do echo "Awaiting vault to be unsealed..."; sleep 5; done
+
   # local-originator
   cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000001 - > /dev/null
   cat service/docker/vault/secrets/local-originator.json | vault kv put $SECRET_PATH/originators/tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0 - > /dev/null
@@ -120,11 +120,10 @@ function build_classification() {
 }
 
 function setup() {
-      brew install docker
-      brew tap hashicorp/tap
-      brew install hashicorp/tap/vault
-      brew install rust
-      brew install jq
+      which -s docker || brew install docker
+      which -s vault || { brew tap hashicorp/tap; brew install hashicorp/tap/vault; }
+      which -s rust || brew install rust
+      which -s jq || brew install jq
       brew install coreutils
 }
 
