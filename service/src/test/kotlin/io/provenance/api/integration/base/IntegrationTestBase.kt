@@ -56,8 +56,8 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
         const val vaultAddress = "http://localhost:8200/v1/kv2_originations/data/originators"
         const val provenanceAddress = "grpc://localhost:9090"
 
-//        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
-//        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
+        // val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
+        // val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
         private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }

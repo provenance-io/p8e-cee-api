@@ -5,6 +5,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
@@ -20,18 +21,16 @@ open class LoggableProperties {
 
         if (obj != null) {
             if (!ClassUtils.getUserClass(obj::class.java).isAnnotationPresent(Secret::class.java)) {
-                obj::class.declaredMemberProperties.forEach {
-                    if (it.visibility == KVisibility.PUBLIC) {
-                        if (it.findAnnotation<Secret>() == null) {
-                            val value = it.getter.call(obj)
-                            if (value != null) {
-                                logMessages.addAll(logify(value::class, value, prefix, ".${it.name}"))
-                            } else {
-                                logMessages.add("$prefix.${it.name} : <null>")
-                            }
+                obj::class.declaredMemberProperties.filter { it.visibility == KVisibility.PUBLIC }.forEach {
+                    if (it.hasAnnotation<Secret>()) {
+                        val value = it.getter.call(obj)
+                        if (value != null) {
+                            logMessages.addAll(logify(value::class, value, prefix, ".${it.name}"))
                         } else {
-                            logMessages.add("$prefix.${it.name} : <secret>")
+                            logMessages.add("$prefix.${it.name} : <null>")
                         }
+                    } else {
+                        logMessages.add("$prefix.${it.name} : <secret>")
                     }
                 }
             } else {
