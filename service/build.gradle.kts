@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring") version Versions.Kotlin
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_11
 
 dependencyManagement {
     applyMavenExclusions(false)

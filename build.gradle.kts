@@ -23,8 +23,8 @@ subprojects {
 
 allprojects {
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -34,7 +34,7 @@ allprojects {
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-Xskip-prerelease-check", // To support loan package contracts dependency using context receivers
             )
-            jvmTarget = "17"
+            jvmTarget = "11"
             apiVersion = "1.6"
             languageVersion = "1.6"
             allWarningsAsErrors = true
@@ -55,8 +55,8 @@ nexusPublishing {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 allprojects {
