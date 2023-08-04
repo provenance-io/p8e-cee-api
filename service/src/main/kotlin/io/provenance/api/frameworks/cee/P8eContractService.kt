@@ -64,12 +64,12 @@ class P8eContractService : ContractService {
         }
 
     override fun executeContract(client: Client, session: Session): ExecutionResult =
-        runCatchingExecutionResult<Session> {
+        runCatchingExecutionResult<Session>() {
             client.execute(session)
         }
 
     override fun executeContract(client: Client, envelope: Envelope): ExecutionResult =
-        runCatchingExecutionResult<Envelope> {
+        runCatchingExecutionResult<Envelope>() {
             client.execute(envelope)
         }
 

@@ -5,16 +5,12 @@ import io.kotest.matchers.string.shouldContain
 import io.provenance.api.domain.usecase.provenance.tx.scope.ChangeScopeOwnership
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
 import io.provenance.api.integration.base.IntegrationTestBase
-import io.provenance.api.models.entity.UserUUID
 import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
+import io.provenance.api.models.entity.UserUUID
 import io.provenance.scope.util.toUuid
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.util.UUID
 
-@ActiveProfiles("development")
-@SpringBootTest
 class ChangeScopeOwnershipTest(
     private val changeScopeOwnership: ChangeScopeOwnership,
 ) : IntegrationTestBase({
@@ -28,7 +24,7 @@ class ChangeScopeOwnershipTest(
                         ChangeScopeOwnershipRequest(
                             provenanceConfig = ProvenanceConfig(
                                 chainId = "chain-local",
-                                nodeEndpoint = PROVENANCE_ADDRESS,
+                                nodeEndpoint = provenanceAddress,
                             ),
                             scopeId = UUID.randomUUID(),
                             newValueOwner = null,

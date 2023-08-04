@@ -6,11 +6,15 @@ import io.kotest.core.spec.style.WordSpec
 import io.kotest.extensions.spring.SpringExtension
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.DockerComposeContainer
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-abstract class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
+@ActiveProfiles("development")
+@SpringBootTest
+class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
 
     override fun extensions(): List<Extension> = listOf(SpringExtension)
 
@@ -19,15 +23,13 @@ abstract class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(bo
         instance.start()
 
         withContext(Dispatchers.IO) {
-            val process: Process = ProcessBuilder()
+            val process = ProcessBuilder().command("./integration_test_setup.sh")
                 .directory(File("src/test/resources/"))
-                .command("./integration_test_setup.sh")
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .start()
 
-            process.waitFor(60, TimeUnit.SECONDS)
-
+            process.waitFor(20, TimeUnit.SECONDS)
             if (process.exitValue() != 0) {
                 throw IllegalStateException("Integration test environment did NOT setup successfully!")
             }
@@ -48,17 +50,14 @@ abstract class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(bo
             defineDockerCompose()
         }
 
-        /*
-            Ideally these should be replaced with the container states commented out below.
-            For whatever reason when running on terminal, the containers could not be found.
-            Related GitHub issue: https://github.com/testcontainers/testcontainers-java/issues/4281
-        */
-        const val OBJECT_STORE_ADDRESS = "grpc://localhost:9993"
-        const val VAULT_ADDRESS = "http://localhost:8200/v1/kv2_originations/data/originators"
-        const val PROVENANCE_ADDRESS = "grpc://localhost:9090"
+        // Ideally these should be replaced with the container states commented out below. For whatever reason when running on terminal, the containers
+        // could not be found. related github issue: https://github.com/testcontainers/testcontainers-java/issues/4281
+        const val objectStoreAddress = "grpc://localhost:9993"
+        const val vaultAddress = "http://localhost:8200/v1/kv2_originations/data/originators"
+        const val provenanceAddress = "grpc://localhost:9090"
 
-        // val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
-        // val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
+//        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
+//        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
         private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }
