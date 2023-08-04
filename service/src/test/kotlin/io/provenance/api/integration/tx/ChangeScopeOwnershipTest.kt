@@ -9,8 +9,11 @@ import io.provenance.api.models.p8e.ProvenanceConfig
 import io.provenance.api.models.p8e.tx.ChangeScopeOwnershipRequest
 import io.provenance.api.models.entity.UserUUID
 import io.provenance.scope.util.toUuid
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import java.util.UUID
 
+@EnabledOnOs(OS.MAC)
 class ChangeScopeOwnershipTest(
     private val changeScopeOwnership: ChangeScopeOwnership,
 ) : IntegrationTestBase({

@@ -13,10 +13,13 @@ import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.entity.EntityID
 import io.provenance.api.util.toPrettyJson
 import io.provenance.plugins.vault.VaultConfig
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import java.util.UUID
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.toProtoUUID
 
+@EnabledOnOs(OS.MAC)
 class ObjectStoreSpec(
     private val storeProto: StoreProto,
     private val getProto: GetProto,

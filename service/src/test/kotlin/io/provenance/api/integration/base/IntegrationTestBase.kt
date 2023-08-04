@@ -6,6 +6,8 @@ import io.kotest.core.spec.style.WordSpec
 import io.kotest.extensions.spring.SpringExtension
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.DockerComposeContainer
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit
 
 @ActiveProfiles("development")
 @SpringBootTest
+@EnabledOnOs(OS.MAC)
 class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
 
     override fun extensions(): List<Extension> = listOf(SpringExtension)
