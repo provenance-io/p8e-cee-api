@@ -71,13 +71,19 @@ class CeeHandler(
         data class DebugHeaders(
             val address: String?,
             val granterAddress: String?,
-            val uuid: String?
+            val uuid: String?,
+            val consumerId: String?,
+            val consumerUsername: String?,
+            val consumerCustomid: String?,
         )
 
         DebugHeaders(
             address = req.headers().firstHeader("x-figure-tech-address"),
             granterAddress = req.headers().firstHeader("x-figure-tech-granter-address"),
             uuid = req.headers().firstHeader("x-uuid"),
+            consumerId = req.headers().firstHeader("X-Consumer-ID"),
+            consumerUsername = req.headers().firstHeader("X-Consumer-Username"),
+            consumerCustomid = req.headers().firstHeader("X-Consumer-Custom-ID"),
         )
     }
 }
