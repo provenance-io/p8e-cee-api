@@ -4,6 +4,7 @@ import io.provenance.api.models.entity.Address
 import io.provenance.api.models.entity.EntityID
 import io.provenance.api.models.entity.UserUUID
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.entity.Consumer
 import java.util.UUID
 
 sealed interface GetSignerRequest {
@@ -12,6 +13,7 @@ sealed interface GetSignerRequest {
         operator fun invoke(id: EntityID, account: AccountInfo): GetSignerRequest = when (id) {
             is Address -> GetSignerByAddressRequest(id.value, account)
             is UserUUID -> GetSignerByUUIDRequest(id.value, account)
+            is Consumer -> GetSignerByAddressRequest(id.username ?: error("missing username"), account)
         }
     }
 

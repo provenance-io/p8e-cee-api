@@ -1,6 +1,7 @@
 package io.provenance.api.frameworks.web.misc
 
 import io.provenance.api.models.entity.Address
+import io.provenance.api.models.entity.Consumer
 import io.provenance.api.models.entity.EntityID
 import io.provenance.api.models.entity.UserUUID
 import mu.KotlinLogging
@@ -22,7 +23,7 @@ suspend inline fun <reified T> ServerRequest.requireBody(): T =
 
 fun ServerRequest.getEntityID(): EntityID {
     try {
-        return requireNotNull(getAddressOrNull() ?: getUUIDOrNull())
+        return requireNotNull(getAddressOrNull() ?: getConsumerOrNull() ?: getUUIDOrNull())
     } catch (exception: IllegalArgumentException) {
         log.error(exception) { "error parsing x-uuid or address header" }
         throw IllegalArgumentException("error parsing x-uuid or address header", exception)
@@ -39,4 +40,13 @@ fun ServerRequest.getAddressOrNull(): Address? {
         log.info { "x-figure-tech-granter-address header = $it" }
     }
     return address?.let { Address(it) }
+}
+
+fun ServerRequest.getConsumerOrNull(): Consumer? {
+    return Consumer(
+        id = headers().firstHeader("X-Consumer-ID"),
+        username = headers().firstHeader("X-Consumer-Username"),
+        customId = headers().firstHeader("X-Consumer-Custom-ID"),
+    ).takeUnless { it.id == null && it.username == null && it.customId == null }
+        ?.also { log.info { "consumer headers $it" } }
 }
