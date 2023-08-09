@@ -44,9 +44,9 @@ fun ServerRequest.getAddressOrNull(): Address? {
 
 fun ServerRequest.getConsumerOrNull(): Consumer? {
     return Consumer(
-        id = headers().firstHeader("X-Consumer-ID"),
-        username = headers().firstHeader("X-Consumer-Username"),
-        customId = headers().firstHeader("X-Consumer-Custom-ID"),
+        id = headers().firstHeader("x-consumer-id"),
+        username = headers().firstHeader("x-consumer-username"),
+        customId = headers().firstHeader("x-consumer-custom-id"),
     ).takeUnless { it.id == null && it.username == null && it.customId == null }
         ?.also { log.info { "consumer headers $it" } }
 }

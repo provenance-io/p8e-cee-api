@@ -10,7 +10,6 @@ import io.provenance.api.domain.usecase.cee.submit.SubmitContractExecutionResult
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getEntityID
-import io.provenance.api.frameworks.web.misc.respond
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -38,18 +37,4 @@ class InternalCeeHandler(
     suspend fun rejectContractExecution(req: ServerRequest): ServerResponse = runCatching {
         rejectContractExecution.execute(RejectContractExecutionRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
-
-    suspend fun showHeaders(req: ServerRequest): ServerResponse = respond {
-        data class DebugHeaders(
-            val address: String?,
-            val granterAddress: String?,
-            val uuid: String?
-        )
-
-        DebugHeaders(
-            address = req.headers().firstHeader("x-figure-tech-address"),
-            granterAddress = req.headers().firstHeader("x-figure-tech-granter-address"),
-            uuid = req.headers().firstHeader("x-uuid"),
-        )
-    }
 }

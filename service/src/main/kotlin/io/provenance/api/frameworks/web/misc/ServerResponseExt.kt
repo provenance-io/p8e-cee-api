@@ -27,5 +27,3 @@ suspend fun Result<Any>.foldToServerResponse(): ServerResponse =
             ErrorResponses.defaultForType(it)
         }
     )
-
-suspend fun respond(block: () -> Any) = runCatching { block() }.foldToServerResponse()

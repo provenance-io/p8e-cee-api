@@ -18,11 +18,13 @@ import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractBatchExe
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getEntityID
-import io.provenance.api.frameworks.web.misc.respond
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
+
+private val log = KotlinLogging.logger("CeeHandler")
 
 @Component
 class CeeHandler(
@@ -67,23 +69,7 @@ class CeeHandler(
         rejectContractBatchExecution.execute(RejectContractBatchRequestWrapper(req.getEntityID(), req.awaitBody()))
     }.foldToServerResponse()
 
-    suspend fun showHeaders(req: ServerRequest): ServerResponse = respond {
-        data class DebugHeaders(
-            val address: String?,
-            val granterAddress: String?,
-            val uuid: String?,
-            val consumerId: String?,
-            val consumerUsername: String?,
-            val consumerCustomid: String?,
-        )
-
-        DebugHeaders(
-            address = req.headers().firstHeader("x-figure-tech-address"),
-            granterAddress = req.headers().firstHeader("x-figure-tech-granter-address"),
-            uuid = req.headers().firstHeader("x-uuid"),
-            consumerId = req.headers().firstHeader("X-Consumer-ID"),
-            consumerUsername = req.headers().firstHeader("X-Consumer-Username"),
-            consumerCustomid = req.headers().firstHeader("X-Consumer-Custom-ID"),
-        )
-    }
+    suspend fun showHeaders(req: ServerRequest): ServerResponse = runCatching {
+        req.headers().also { log.info { "headers: $it" } }
+    }.foldToServerResponse()
 }
