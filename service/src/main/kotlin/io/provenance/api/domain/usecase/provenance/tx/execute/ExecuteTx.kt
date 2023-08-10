@@ -18,7 +18,7 @@ class ExecuteTx(
     private val getSigner: GetSigner,
 ) : AbstractUseCase<ExecuteTxRequestWrapper, TxResponse>() {
     override suspend fun execute(args: ExecuteTxRequestWrapper): TxResponse {
-        val signer = getSigner.execute(GetSignerRequest(args.entityID, args.request.account))
+        val signer = getSigner.execute(GetSignerRequest(args.Entity, args.request.account))
         val messages = args.request.tx.base64.map { tx ->
             Any.parseFrom(Base64.getDecoder().decode(tx))
         }

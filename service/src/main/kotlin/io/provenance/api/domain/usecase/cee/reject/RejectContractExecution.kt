@@ -14,7 +14,7 @@ class RejectContractExecution(
 
     override suspend fun execute(args: RejectContractExecutionRequestWrapper) {
         val error = Envelopes.EnvelopeError.newBuilder().mergeFrom(args.request.rejection).build()
-        createClient.execute(CreateClientRequest(args.entityID, args.request.account, args.request.client)).use { client ->
+        createClient.execute(CreateClientRequest(args.Entity, args.request.account, args.request.client)).use { client ->
             client.respondWithError(error)
         }
     }

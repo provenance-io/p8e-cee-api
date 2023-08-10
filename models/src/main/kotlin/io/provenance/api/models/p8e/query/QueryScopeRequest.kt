@@ -1,10 +1,10 @@
 package io.provenance.api.models.p8e.query
 
-import io.provenance.api.models.entity.EntityID
+import io.provenance.api.models.entity.Entity
 import java.util.UUID
 
 data class QueryScopeRequest(
-    val entityID: EntityID,
+    val entity: Entity,
     val scopeUuid: UUID,
     val chainId: String,
     val nodeEndpoint: String,

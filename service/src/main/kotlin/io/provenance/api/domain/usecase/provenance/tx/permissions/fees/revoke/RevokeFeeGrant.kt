@@ -19,7 +19,7 @@ class RevokeFeeGrant(
     override suspend fun execute(args: RevokeFeeGrantRequestWrapper): TxResponse {
         val signer = getSigner.execute(
             GetSignerRequest(
-                args.entityID,
+                args.Entity,
                 args.request.account
             )
         )

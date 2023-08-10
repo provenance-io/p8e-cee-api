@@ -9,7 +9,7 @@ import io.provenance.api.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getEntityID
+import io.provenance.api.frameworks.web.misc.getEntity
 import io.provenance.api.models.eos.get.GetFileRequest
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.toModel
@@ -30,7 +30,7 @@ class InternalObjectStoreHandler(
     suspend fun storeProto(req: ServerRequest): ServerResponse = runCatching {
         storeProto.execute(
             StoreProtoRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -39,7 +39,7 @@ class InternalObjectStoreHandler(
     suspend fun storeFile(req: ServerRequest): ServerResponse = runCatching {
         storeFile.execute(
             StoreFileRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 req.awaitMultipartData().toSingleValueMap()
             )
         )
@@ -48,7 +48,7 @@ class InternalObjectStoreHandler(
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
         getProto.execute(
             GetProtoRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 GetProtoRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -61,7 +61,7 @@ class InternalObjectStoreHandler(
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
         getFile.execute(
             GetFileRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 GetFileRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -74,7 +74,7 @@ class InternalObjectStoreHandler(
     suspend fun storeProtoV2(req: ServerRequest): ServerResponse = runCatching {
         storeProto.execute(
             StoreProtoRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 req.awaitBody(),
                 true
             )
@@ -84,7 +84,7 @@ class InternalObjectStoreHandler(
     suspend fun storeFileV2(req: ServerRequest): ServerResponse = runCatching {
         storeFile.execute(
             StoreFileRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 req.awaitMultipartData().toSingleValueMap(),
                 true
             )
@@ -94,7 +94,7 @@ class InternalObjectStoreHandler(
     suspend fun getProtoV2(req: ServerRequest): ServerResponse = runCatching {
         getProto.execute(
             GetProtoRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 GetProtoRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -108,7 +108,7 @@ class InternalObjectStoreHandler(
     suspend fun getFileV2(req: ServerRequest): ServerResponse = runCatching {
         getFile.execute(
             GetFileRequestWrapper(
-                req.getEntityID(),
+                req.getEntity(),
                 GetFileRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),

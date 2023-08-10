@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.provenance.contracts.fees.models
 
-import io.provenance.api.models.entity.EntityID
+import io.provenance.api.models.entity.Entity
 
 data class GetFeesForAssetRequest(
-    val entityID: EntityID,
+    val entity: Entity,
     val contractName: String,
     val assetType: String,
     val chainId: String,

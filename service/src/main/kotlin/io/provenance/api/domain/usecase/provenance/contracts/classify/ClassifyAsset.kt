@@ -18,7 +18,7 @@ class ClassifyAsset(
     override suspend fun execute(args: ClassifyAssetRequestWrapper): TxResponse {
         val signer = getSigner.execute(
             GetSignerRequest(
-                args.entityID,
+                args.Entity,
                 args.request.account,
             )
         )

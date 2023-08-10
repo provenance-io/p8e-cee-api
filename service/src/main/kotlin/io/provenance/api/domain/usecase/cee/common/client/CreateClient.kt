@@ -23,7 +23,7 @@ class CreateClient(
     override suspend fun execute(args: CreateClientRequest): Client {
         val originator = entityManager.getEntity(
             KeyManagementConfigWrapper(
-                entity = args.entityID.toString(),
+                entity = args.Entity.toString(),
                 config = args.account.keyManagementConfig
             )
         )

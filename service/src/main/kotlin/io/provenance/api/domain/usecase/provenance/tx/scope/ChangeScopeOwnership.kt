@@ -30,7 +30,7 @@ class ChangeScopeOwnership(
             "Must request at least one change to the scope"
         }
 
-        val signer = getSigner.execute(GetSignerRequest(args.entityID, args.request.account))
+        val signer = getSigner.execute(GetSignerRequest(args.Entity, args.request.account))
 
         val messages = args.request.scopeIds.distinct().map {
             val scopeResponse = provenance.getScope(args.request.provenanceConfig, it)

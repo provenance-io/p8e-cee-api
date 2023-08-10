@@ -1,10 +1,10 @@
 package io.provenance.api.domain.usecase.objectStore.store.models
 
-import io.provenance.api.models.entity.EntityID
+import io.provenance.api.models.entity.Entity
 import io.provenance.api.models.eos.store.StoreProtoRequest
 
 data class StoreProtoRequestWrapper(
-    val entityID: EntityID,
+    val entity: Entity,
     val request: StoreProtoRequest,
     val useObjectStoreGateway: Boolean = false
 )

@@ -19,7 +19,7 @@ class RegisterObjectAccess(
 
         val jwt = createGatewayJwt.execute(
             CreateGatewayJwtRequest(
-                args.entityID,
+                args.Entity,
                 args.request.accountInfo.keyManagementConfig
             )
         )

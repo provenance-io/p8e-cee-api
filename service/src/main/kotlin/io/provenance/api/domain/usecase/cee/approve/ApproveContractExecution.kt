@@ -26,12 +26,12 @@ class ApproveContractExecution(
 ) : AbstractUseCase<ApproveContractRequestWrapper, ApproveContractExecutionResponse>() {
     override suspend fun execute(args: ApproveContractRequestWrapper): ApproveContractExecutionResponse {
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.approval.envelope).build()
-        createClient.execute(CreateClientRequest(args.entityID, args.request.account, args.request.client)).use { client ->
+        createClient.execute(CreateClientRequest(args.Entity, args.request.account, args.request.client)).use { client ->
 
             val result = client.execute(envelope)
             if (result is FragmentResult) {
                 val tx = client.approveScopeUpdate(result.envelopeState, args.request.approval.expiration).let {
-                    val signer = getSigner.execute(GetSignerRequest(args.entityID, args.request.account))
+                    val signer = getSigner.execute(GetSignerRequest(args.Entity, args.request.account))
                     provenance.executeTransaction(args.request.provenanceConfig, it.toAny(), signer)
                 }
 

@@ -13,7 +13,7 @@ class CreateGatewayJwt(
     private val entityManager: EntityManager
 ) : AbstractUseCase<CreateGatewayJwtRequest, GatewayJwt.KeyRefJwt>() {
     override suspend fun execute(args: CreateGatewayJwtRequest): GatewayJwt.KeyRefJwt {
-        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.entityID.toString(), args.keyManagementConfig))
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.Entity.toString(), args.keyManagementConfig))
 
         return GatewayJwt.KeyRefJwt(entity.getKeyRef(KeyType.ENCRYPTION))
     }

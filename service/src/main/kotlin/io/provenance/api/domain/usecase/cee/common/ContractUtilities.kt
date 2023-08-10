@@ -8,11 +8,11 @@ import io.provenance.api.domain.usecase.cee.common.client.CreateClient
 import io.provenance.api.domain.usecase.cee.common.client.model.CreateClientRequest
 import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
-import io.provenance.api.models.entity.EntityID
 import io.provenance.api.models.account.Participant
 import io.provenance.api.models.cee.ParserConfig
 import io.provenance.api.models.cee.execute.ExecuteContractConfig
 import io.provenance.api.models.cee.execute.ScopeInfo
+import io.provenance.api.models.entity.Entity
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.client.protobuf.extensions.isSet
 import io.provenance.metadata.v1.ScopeResponse
@@ -21,10 +21,10 @@ import io.provenance.scope.contract.spec.P8eContract
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.sdk.Client
 import io.provenance.scope.sdk.Session
-import kotlin.reflect.KType
-import kotlin.reflect.full.functions
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import kotlin.reflect.KType
+import kotlin.reflect.full.functions
 
 @Component
 class ContractUtilities(
@@ -36,9 +36,9 @@ class ContractUtilities(
 ) {
     private val log = KotlinLogging.logger { }
 
-    suspend fun createClient(entityID: EntityID, permissions: PermissionInfo?, participants: List<Participant>, config: ExecuteContractConfig): Client {
+    suspend fun createClient(entity: Entity, permissions: PermissionInfo?, participants: List<Participant>, config: ExecuteContractConfig): Client {
         val audiences = entityManager.hydrateKeys(permissions, participants)
-        return createClient.execute(CreateClientRequest(entityID, config.account, config.client, audiences))
+        return createClient.execute(CreateClientRequest(entity, config.account, config.client, audiences))
     }
 
     suspend fun createSession(client: Client, permissions: PermissionInfo?, participants: List<Participant>, config: ExecuteContractConfig, records: Map<String, Any>, scopes: List<ScopeInfo>): List<Session> {

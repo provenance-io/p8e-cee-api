@@ -22,7 +22,7 @@ class GetObject(
     private val provenanceProperties: ProvenanceProperties,
 ) : AbstractUseCase<RetrieveAndDecryptRequest, ByteArray>() {
     override suspend fun execute(args: RetrieveAndDecryptRequest): ByteArray {
-        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.entityID.toString(), args.keyManagementConfig))
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.Entity.toString(), args.keyManagementConfig))
 
         if (args.useObjectStoreGateway) {
             GatewayClient(ClientConfig(URI.create(args.objectStoreAddress), provenanceProperties.mainnet))
