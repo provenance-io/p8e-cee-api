@@ -2,7 +2,7 @@ package io.provenance.api.models.entity
 
 import java.util.UUID
 
-sealed interface Entity
+sealed interface Entity { val id: String }
 
 /**
  * Kong consumer
@@ -13,9 +13,15 @@ sealed interface Entity
  * @constructor Create empty Kong consumer
  */
 data class KongConsumer(
-    val id: String,
+    val entityId: String,
     val username: String?,
     val customId: String,
-) : Entity
+) : Entity {
+    override val id: String
+        get() = entityId
+}
 
-data class MemberUUID(val value: UUID) : Entity
+data class MemberUUID(val value: UUID) : Entity {
+    override val id: String
+        get() = value.toString()
+}

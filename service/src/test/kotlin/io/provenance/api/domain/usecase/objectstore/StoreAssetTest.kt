@@ -15,21 +15,21 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoReque
 import io.provenance.api.frameworks.cee.parsers.MessageParser
 import io.provenance.api.frameworks.config.ObjectStoreProperties
 import io.provenance.api.models.account.AccountInfo
+import io.provenance.api.models.entity.MemberUUID
 import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.Audience
 import io.provenance.api.models.p8e.AudienceKeyPair
 import io.provenance.api.models.p8e.PermissionInfo
-import io.provenance.api.models.entity.UserUUID
 import io.provenance.entity.KeyEntity
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.util.toJavaPublicKey
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.util.toUuid
-import java.security.PrivateKey
-import java.security.PublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import tech.figure.asset.v1beta1.Asset
+import java.security.PrivateKey
+import java.security.PublicKey
 
 const val ADD_ASSET_OBJECT_STORE_ADDRESS = "grpc://localhost:5005"
 const val ADD_ASSET_AUDIENCE_PUBLIC_KEY =
@@ -85,7 +85,7 @@ class StoreAssetTest : FunSpec({
         // Execute enable replication code
         val response = storeAsset.execute(
             StoreProtoRequestWrapper(
-                UserUUID(REQUEST_UUID),
+                MemberUUID(REQUEST_UUID),
                 StoreProtoRequest(
                     ADD_ASSET_OBJECT_STORE_ADDRESS,
                     PermissionInfo(

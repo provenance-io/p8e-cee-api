@@ -9,13 +9,13 @@ data class ChangeScopeOwnershipRequestWrapper(
     val request: ChangeScopeOwnershipRequest,
 ) {
     fun toBatchWrapper() = ChangeScopeOwnershipBatchRequestWrapper(
-        Entity,
+        entity,
         ChangeScopeOwnershipBatchRequest(
             request.account,
             request.provenanceConfig,
             listOf(request.scopeId),
             request.newValueOwner,
             request.newDataAccess
-        )
+        ),
     )
 }

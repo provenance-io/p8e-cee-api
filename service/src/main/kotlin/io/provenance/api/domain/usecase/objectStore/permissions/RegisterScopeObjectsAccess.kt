@@ -20,7 +20,7 @@ class RegisterScopeObjectsAccess(
     override suspend fun execute(args: RegisterScopeObjectsAccessRequestWrapper) {
         val jwt = createGatewayJwt.execute(
             CreateGatewayJwtRequest(
-                args.Entity,
+                args.entity,
                 args.request.accountInfo.keyManagementConfig
             )
         )

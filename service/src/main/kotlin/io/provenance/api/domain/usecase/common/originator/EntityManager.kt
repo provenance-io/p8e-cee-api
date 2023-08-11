@@ -26,14 +26,14 @@ class EntityManager(
     fun getEntity(args: KeyManagementConfigWrapper): KeyEntity {
         val config = args.config ?: KeyManagementConfig(
             pluginConfig = VaultConfig(
-                "${vaultProperties.address}/${args.entity}",
+                "${vaultProperties.address}/${args.entityId}",
                 vaultProperties.tokenPath,
             )
         )
 
         val plugin = Class.forName(config.plugin).asSubclass(Plugin::class.java).kotlin.createInstance()
         manager.register(plugin)
-        return manager.get(args.entity, config.pluginConfig)
+        return manager.get(args.entityId, config.pluginConfig)
     }
 
     fun hydrateKeys(permissions: PermissionInfo?, participants: List<Participant> = emptyList(), keyManagementConfig: KeyManagementConfig? = null): Set<AudienceKeyPair> {
@@ -53,8 +53,8 @@ class EntityManager(
 
         // Populate the audiences into the audience list
         permissions?.audiences?.forEach {
-            it.uuid?.let { entity ->
-                val keyEntity = getEntity(KeyManagementConfigWrapper(entity.toString(), keyManagementConfig))
+            it.uuid?.let { uuid ->
+                val keyEntity = getEntity(KeyManagementConfigWrapper(uuid.toString(), keyManagementConfig))
 
                 additionalAudiences.add(
                     AudienceKeyPair(

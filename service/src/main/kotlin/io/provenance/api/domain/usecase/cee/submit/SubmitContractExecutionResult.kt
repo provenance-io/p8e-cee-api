@@ -19,7 +19,7 @@ class SubmitContractExecutionResult(
     private val getSigner: GetSigner,
 ) : AbstractUseCase<SubmitContractExecutionResultRequestWrapper, TxResponse>() {
     override suspend fun execute(args: SubmitContractExecutionResultRequestWrapper): TxResponse {
-        val signer = getSigner.execute(GetSignerRequest(args.Entity, args.request.account))
+        val signer = getSigner.execute(GetSignerRequest(args.entity, args.request.account))
 
         val envelope = Envelopes.Envelope.newBuilder().mergeFrom(args.request.submission.envelope).build()
         val state = Envelopes.EnvelopeState.newBuilder().mergeFrom(args.request.submission.state).build()

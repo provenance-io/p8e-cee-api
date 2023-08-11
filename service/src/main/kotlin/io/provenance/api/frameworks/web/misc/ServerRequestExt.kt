@@ -22,23 +22,23 @@ suspend inline fun <reified T> ServerRequest.requireBody(): T =
 
 fun ServerRequest.getEntity(): Entity {
     try {
-        return requireNotNull(getConsumerOrNull() ?: getMemberUUIDOrNull())
+        return requireNotNull(getMemberUUIDOrNull() ?: getConsumerOrNull())
     } catch (exception: IllegalArgumentException) {
-        log.error(exception) { "error parsing x-uuid or address header" }
-        throw IllegalArgumentException("error parsing x-uuid or address header", exception)
+        log.error(exception) { "error parsing headers for entity (x-uuid and x-consumer-id)" }
+        throw IllegalArgumentException("error parsing headers for entity (x-uuid and x-consumer-id)", exception)
     }
 }
 
-fun ServerRequest.getMemberUUIDOrNull(): MemberUUID? = headers().firstHeader("x-uuid")
+private fun ServerRequest.getMemberUUIDOrNull(): MemberUUID? = headers().firstHeader("x-uuid")
     ?.let { MemberUUID(UUID.fromString(it)) }
 
-fun ServerRequest.getConsumerOrNull(): KongConsumer? {
+private fun ServerRequest.getConsumerOrNull(): KongConsumer? {
     return headers().firstHeader("x-consumer-id")?.let { id ->
         KongConsumer(
-            id = id,
+            entityId = id,
             username = headers().firstHeader("x-consumer-username"),
             customId = requireNotNull(headers().firstHeader("x-consumer-custom-id")) {
-                "Custom ID for consumer missing"
+                "Custom ID for consumer (x-consumer-custom-id) missing"
             },
         )
     }

@@ -14,7 +14,7 @@ class GetProto(
     override suspend fun execute(args: GetProtoRequestWrapper): String {
         val message = getObject.execute(
             RetrieveAndDecryptRequest(
-                args.Entity,
+                args.entity,
                 args.request.objectStoreAddress,
                 args.request.hash,
                 args.request.account.keyManagementConfig,

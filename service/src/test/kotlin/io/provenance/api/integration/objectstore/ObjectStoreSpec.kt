@@ -11,6 +11,7 @@ import io.provenance.api.models.account.KeyManagementConfig
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.entity.Entity
+import io.provenance.api.models.entity.MemberUUID
 import io.provenance.api.util.toPrettyJson
 import io.provenance.plugins.vault.VaultConfig
 import java.util.UUID
@@ -22,12 +23,14 @@ class ObjectStoreSpec(
     private val getProto: GetProto,
 ) : IntegrationTestBase({
 
-    val entities = listOf(
-        Entity.fromString("deadbeef-face-479b-860c-facefaceface"),
-        Entity.fromString("deadbeef-face-2222-860c-facefaceface")
+    val entities = listOf<Entity>(
+        MemberUUID(UUID.fromString("deadbeef-face-479b-860c-facefaceface")),
+        MemberUUID(UUID.fromString("deadbeef-face-2222-860c-facefaceface")),
     )
 
     "Object Store" should {
+        val entity = entities.first()
+
         "Store Object and Return Hash" {
             val assetToStore = Asset.newBuilder()
                 .setDescription("arvo")
@@ -37,7 +40,7 @@ class ObjectStoreSpec(
 
             val response = storeProto.execute(
                 StoreProtoRequestWrapper(
-                    entities.first(),
+                    entity,
                     StoreProtoRequest(
                         objectStoreAddress = objectStoreAddress,
                         message = assetToStore,
@@ -45,7 +48,7 @@ class ObjectStoreSpec(
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
                                 pluginConfig = VaultConfig(
-                                    "$vaultAddress/${entities.first()}",
+                                    "$vaultAddress/${entity.id}",
                                     "src/test/resources/vault/token.output"
                                 )
                             )
@@ -56,7 +59,7 @@ class ObjectStoreSpec(
 
             val retrievedAsset = getProto.execute(
                 GetProtoRequestWrapper(
-                    entities.first(),
+                    entity,
                     GetProtoRequest(
                         response.hash,
                         objectStoreAddress,
@@ -64,7 +67,7 @@ class ObjectStoreSpec(
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
                                 pluginConfig = VaultConfig(
-                                    "$vaultAddress/${entities.first()}",
+                                    "$vaultAddress/${entity.id}",
                                     "src/test/resources/vault/token.output"
                                 )
                             )
