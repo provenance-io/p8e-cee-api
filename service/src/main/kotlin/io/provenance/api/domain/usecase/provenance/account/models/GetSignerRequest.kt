@@ -18,18 +18,20 @@ sealed interface GetSignerRequest {
     val account: AccountInfo
 
     val entity: String
-        get() = when (this) {
-            is GetSignerByAddressRequest -> address
-            is GetSignerByUUIDRequest -> uuid.toString()
-        }
 }
 
 data class GetSignerByUUIDRequest(
     val uuid: UUID,
     override val account: AccountInfo
-) : GetSignerRequest
+) : GetSignerRequest {
+    override val entity: String
+        get() = uuid.toString()
+}
 
 data class GetSignerByAddressRequest(
     val address: String,
     override val account: AccountInfo
-) : GetSignerRequest
+) : GetSignerRequest {
+    override val entity: String
+        get() = address
+}
