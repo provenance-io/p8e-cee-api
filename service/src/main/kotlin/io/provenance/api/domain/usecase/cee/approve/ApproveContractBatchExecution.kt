@@ -34,8 +34,8 @@ class ApproveContractBatchExecution(
         val responses = mutableListOf<ApproveContractExecutionResponse>()
         val errors = mutableListOf<ApproveContractExecutionErrorResponse>()
         val executionResults = mutableListOf<Pair<Envelopes.EnvelopeState, List<Tx.MsgGrant>>>()
-        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
-        createClient.execute(CreateClientRequest(args.uuid, args.request.account, args.request.client)).use { client ->
+        val signer = getSigner.execute(GetSignerRequest(args.entity, args.request.account))
+        createClient.execute(CreateClientRequest(args.entity, args.request.account, args.request.client)).use { client ->
 
             args.request.approvals.forEach {
                 val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()

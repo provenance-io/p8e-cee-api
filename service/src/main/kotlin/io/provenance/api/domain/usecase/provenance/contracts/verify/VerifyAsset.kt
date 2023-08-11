@@ -18,7 +18,7 @@ class VerifyAsset(
     override suspend fun execute(args: VerifyAssetRequestWrapper): TxResponse {
         val signer = getSigner.execute(
             GetSignerRequest(
-                args.uuid,
+                args.entity,
                 args.request.account,
             )
         )
