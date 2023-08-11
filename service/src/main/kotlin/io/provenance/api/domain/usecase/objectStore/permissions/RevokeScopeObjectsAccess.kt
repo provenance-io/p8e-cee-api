@@ -20,7 +20,7 @@ class RevokeScopeObjectsAccess(
     override suspend fun execute(args: RevokeScopeObjectsAccessRequestWrapper) {
         val jwt = createGatewayJwt.execute(
             CreateGatewayJwtRequest(
-                args.uuid,
+                args.entity,
                 args.request.accountInfo.keyManagementConfig
             )
         )

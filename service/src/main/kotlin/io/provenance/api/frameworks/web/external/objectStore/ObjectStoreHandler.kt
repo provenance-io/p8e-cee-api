@@ -18,7 +18,7 @@ import io.provenance.api.domain.usecase.objectStore.store.StoreProto
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.frameworks.web.misc.getEntity
 import io.provenance.api.models.eos.get.GetFileRequest
 import io.provenance.api.models.eos.get.GetProtoRequest
 import io.provenance.api.models.eos.store.toModel
@@ -45,7 +45,7 @@ class ObjectStoreHandler(
     suspend fun storeProto(req: ServerRequest): ServerResponse = runCatching {
         storeProto.execute(
             StoreProtoRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -54,7 +54,7 @@ class ObjectStoreHandler(
     suspend fun storeProtoV2(req: ServerRequest): ServerResponse = runCatching {
         storeProto.execute(
             StoreProtoRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody(),
                 true
             )
@@ -64,7 +64,7 @@ class ObjectStoreHandler(
     suspend fun storeFile(req: ServerRequest): ServerResponse = runCatching {
         storeFile.execute(
             StoreFileRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitMultipartData().toSingleValueMap(),
             )
         )
@@ -73,7 +73,7 @@ class ObjectStoreHandler(
     suspend fun storeFileV2(req: ServerRequest): ServerResponse = runCatching {
         storeFile.execute(
             StoreFileRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitMultipartData().toSingleValueMap(),
                 true
             )
@@ -83,7 +83,7 @@ class ObjectStoreHandler(
     suspend fun getProto(req: ServerRequest): ServerResponse = runCatching {
         getProto.execute(
             GetProtoRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 GetProtoRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -96,7 +96,7 @@ class ObjectStoreHandler(
     suspend fun getProtoV2(req: ServerRequest): ServerResponse = runCatching {
         getProto.execute(
             GetProtoRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 GetProtoRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -110,7 +110,7 @@ class ObjectStoreHandler(
     suspend fun getFile(req: ServerRequest): ServerResponse = runCatching {
         getFile.execute(
             GetFileRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 GetFileRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -123,7 +123,7 @@ class ObjectStoreHandler(
     suspend fun getFileV2(req: ServerRequest): ServerResponse = runCatching {
         getFile.execute(
             GetFileRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 GetFileRequest(
                     req.queryParam("hash").get(),
                     req.queryParam("objectStoreAddress").get(),
@@ -141,7 +141,7 @@ class ObjectStoreHandler(
     suspend fun registerObjectAccess(req: ServerRequest): ServerResponse = runCatching {
         registerObjectAccess.execute(
             RegisterObjectAccessRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -150,7 +150,7 @@ class ObjectStoreHandler(
     suspend fun revokeObjectAccess(req: ServerRequest): ServerResponse = runCatching {
         revokeObjectAccess.execute(
             RevokeObjectAccessRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -159,7 +159,7 @@ class ObjectStoreHandler(
     suspend fun registerScopeObjectAccess(req: ServerRequest): ServerResponse = runCatching {
         registerScopeObjectsAccess.execute(
             RegisterScopeObjectsAccessRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -168,7 +168,7 @@ class ObjectStoreHandler(
     suspend fun revokeScopeObjectsAccess(req: ServerRequest): ServerResponse = runCatching {
         revokeScopeObjectsAccess.execute(
             RevokeScopeObjectsAccessRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )

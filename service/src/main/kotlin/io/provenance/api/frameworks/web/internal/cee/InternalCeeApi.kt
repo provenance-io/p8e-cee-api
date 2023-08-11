@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.coRouter
 
-private val log = KotlinLogging.logger {}
+private val log = KotlinLogging.logger("InternalCeeApi")
 
 @Configuration
 class InternalCeeApi {

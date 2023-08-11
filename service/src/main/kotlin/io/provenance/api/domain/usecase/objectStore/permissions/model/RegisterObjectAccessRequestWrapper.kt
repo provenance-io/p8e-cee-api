@@ -1,9 +1,9 @@
 package io.provenance.api.domain.usecase.objectStore.permissions.model
 
 import io.provenance.api.models.eos.permissions.RegisterObjectAccessRequest
-import java.util.UUID
+import io.provenance.api.models.entity.Entity
 
 data class RegisterObjectAccessRequestWrapper(
-    val uuid: UUID,
+    val entity: Entity,
     val request: RegisterObjectAccessRequest
 )

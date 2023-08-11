@@ -28,7 +28,7 @@ import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOw
 import io.provenance.api.domain.usecase.provenance.tx.scope.models.ChangeScopeOwnershipRequestWrapper
 import io.provenance.api.frameworks.web.SuccessResponses
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.frameworks.web.misc.getEntity
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.p8e.query.QueryScopeRequest
 import io.provenance.api.models.p8e.tx.permissions.fees.get.GetFeeGrantAllowanceRequest
@@ -57,13 +57,13 @@ class ProvenanceHandler(
     private val revokeFeeGrant: RevokeFeeGrant,
 ) {
     suspend fun executeTx(req: ServerRequest): ServerResponse = runCatching {
-        executeTx.execute(ExecuteTxRequestWrapper(req.getUser(), req.awaitBody()))
+        executeTx.execute(ExecuteTxRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun queryScope(req: ServerRequest): ServerResponse = runCatching {
         queryScope.execute(
             QueryScopeRequest(
-                req.getUser(),
+                req.getEntity(),
                 req.queryParam("scopeUuid").get().toUuid(),
                 req.queryParam("chainId").get(),
                 req.queryParam("nodeEndpoint").get(),
@@ -75,7 +75,7 @@ class ProvenanceHandler(
     suspend fun changeScopeOwnership(req: ServerRequest): ServerResponse = runCatching {
         changeScopeOwnership.execute(
             ChangeScopeOwnershipRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody(),
             ).toBatchWrapper()
         )
@@ -84,24 +84,24 @@ class ProvenanceHandler(
     suspend fun changeScopeOwnershipBatch(req: ServerRequest): ServerResponse = runCatching {
         changeScopeOwnership.execute(
             ChangeScopeOwnershipBatchRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody(),
             )
         )
     }.foldToServerResponse()
 
     suspend fun classifyAsset(req: ServerRequest): ServerResponse = runCatching {
-        classifyAsset.execute(ClassifyAssetRequestWrapper(req.getUser(), req.awaitBody()))
+        classifyAsset.execute(ClassifyAssetRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun verifyAsset(req: ServerRequest): ServerResponse = runCatching {
-        verifyAsset.execute(VerifyAssetRequestWrapper(req.getUser(), req.awaitBody()))
+        verifyAsset.execute(VerifyAssetRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun getFees(req: ServerRequest): ServerResponse = runCatching {
         getFees.execute(
             GetFeesForAssetRequest(
-                req.getUser(),
+                req.getEntity(),
                 req.queryParam("contractName").get(),
                 req.queryParam("assetType").get(),
                 req.queryParam("chainId").get(),
@@ -113,7 +113,7 @@ class ProvenanceHandler(
     suspend fun getClassificationStatus(req: ServerRequest): ServerResponse = runCatching {
         getClassificationStatus.execute(
             GetStatusOfClassificationRequest(
-                req.getUser(),
+                req.getEntity(),
                 req.queryParam("assetUuid").get().toUuid(),
                 req.queryParam("assetType").get(),
                 req.queryParam("contractName").get(),
@@ -126,7 +126,7 @@ class ProvenanceHandler(
     suspend fun updateDataAccess(req: ServerRequest): ServerResponse = runCatching {
         updateDataAccess.execute(
             UpdateScopeDataAccessRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -135,7 +135,7 @@ class ProvenanceHandler(
     suspend fun updateAuthz(req: ServerRequest): ServerResponse = runCatching {
         updateAuthzGrant.execute(
             UpdateAuthzRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -144,7 +144,7 @@ class ProvenanceHandler(
     suspend fun checkCustody(req: ServerRequest): ServerResponse = kotlin.runCatching {
         getSigner.execute(
             GetSignerRequest(
-                uuid = req.getUser(),
+                id = req.getEntity(),
                 account = req.awaitBodyOrNull() ?: AccountInfo()
             )
         )
@@ -160,7 +160,7 @@ class ProvenanceHandler(
     suspend fun createFeesGrant(req: ServerRequest): ServerResponse = runCatching {
         grantFeeGrant.execute(
             GrantFeeGrantRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -169,7 +169,7 @@ class ProvenanceHandler(
     suspend fun revokeFeesGrant(req: ServerRequest): ServerResponse = runCatching {
         revokeFeeGrant.execute(
             RevokeFeeGrantRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 req.awaitBody()
             )
         )
@@ -178,7 +178,7 @@ class ProvenanceHandler(
     suspend fun getFeeGrant(req: ServerRequest): ServerResponse = runCatching {
         getFeeGrant.execute(
             GetFeeGrantAllowanceRequestWrapper(
-                req.getUser(),
+                req.getEntity(),
                 GetFeeGrantAllowanceRequest(
                     nodeEndpoint = req.queryParam("nodeEndpoint").get(),
                     chainId = req.queryParam("chainId").get(),

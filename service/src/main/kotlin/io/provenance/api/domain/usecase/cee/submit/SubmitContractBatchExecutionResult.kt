@@ -31,7 +31,7 @@ class SubmitContractBatchExecutionResult(
         val signedResults = mutableListOf<Pair<UUID, SignedResult>>()
         val response = mutableListOf<SubmitContractBatchExecutionResultResponse>()
         val errors = mutableListOf<SubmitContractBatchErrorResponse>()
-        val signer = getSigner.execute(GetSignerRequest(args.uuid, args.request.account))
+        val signer = getSigner.execute(GetSignerRequest(args.entity, args.request.account))
 
         args.request.submission.forEach {
             val envelope = Envelopes.Envelope.newBuilder().mergeFrom(it.envelope).build()

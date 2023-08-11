@@ -68,7 +68,7 @@ services:
             - provenance:/provenance
 
     vault:
-        image: vault:latest
+        image: hashicorp/vault:latest
         container_name: vault-cee
         networks:
             - p8e-network

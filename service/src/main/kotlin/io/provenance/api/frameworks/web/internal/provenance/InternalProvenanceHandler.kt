@@ -11,7 +11,7 @@ import io.provenance.api.domain.usecase.provenance.contracts.status.models.GetSt
 import io.provenance.api.domain.usecase.provenance.contracts.verify.VerifyAsset
 import io.provenance.api.domain.usecase.provenance.contracts.verify.models.VerifyAssetRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.frameworks.web.misc.getEntity
 import io.provenance.scope.util.toUuid
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -27,17 +27,17 @@ class InternalProvenanceHandler(
     private val getAssetDefinitions: GetAssetDefinitions
 ) {
     suspend fun classifyAsset(req: ServerRequest): ServerResponse = runCatching {
-        classifyAsset.execute(ClassifyAssetRequestWrapper(req.getUser(), req.awaitBody()))
+        classifyAsset.execute(ClassifyAssetRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun verifyAsset(req: ServerRequest): ServerResponse = runCatching {
-        verifyAsset.execute(VerifyAssetRequestWrapper(req.getUser(), req.awaitBody()))
+        verifyAsset.execute(VerifyAssetRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun getClassificationStatus(req: ServerRequest): ServerResponse = runCatching {
         getClassificationStatus.execute(
             GetStatusOfClassificationRequest(
-                req.getUser(),
+                req.getEntity(),
                 req.queryParam("assetUuid").get().toUuid(),
                 req.queryParam("assetType").get(),
                 req.queryParam("contractName").get(),
@@ -50,7 +50,7 @@ class InternalProvenanceHandler(
     suspend fun getFees(req: ServerRequest): ServerResponse = runCatching {
         getFees.execute(
             GetFeesForAssetRequest(
-                req.getUser(),
+                req.getEntity(),
                 req.queryParam("contractName").get(),
                 req.queryParam("assetType").get(),
                 req.queryParam("chainId").get(),

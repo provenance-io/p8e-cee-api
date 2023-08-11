@@ -269,6 +269,7 @@ class CeeApi {
             POST("/execute", handler::executeContract)
             POST("/submit", handler::submitContractResult)
             POST("/reject", handler::rejectContractExecution)
+            GET("/headers", handler::showHeaders)
             "/batch".nest {
                 POST("/execute", handler::executeContractBatch)
                 POST("/submit", handler::submitContractBatchResult)

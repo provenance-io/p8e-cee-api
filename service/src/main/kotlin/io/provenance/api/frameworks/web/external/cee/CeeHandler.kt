@@ -17,11 +17,14 @@ import io.provenance.api.domain.usecase.cee.submit.SubmitContractExecutionResult
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractBatchExecutionResultRequestWrapper
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
-import io.provenance.api.frameworks.web.misc.getUser
+import io.provenance.api.frameworks.web.misc.getEntity
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
+
+private val log = KotlinLogging.logger("CeeHandler")
 
 @Component
 class CeeHandler(
@@ -35,34 +38,38 @@ class CeeHandler(
     private val rejectContractBatchExecution: RejectContractBatchExecution,
 ) {
     suspend fun executeContract(req: ServerRequest): ServerResponse = runCatching {
-        executeContract.execute(ExecuteContractRequestWrapper(req.getUser(), req.awaitBody()))
+        executeContract.execute(ExecuteContractRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun submitContractResult(req: ServerRequest): ServerResponse = runCatching {
-        submitContract.execute(SubmitContractExecutionResultRequestWrapper(req.getUser(), req.awaitBody()))
+        submitContract.execute(SubmitContractExecutionResultRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun approveContractExecution(req: ServerRequest): ServerResponse = runCatching {
-        approveContractExecution.execute(ApproveContractRequestWrapper(req.getUser(), req.awaitBody()))
+        approveContractExecution.execute(ApproveContractRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun rejectContractExecution(req: ServerRequest): ServerResponse = runCatching {
-        rejectContractExecution.execute(RejectContractExecutionRequestWrapper(req.getUser(), req.awaitBody()))
+        rejectContractExecution.execute(RejectContractExecutionRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun executeContractBatch(req: ServerRequest): ServerResponse = runCatching {
-        executeContractBatch.execute(ExecuteContractBatchRequestWrapper(req.getUser(), req.awaitBody()))
+        executeContractBatch.execute(ExecuteContractBatchRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun submitContractBatchResult(req: ServerRequest): ServerResponse = runCatching {
-        submitExecuteContractBatch.execute(SubmitContractBatchExecutionResultRequestWrapper(req.getUser(), req.awaitBody()))
+        submitExecuteContractBatch.execute(SubmitContractBatchExecutionResultRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun approveContractBatchExecution(req: ServerRequest): ServerResponse = runCatching {
-        approveContractBatchExecution.execute(ApproveContractBatchRequestWrapper(req.getUser(), req.awaitBody()))
+        approveContractBatchExecution.execute(ApproveContractBatchRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
 
     suspend fun rejectContractBatchExecution(req: ServerRequest): ServerResponse = runCatching {
-        rejectContractBatchExecution.execute(RejectContractBatchRequestWrapper(req.getUser(), req.awaitBody()))
+        rejectContractBatchExecution.execute(RejectContractBatchRequestWrapper(req.getEntity(), req.awaitBody()))
+    }.foldToServerResponse()
+
+    suspend fun showHeaders(req: ServerRequest): ServerResponse = runCatching {
+        req.headers().also { log.info { "headers: $it" } }
     }.foldToServerResponse()
 }
