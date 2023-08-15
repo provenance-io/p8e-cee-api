@@ -141,11 +141,11 @@ class ProvenanceHandler(
         )
     }.foldToServerResponse()
 
-    suspend fun checkCustody(req: ServerRequest): ServerResponse = kotlin.runCatching {
+    suspend fun checkCustody(req: ServerRequest): ServerResponse = runCatching {
         getSigner.execute(
             GetSignerRequest(
-                id = req.getEntity(),
-                account = req.awaitBodyOrNull() ?: AccountInfo()
+                entity = req.getEntity(),
+                account = req.awaitBodyOrNull() ?: AccountInfo(),
             )
         )
     }.fold(
