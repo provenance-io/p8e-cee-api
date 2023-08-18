@@ -18,13 +18,10 @@ import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractBatchExe
 import io.provenance.api.domain.usecase.cee.submit.models.SubmitContractExecutionResultRequestWrapper
 import io.provenance.api.frameworks.web.misc.foldToServerResponse
 import io.provenance.api.frameworks.web.misc.getEntity
-import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
-
-private val log = KotlinLogging.logger("CeeHandler")
 
 @Component
 class CeeHandler(
@@ -67,9 +64,5 @@ class CeeHandler(
 
     suspend fun rejectContractBatchExecution(req: ServerRequest): ServerResponse = runCatching {
         rejectContractBatchExecution.execute(RejectContractBatchRequestWrapper(req.getEntity(), req.awaitBody()))
-    }.foldToServerResponse()
-
-    suspend fun showHeaders(req: ServerRequest): ServerResponse = runCatching {
-        req.headers().also { log.info { "headers: $it" } }
     }.foldToServerResponse()
 }

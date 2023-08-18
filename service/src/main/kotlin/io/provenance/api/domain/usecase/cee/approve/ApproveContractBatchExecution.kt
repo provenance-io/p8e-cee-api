@@ -66,7 +66,7 @@ class ApproveContractBatchExecution(
                     }
                 }.fold(
                     onSuccess = {
-                        log.info("Successfully processed batch $index of ${chunked.size}")
+                        log.debug { "Successfully processed batch $index of ${chunked.size}" }
                     },
                     onFailure = { error ->
                         errors.add(

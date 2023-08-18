@@ -9,9 +9,9 @@ import java.util.UUID
 sealed interface GetSignerRequest {
 
     companion object {
-        operator fun invoke(id: Entity, account: AccountInfo): GetSignerRequest = when (id) {
-            is KongConsumer -> GetSignerByAddressRequest(id.customId, account)
-            is MemberUUID -> GetSignerByUUIDRequest(id.value, account)
+        operator fun invoke(entity: Entity, account: AccountInfo): GetSignerRequest = when (entity) {
+            is KongConsumer -> GetSignerByAddressRequest(entity.id, account)
+            is MemberUUID -> GetSignerByUUIDRequest(entity.value, account)
         }
     }
 

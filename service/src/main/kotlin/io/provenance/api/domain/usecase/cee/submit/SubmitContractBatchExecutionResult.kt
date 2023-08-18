@@ -67,7 +67,7 @@ class SubmitContractBatchExecutionResult(
                 }
             }.fold(
                 onSuccess = {
-                    log.info("Successfully processed batch $index of ${pair.size}")
+                    log.debug { "Successfully processed batch $index of ${pair.size}" }
                 },
                 onFailure = {
                     errors.add(

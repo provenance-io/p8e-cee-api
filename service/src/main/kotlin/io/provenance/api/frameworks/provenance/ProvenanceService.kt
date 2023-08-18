@@ -153,17 +153,12 @@ class ProvenanceService : Provenance {
                 val account = getBaseAccount(pbClient, signer.address())
                 val cachedOffset = cachedSequenceMap.getOrPut(signer.address()) { CachedAccountSequence() }
 
-                runCatching {
+                return runCatching {
                     action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
-                }.fold(
-                    onSuccess = {
-                        return it
-                    },
-                    onFailure = {
-                        cachedOffset.getAndDecrement(account.sequence)
-                        throw it
-                    }
-                )
+                }.getOrElse {
+                    cachedOffset.getAndDecrement(account.sequence)
+                    throw it
+                }
             }
         }
     }

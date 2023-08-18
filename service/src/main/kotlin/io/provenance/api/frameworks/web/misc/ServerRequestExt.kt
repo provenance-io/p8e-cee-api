@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBodyOrNull
 import java.util.UUID
 
-private val log = KotlinLogging.logger {}
+private val log = KotlinLogging.logger("ServerRequest")
 
 val ServerRequest.ipAddress: String
     get() = headers().firstHeader("x-real-ip") ?: remoteAddress().get().address.toString()
@@ -37,9 +37,7 @@ private fun ServerRequest.getConsumerOrNull(): KongConsumer? {
         KongConsumer(
             entityId = id,
             username = headers().firstHeader("x-consumer-username"),
-            customId = requireNotNull(headers().firstHeader("x-consumer-custom-id")) {
-                "Custom ID for consumer (x-consumer-custom-id) missing"
-            },
+            customId = headers().firstHeader("x-consumer-custom-id"),
         )
     }
 }

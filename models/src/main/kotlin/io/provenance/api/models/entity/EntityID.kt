@@ -15,10 +15,10 @@ sealed interface Entity { val id: String }
 data class KongConsumer(
     val entityId: String,
     val username: String?,
-    val customId: String,
+    val customId: String?,
 ) : Entity {
     override val id: String
-        get() = entityId
+        get() = customId ?: username ?: entityId
 }
 
 data class MemberUUID(val value: UUID) : Entity {

@@ -93,20 +93,12 @@ class UpdateScopeDataAccess(
                 DataAccessChangeType.ADD -> {
                     runCatching {
                         addAction(change)
-                    }
-                        .fold(
-                            onSuccess = { result -> result },
-                            onFailure = { error -> errors.add(error) }
-                        )
+                    }.getOrElse { error -> errors.add(error) }
                 }
                 DataAccessChangeType.REMOVE -> {
                     runCatching {
                         removeAction(change)
-                    }
-                        .fold(
-                            onSuccess = { result -> result },
-                            onFailure = { error -> errors.add(error) }
-                        )
+                    }.getOrElse { error -> errors.add(error) }
                 }
             }
         }
