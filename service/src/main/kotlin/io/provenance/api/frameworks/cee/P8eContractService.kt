@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class P8eContractService : ContractService {
-    private val log = KotlinLogging.logger { }
+    private val log = KotlinLogging.logger("P8eContractService")
 
     override fun getContract(contractName: String): Class<out P8eContract> {
         return Class.forName(contractName).asSubclass(P8eContract::class.java)
@@ -64,29 +64,31 @@ class P8eContractService : ContractService {
         }
 
     override fun executeContract(client: Client, session: Session): ExecutionResult =
-        runCatchingExecutionResult<Session>() {
+        runCatchingExecutionResult {
             client.execute(session)
         }
 
     override fun executeContract(client: Client, envelope: Envelope): ExecutionResult =
-        runCatchingExecutionResult<Envelope>() {
+        runCatchingExecutionResult {
             client.execute(envelope)
         }
 
-    private fun <T> runCatchingExecutionResult(execution: () -> ExecutionResult): ExecutionResult =
-        runCatching {
-            execution()
-        }.fold(
-            onSuccess = { result -> result },
-            onFailure = { throwable ->
-                throw ContractExecutionException("Contract execution failed: ${throwable.message}", throwable)
-            }
-        )
+    private fun runCatchingExecutionResult(execution: () -> ExecutionResult): ExecutionResult = runCatching {
+        execution()
+    }.getOrElse { throwable ->
+        throw ContractExecutionException("Contract execution failed: ${throwable.message}", throwable)
+    }
 
-    private fun Session.Builder.configureSession(records: Map<String, Message>, sessionUuid: UUID? = null, participants: Map<Specifications.PartyType, KeyEntity>?, audiences: Set<PublicKey>): Session =
+    private fun Session.Builder.configureSession(
+        records: Map<String, Message>,
+        sessionUuid: UUID? = null,
+        participants: Map<Specifications.PartyType, KeyEntity>?,
+        audiences: Set<PublicKey>,
+    ): Session =
         this.setSessionUuid(sessionUuid ?: UUID.randomUUID())
-            .also { records.forEach { record -> it.addProposedRecord(record.key, record.value) } }
             .also {
+                records.forEach { record -> it.addProposedRecord(record.key, record.value) }
+
                 participants?.forEach { participant ->
                     it.addParticipant(
                         participant.key,

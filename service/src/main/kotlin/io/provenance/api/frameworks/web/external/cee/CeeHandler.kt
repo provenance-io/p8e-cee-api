@@ -68,8 +68,4 @@ class CeeHandler(
     suspend fun rejectContractBatchExecution(req: ServerRequest): ServerResponse = runCatching {
         rejectContractBatchExecution.execute(RejectContractBatchRequestWrapper(req.getEntity(), req.awaitBody()))
     }.foldToServerResponse()
-
-    suspend fun showHeaders(req: ServerRequest): ServerResponse = runCatching {
-        req.headers().also { log.info { "headers: $it" } }
-    }.foldToServerResponse()
 }

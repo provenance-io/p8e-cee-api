@@ -69,7 +69,7 @@ class ContractUtilities(
                 participantsMap,
                 scopeToUse,
                 config.contract.scopeSpecificationName,
-                audiences.map { it.encryptionKey.toJavaPublicKey() }.toSet()
+                audiences.map { audience -> audience.encryptionKey.toJavaPublicKey() }.toSet()
             )
         }
     }

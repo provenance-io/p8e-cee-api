@@ -22,7 +22,6 @@ suspend inline fun <reified T> ServerRequest.requireBody(): T =
 
 fun ServerRequest.getEntity(): Entity {
     try {
-        log.info { "headers: ${headers().asHttpHeaders()}" }
         return requireNotNull(getMemberUUIDOrNull() ?: getConsumerOrNull())
     } catch (exception: IllegalArgumentException) {
         log.error(exception) { "error parsing headers for entity (x-uuid and x-consumer-id)" }

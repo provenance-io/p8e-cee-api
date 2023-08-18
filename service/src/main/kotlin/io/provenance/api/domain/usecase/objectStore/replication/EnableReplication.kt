@@ -27,8 +27,9 @@ class EnableReplication(
                 args.targetSigningPublicKey.toJavaPublicKey(),
                 args.targetEncryptionPublicKey.toJavaPublicKey(),
                 args.targetObjectStoreAddress,
-            ) ?: throw IllegalStateException("Error performing operation")
-        }
-        log.info("createPublicKey() response: ${publicKeyResponse.toJson()}")
+            )
+        } ?: throw IllegalStateException("Error performing operation")
+
+        log.debug { "createPublicKey() response: ${publicKeyResponse.toJson()}" }
     }
 }

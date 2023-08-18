@@ -83,7 +83,7 @@ class ExecuteContractBatch(
                     }
                 }.fold(
                     onSuccess = {
-                        log.info("Successfully processed batch $index of ${chunkedSignedResult.size}")
+                        log.debug { "Successfully processed batch $index of ${chunkedSignedResult.size}" }
                     },
                     onFailure = { error ->
                         errors.add(
@@ -111,7 +111,7 @@ class ExecuteContractBatch(
                         )
                     }.fold(
                         onSuccess = {
-                            log.info("Successfully processed batch $index of ${chunkedFragResult.size}")
+                            log.debug { "Successfully processed batch $index of ${chunkedFragResult.size}" }
                         },
                         onFailure = {
                             errors.add(
