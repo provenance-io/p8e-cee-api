@@ -155,7 +155,7 @@ class ProvenanceService : Provenance {
 
                 return runCatching {
                     action(pbClient, account, cachedOffset.getAndIncrementOffset(account.sequence))
-                }.getOrElse{
+                }.getOrElse {
                     cachedOffset.getAndDecrement(account.sequence)
                     throw it
                 }
