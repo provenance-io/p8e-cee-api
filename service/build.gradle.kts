@@ -1,10 +1,11 @@
 val ktlint: Configuration by configurations.creating
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    Plugins.Detekt.addTo(this)
-    Plugins.SpringBoot.addTo(this)
-    Plugins.SpringDependencyManagement.addTo(this)
-    kotlin("plugin.spring") version Versions.Kotlin
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependencyManagement)
+    kotlin("plugin.spring") version "1.8.10"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
@@ -14,85 +15,90 @@ dependencyManagement {
 }
 
 dependencies {
-    ktlint(Dependencies.Ktlint.toDependencyNotation())
+    ktlint(libs.ktlint)
+
     implementation(project(":models"))
     testImplementation(project(":models"))
 
     listOf(
-        Dependencies.Kotlin.AllOpen,
-        Dependencies.Kotlin.Reflect,
-        Dependencies.Kotlin.StdlbJdk8,
-        Dependencies.Kotlin.StdlbCommon,
-        Dependencies.Kotlin.CoroutinesCoreJvm,
-        Dependencies.Kotlin.CoroutinesJdk8,
-        Dependencies.Kotlin.CoroutinesReactor,
-        Dependencies.SpringBoot.Starter,
-        Dependencies.SpringBoot.StarterActuator,
-        Dependencies.SpringBoot.StarterWebFlux,
-        Dependencies.SpringBoot.StarterJetty,
-        Dependencies.SpringBoot.StarterDevTools,
-        Dependencies.SpringBoot.StarterSecurity,
-        Dependencies.SpringBoot.StarterValidation,
-        // Needed to play nice with WebFlux Coroutines stuff
-        Dependencies.Reactor.Core,
-        Dependencies.KotlinLogging,
-        Dependencies.SpringBoot.Swagger,
-        Dependencies.SpringBoot.SwaggerUI,
-        Dependencies.Swagger.Annotations,
-        Dependencies.P8eScope.Encryption,
-        Dependencies.P8eScope.OsClient,
-        Dependencies.P8eScope.Sdk,
-        Dependencies.P8eScope.Util,
-        Dependencies.Provenance.KeyAccessLib,
-        Dependencies.Provenance.HdWallet.HdWallet,
-        Dependencies.Provenance.HdWallet.HdWalletBip39,
-        Dependencies.Provenance.Client.GrpcClientKotlin,
-        Dependencies.Provenance.ProtoKotlin,
-        Dependencies.Provenance.LoanPackage,
-        Dependencies.Jackson.Databind,
-        Dependencies.Jackson.Datatype,
-        Dependencies.Jackson.Hubspot,
-        Dependencies.Jackson.KotlinModule,
-        Dependencies.Protobuf.JavaUtil,
-        Dependencies.Kong.Unirest,
-        Dependencies.Grpc.Protobuf,
-        Dependencies.Grpc.Stub,
-        Dependencies.Reflections,
-        Dependencies.BouncyCastle,
-        Dependencies.BouncyCastleProvider,
-        Dependencies.OpenApi.WebFluxSupport,
-        Dependencies.OpenApi.KotlinSupport,
-        Dependencies.AssetClassification.Client,
-        Dependencies.AssetClassification.Verifier,
-        Dependencies.P8eScope.OsGateway,
-
-    ).forEach { dep ->
-        dep.implementation(this)
+        libs.kotlin.allOpen,
+        libs.kotlin.reflect,
+        libs.kotlin.stdLib.jdk8,
+        libs.kotlin.stdLib.common,
+        libs.kotlin.coroutines.coreJvm,
+        libs.kotlin.coroutines.jdk8,
+        libs.kotlin.coroutines.reactor,
+        libs.springBoot.starter,
+        libs.springBoot.starter.actuator,
+        libs.springBoot.starter.jetty,
+        libs.springBoot.starter.devTools,
+        libs.springBoot.starter.security,
+        libs.springBoot.starter.validation,
+        libs.reactor.core, // Needed to play nice with WebFlux Coroutines stuff
+        libs.kotlin.logging,
+        libs.springfox.swagger,
+        libs.springfox.swagger.ui,
+        libs.swagger.annotations,
+        libs.p8eScope.encryption,
+        libs.p8eScope.objectStore.client,
+        libs.p8eScope.sdk,
+        libs.provenance.keyAccessLib,
+        libs.provenance.hdWallet,
+        libs.provenance.hdWallet.bip39,
+        libs.provenance.client,
+        libs.provenance.protoKotlin,
+        libs.provenance.loanPackage,
+        libs.jackson.databind,
+        libs.jackson.datatype,
+        libs.jackson.protobuf,
+        libs.jackson.kotlinModule,
+        libs.protobuf.java.util,
+        libs.kong.unirest,
+        libs.grpc.protobuf,
+        libs.grpc.stub,
+        libs.reflections,
+        libs.bouncyCastle,
+        libs.bouncyCastle.provider,
+        libs.springdoc.openApi.webFluxSupport,
+        libs.springdoc.openApi.kotlinSupport,
+        libs.assetClassification.client,
+        libs.assetClassification.verifier,
+        libs.objectStore.gateway,
+    ).forEach { dependency ->
+        implementation(dependency)
     }
 
-    implementation(Dependencies.Provenance.AssetModel.toDependencyNotation()) {
+    implementation(libs.springBoot.starter.webflux) {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+    }
+
+    implementation(libs.provenance.metadataAssetModel) {
         version {
-            strictly(Versions.AssetModel)
+            strictly(libs.versions.metadataAssetModel.get())
         }
     }
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     listOf(
-        Dependencies.Hamkrest,
-        Dependencies.Mockk,
-        Dependencies.KotlinFaker,
-        Dependencies.Kotlin.CoroutinesTest,
-        Dependencies.SpringMockk,
-        Dependencies.SpringBoot.StarterTest,
-        Dependencies.Kotest,
-        Dependencies.KotestAssertions,
-        Dependencies.KotestAssertionsArrow,
-        Dependencies.KotestProperty,
-        Dependencies.KotestSpring,
-        Dependencies.TestContainers.Core,
-    ).forEach { testDep ->
-        testDep.testImplementation(this)
+        libs.hamkrest,
+        libs.mockk,
+        libs.kotlin.faker,
+        libs.kotlin.coroutines.test,
+        libs.spring.mockk,
+        libs.kotest,
+        libs.kotest.assertions,
+        libs.kotest.assertions.arrow,
+        libs.kotest.property,
+        libs.kotest.spring,
+        libs.testContainers.core,
+    ).forEach { testDependency ->
+        testImplementation(testDependency)
+    }
+
+    testImplementation(libs.springBoot.starter.test) {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+        exclude(group = "org.mockito", module = "mockito-core")
     }
 }
 
@@ -132,7 +138,7 @@ tasks.bootRun.configure {
 }
 
 detekt {
-   toolVersion = Versions.Detekt
+   toolVersion = libs.versions.detekt.get()
    buildUponDefaultConfig = true
    config = files("${rootDir.path}/detekt.yml")
    input = files("src/main/kotlin", "src/test/kotlin")

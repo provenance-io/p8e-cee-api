@@ -1,16 +1,17 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version Versions.Kotlin
+    kotlin("jvm") version "1.8.10"
     id("java")
     id("maven-publish")
     id("java-library")
-    id("io.github.gradle-nexus.publish-plugin") version Versions.NexusPublishing
+    alias(libs.plugins.nexus.publishing)
     signing
 }
 
 subprojects {
     apply {
-        Plugins.Kotlin.addTo(this)
-        Plugins.Idea.addTo(this)
+        plugin("kotlin")
+        plugin("idea")
         plugin("java")
         plugin("signing")
     }

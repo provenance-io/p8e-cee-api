@@ -1,7 +1,8 @@
 val ktlint: Configuration by configurations.creating
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    Plugins.Detekt.addTo(this)
+    alias(libs.plugins.detekt)
     `java-library`
     `maven-publish`
 }
@@ -9,25 +10,25 @@ plugins {
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 dependencies {
-    ktlint(Dependencies.Ktlint.toDependencyNotation())
+    ktlint(libs.ktlint)
 
     listOf(
-        Dependencies.Protobuf.JavaUtil,
-        Dependencies.P8eScope.ContractProto,
-        Dependencies.P8eScope.ContractBase,
-        Dependencies.P8eScope.OsClient,
-        Dependencies.Kotlin.CoroutinesReactor,
-        Dependencies.Jackson.Databind,
-        Dependencies.AssetClassification.Client,
-        Dependencies.AssetClassification.Verifier,
-        Dependencies.Provenance.KeyAccessLib,
-    ).forEach { dep ->
-        dep.implementation(this)
+        libs.protobuf.java.util,
+        libs.p8eScope.contract.base,
+        libs.p8eScope.contract.proto,
+        libs.p8eScope.objectStore.client,
+        libs.kotlin.coroutines.reactor,
+        libs.jackson.databind,
+        libs.assetClassification.client,
+        libs.assetClassification.verifier,
+        libs.provenance.keyAccessLib,
+    ).forEach { dependency ->
+        implementation(dependency)
     }
 
-    implementation(Dependencies.Provenance.AssetModel.toDependencyNotation()) {
+    implementation(libs.provenance.metadataAssetModel) {
         version {
-            strictly(Versions.AssetModel)
+            strictly(libs.versions.metadataAssetModel.get())
         }
     }
 }
@@ -106,7 +107,7 @@ tasks.register<JavaExec>("ktlintFormat") {
 }
 
 detekt {
-    toolVersion = Versions.Detekt
+    toolVersion = libs.versions.detekt.get()
     buildUponDefaultConfig = true
     config = files("${rootDir.path}/detekt.yml")
     input = files("src/main/kotlin", "src/test/kotlin")
