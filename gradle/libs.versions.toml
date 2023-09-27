@@ -1,0 +1,127 @@
+[versions]
+kotlin = "1.8.10"
+kotlin_coroutines = "1.6.4"
+assetClassification = "3.7.0"
+bouncyCastle = "1.70"
+detekt = "1.18.1"
+grpc = "1.51.3"
+hamkrest = "1.8.0.1"
+jackson_databind = "2.12.6.1"
+jackson_jsr310 = "2.12.+"
+jackson_kotlinModule = "2.12.5"
+jackson_protobuf = "0.9.9-jackson2.9-proto3"
+kong_unirest = "3.13.6"
+kotest = "5.5.5"
+kotest_extensions_arrow = "1.2.+"
+kotest_spring = "1.1.2"
+kotlin_faker = "1.7.1"
+kotlin_logging = "2.0.11"
+ktlint = "0.45.2"
+loanPackage = "1.1.4"
+metadataAssetModel = "1.1.3"
+mockk = "1.13.4"
+nexus_publishing = "1.1.0"
+objectStore_gateway = "3.3.0"
+p8eScopeSdk = "0.6.4"
+protobuf = "3.21.12"
+protobuf_plugin = "0.8.16"
+provenance_client = "1.3.0"
+provenance_hdWallet = "0.1.15"
+provenance_kmsConnector = "0.3.6"
+provenance_proto = "1.13.1"
+reactor = "3.4.9"
+redisson = "3.16.0"
+reflections = "0.9.10"
+spring_boot = "2.5.6"
+spring_dependencyManagement = "1.0.11.RELEASE"
+spring_mockk = "3.0.1"
+springdoc = "1.5.13"
+springfox = "3.0.0"
+swagger = "1.6.2"
+testContainers = "1.3.3"
+
+[plugins]
+kotlin = { id = "kotlin", version.ref = "kotlin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+idea = { id = "idea" }
+nexus_publishing = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus_publishing" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin" }
+spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }
+spring_dependencyManagement = { id = "io.spring.dependency-management", version.ref = "spring_dependencyManagement" }
+
+[libraries]
+# Kotlin
+kotlin_allOpen = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
+kotlin_reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin_stdLib_jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin_stdLib_common = { module = "org.jetbrains.kotlin:kotlin-stdlib-common", version.ref = "kotlin" }
+kotlin_coroutines_coreJvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlin_coroutines" }
+kotlin_coroutines_reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlin_coroutines" }
+kotlin_coroutines_jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin_coroutines" }
+kotlin_coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin_coroutines" }
+# Spring
+springBoot_starter = { module = "org.springframework.boot:spring-boot-starter" }
+springBoot_starter_actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+springBoot_starter_devTools = { module = "org.springframework.boot:spring-boot-devtools" }
+springBoot_starter_jetty = { module = "org.springframework.boot:spring-boot-starter-jetty" }
+springBoot_starter_security = { module = "org.springframework.boot:spring-boot-starter-security" }
+springBoot_starter_validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBoot_starter_webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+springBoot_starter_test = { module = "org.springframework.boot:spring-boot-starter-test" }
+# Provenance
+p8eScope_contract_base = { module = "io.provenance.scope:contract-base", version.ref = "p8eScopeSdk" }
+p8eScope_contract_proto = { module = "io.provenance.scope:contract-proto", version.ref = "p8eScopeSdk" }
+p8eScope_encryption = { module = "io.provenance.scope:encryption", version.ref = "p8eScopeSdk" }
+p8eScope_objectStore_client = { module = "io.provenance.scope:os-client", version.ref = "p8eScopeSdk" }
+p8eScope_sdk = { module = "io.provenance.scope:sdk", version.ref = "p8eScopeSdk" }
+p8eScope_util = { module = "io.provenance.scope:util", version.ref = "p8eScopeSdk" }
+provenance_client = { module = "io.provenance.client:pb-grpc-client-kotlin", version.ref = "provenance_client" }
+provenance_hdWallet = { module = "io.provenance.hdwallet:hdwallet", version.ref = "provenance_hdWallet" }
+provenance_hdWallet_bip39 = { module = "io.provenance.hdwallet:hdwallet-bip39", version.ref = "provenance_hdWallet" }
+provenance_keyAccessLib = { module = "io.provenance.kms-connector:lib", version.ref = "provenance_kmsConnector" }
+provenance_loanPackage = { module = "io.provenance.loan-package:contract", version.ref = "loanPackage" }
+provenance_metadataAssetModel = { module = "io.provenance.model:metadata-asset-model", version.ref = "metadataAssetModel" }
+provenance_protoKotlin = { module = "io.provenance:proto-kotlin", version.ref = "provenance_proto" }
+# Figure Tech
+assetClassification_client = { module = "tech.figure.classification.asset:ac-client", version.ref = "assetClassification" }
+assetClassification_verifier = { module = "tech.figure.classification.asset:ac-verifier", version.ref = "assetClassification" }
+objectStore_gateway = { module = "tech.figure.objectstore.gateway:client", version.ref = "objectStore_gateway" }
+# Jackson
+## TODO: Clean up Jackson versions
+jackson_databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson_databind" }
+jackson_datatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson_jsr310" }
+jackson_kotlinModule = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson_kotlinModule" }
+jackson_protobuf = { module = "com.hubspot.jackson:jackson-datatype-protobuf", version.ref = "jackson_protobuf" }
+# Google
+grpc_protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+grpc_stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+protobuf_java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protobuf_java_util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
+# Other
+bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }
+bouncyCastle_provider = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bouncyCastle" }
+kong_unirest = { module = "com.konghq:unirest-java", version.ref = "kong_unirest" }
+kotlin_logging = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin_logging" }
+ktlint = { module = "com.pinterest:ktlint", version.ref = "ktlint" }
+reactor_core = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
+redisson = { module = "org.redisson:redisson", version.ref = "redisson" }
+reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
+springdoc_openApi_kotlinSupport = { module = "org.springdoc:springdoc-openapi-kotlin", version.ref = "springdoc" }
+springdoc_openApi_webFluxSupport = { module = "org.springdoc:springdoc-openapi-webflux-ui", version.ref = "springdoc" }
+springfox_swagger = { module = "io.springfox:springfox-boot-starter", version.ref = "springfox" }
+springfox_swagger_ui = { module = "io.springfox:springfox-swagger-ui", version.ref = "springfox" }
+swagger_annotations = { module = "io.swagger:swagger-annotations", version.ref = "swagger" }
+# Testing
+hamkrest = { module = "com.natpryce:hamkrest", version.ref = "hamkrest" }
+kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest_assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+kotest_assertions_arrow = { module = "io.kotest.extensions:kotest-assertions-arrow", version.ref = "kotest_extensions_arrow" }
+kotest_property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest_spring = { module = "io.kotest.extensions:kotest-extensions-spring", version.ref = "kotest_spring" }
+kotlin_faker = { module = "io.github.serpro69:kotlin-faker", version.ref = "kotlin_faker" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+spring_mockk = { module = "com.ninja-squad:springmockk", version.ref = "spring_mockk" }
+testContainers_core = { module = "io.kotest.extensions:kotest-extensions-testcontainers", version.ref = "testContainers" }
+
+[bundles]
+

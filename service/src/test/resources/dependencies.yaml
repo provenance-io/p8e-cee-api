@@ -50,7 +50,7 @@ services:
             - ./object-store:/mnt/data
 
     provenance:
-        image: provenanceio/provenance:v1.13.1
+        image: provenanceio/provenance:v1.13.1 # TODO: Update version
         command: bash -c "cp -rn /home/provenance_seed/* /provenance && /usr/bin/provenanced -t --home /provenance start"
         networks:
             - p8e-network-test
@@ -66,7 +66,7 @@ services:
             - provenance:/provenance
 
     vault:
-        image: hashicorp/vault:latest
+        image: hashicorp/vault:latest # TODO: Pin version
         networks:
             - p8e-network-test
         ports:
