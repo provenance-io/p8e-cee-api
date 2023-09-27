@@ -39,6 +39,12 @@ autolabeler:
     - label: 'docs'
       title:
           - '/docs/i'
+exclude-contributors:
+    - 'renovate'
+    - 'renovate[bot]'
+replacers:
+    - search: '/@renovate(\[bot\])?$/gim'
+      replace: 'by [Renovate](https://github.com/renovatebot/renovate)'
 template: |
     # Changelog
     $CHANGES
