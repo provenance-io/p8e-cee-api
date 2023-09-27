@@ -64,6 +64,11 @@ publishing {
                         name.set("Cody Worsnop")
                         email.set("cworsnop@figure.com")
                     }
+                    developer {
+                        id.set("rpatel-figure")
+                        name.set("Ravi Patel")
+                        email.set("rpatel@figure.com")
+                    }
                 }
 
                 scm {
@@ -90,7 +95,7 @@ tasks.register<JavaExec>("ktlint") {
     group = "verification"
     description = "Check Kotlin code style."
     classpath = ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass.set("com.pinterest.ktlint.Main")
     args("src/**/*.kt")
 }
 
@@ -102,7 +107,7 @@ tasks.register<JavaExec>("ktlintFormat") {
     group = "formatting"
     description = "Fix Kotlin code style deviations."
     classpath = ktlint
-    main = "com.pinterest.ktlint.Main"
+    mainClass.set("com.pinterest.ktlint.Main")
     args("-F", "src/**/*.kt")
 }
 
@@ -110,5 +115,5 @@ detekt {
     toolVersion = libs.versions.detekt.get()
     buildUponDefaultConfig = true
     config = files("${rootDir.path}/detekt.yml")
-    input = files("src/main/kotlin", "src/test/kotlin")
+    source = files("src/main/kotlin", "src/test/kotlin")
 }
