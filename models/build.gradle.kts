@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 dependencies {
     ktlint(libs.ktlint)

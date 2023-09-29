@@ -1,15 +1,14 @@
 [versions]
-kotlin = "1.8.10"
+kotlin = "1.8.22"
 kotlin_coroutines = "1.6.4"
 assetClassification = "3.7.0"
 bouncyCastle = "1.70"
 detekt = "1.18.1"
 grpc = "1.51.3"
 hamkrest = "1.8.0.1"
-jackson_databind = "2.12.6.1"
-jackson_jsr310 = "2.12.+"
-jackson_kotlinModule = "2.12.5"
-jackson_protobuf = "0.9.9-jackson2.9-proto3"
+jackson = "2.15.2"
+jackson_protobuf = "0.9.14"
+jakarta_servlet = "5.0.0"
 kong_unirest = "3.13.6"
 kotest = "5.5.5"
 kotest_extensions_arrow = "1.2.+"
@@ -32,8 +31,8 @@ provenance_proto = "1.13.1"
 reactor = "3.4.9"
 redisson = "3.16.0"
 reflections = "0.9.10"
-spring_boot = "2.5.6"
-spring_dependencyManagement = "1.0.11.RELEASE"
+spring_boot = "3.1.4"
+spring_dependencyManagement = "1.1.3"
 spring_mockk = "3.0.1"
 springdoc = "1.5.13"
 springfox = "3.0.0"
@@ -87,10 +86,9 @@ assetClassification_client = { module = "tech.figure.classification.asset:ac-cli
 assetClassification_verifier = { module = "tech.figure.classification.asset:ac-verifier", version.ref = "assetClassification" }
 objectStore_gateway = { module = "tech.figure.objectstore.gateway:client", version.ref = "objectStore_gateway" }
 # Jackson
-## TODO: Clean up Jackson versions
-jackson_databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson_databind" }
-jackson_datatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson_jsr310" }
-jackson_kotlinModule = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson_kotlinModule" }
+jackson_databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson_datatype = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson_kotlinModule = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson_protobuf = { module = "com.hubspot.jackson:jackson-datatype-protobuf", version.ref = "jackson_protobuf" }
 # Google
 grpc_protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
@@ -100,6 +98,7 @@ protobuf_java_util = { module = "com.google.protobuf:protobuf-java-util", versio
 # Other
 bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }
 bouncyCastle_provider = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bouncyCastle" }
+jakarta_servlet = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta_servlet" }
 kong_unirest = { module = "com.konghq:unirest-java", version.ref = "kong_unirest" }
 kotlin_logging = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin_logging" }
 ktlint = { module = "com.pinterest:ktlint", version.ref = "ktlint" }

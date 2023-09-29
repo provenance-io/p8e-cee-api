@@ -1,4 +1,4 @@
-FROM gradle:7.3.3-jdk11 AS build
+FROM gradle:7.6.2-jdk17-alpine AS build
 RUN gradle --version && java -version
 WORKDIR /app
 
@@ -16,12 +16,12 @@ COPY buildSrc /app/buildSrc/
 COPY .git /app/.git/
 COPY detekt.yml /app/
 COPY build.gradle.kts gradle.properties settings.gradle.kts /app/
-COPY CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md LICENSE README.md /app/
+COPY CODE_OF_CONDUCT.md LICENSE README.md /app/
 
 # Do the actual build
 RUN gradle clean build --no-daemon
 
-FROM openjdk:11-jre
+FROM azul/zulu-openjdk:17-jre-latest
 
 ADD service/build/libs/*.jar /p8e-cee-api.jar
 ADD service/docker/service-configure /configure

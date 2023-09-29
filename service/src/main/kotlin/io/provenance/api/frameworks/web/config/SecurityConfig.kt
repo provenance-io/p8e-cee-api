@@ -16,20 +16,37 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 @EnableConfigurationProperties(value = [ServiceProps::class])
 class SecurityConfig {
     @Bean
-    fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.authorizeExchange {
-            it.pathMatchers("${Routes.MANAGE_BASE}/**", "${Routes.EXTERNAL_BASE}/**", "${Routes.INTERNAL_BASE}/**", "${Routes.DOCS_BASE}/**").permitAll()
+    fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = http.apply {
+        authorizeExchange { spec ->
+            spec.pathMatchers(
+                "${Routes.MANAGE_BASE}/**",
+                "${Routes.EXTERNAL_BASE}/**",
+                "${Routes.INTERNAL_BASE}/**",
+                "${Routes.DOCS_BASE}/**"
+            ).permitAll()
         }
-
-        return http.httpBasic().disable()
-            .formLogin().disable()
-            .logout().disable()
-            .csrf().disable()
-            .headers().frameOptions().disable()
-            .cache().disable()
-            .and()
-            .authorizeExchange()
-            .pathMatchers("/").permitAll()
-            .and().build()
-    }
+        httpBasic { spec ->
+            spec.disable()
+        }
+        formLogin { spec ->
+            spec.disable()
+        }
+        logout { spec ->
+            spec.disable()
+        }
+        csrf { spec ->
+            spec.disable()
+        }
+        headers { spec ->
+            spec.frameOptions { frameOptionsSpec ->
+                frameOptionsSpec.disable()
+            }
+            spec.cache { cacheSpec ->
+                cacheSpec.disable()
+            }
+        }
+        http.authorizeExchange { authorize ->
+            authorize.pathMatchers("/").permitAll()
+        }
+    }.build()
 }

@@ -5,10 +5,10 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependencyManagement)
-    kotlin("plugin.spring") version "1.8.10"
+    kotlin("plugin.spring") version "1.8.22"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 dependencyManagement {
     applyMavenExclusions(false)
@@ -30,40 +30,41 @@ dependencies {
         libs.kotlin.coroutines.reactor,
         libs.springBoot.starter,
         libs.springBoot.starter.actuator,
-        libs.springBoot.starter.jetty,
         libs.springBoot.starter.devTools,
+        libs.springBoot.starter.jetty,
         libs.springBoot.starter.security,
         libs.springBoot.starter.validation,
-        libs.reactor.core, // Needed to play nice with WebFlux Coroutines stuff
+        libs.assetClassification.client,
+        libs.assetClassification.verifier,
+        libs.bouncyCastle,
+        libs.bouncyCastle.provider,
+        libs.grpc.protobuf,
+        libs.grpc.stub,
+        libs.jackson.databind,
+        libs.jackson.datatype,
+        libs.jackson.kotlinModule,
+        libs.jackson.protobuf,
+        libs.jakarta.servlet,
+        libs.kong.unirest,
         libs.kotlin.logging,
-        libs.springfox.swagger,
-        libs.springfox.swagger.ui,
-        libs.swagger.annotations,
+        libs.objectStore.gateway,
         libs.p8eScope.encryption,
         libs.p8eScope.objectStore.client,
         libs.p8eScope.sdk,
-        libs.provenance.keyAccessLib,
+        libs.protobuf.java.util,
+        libs.provenance.client,
         libs.provenance.hdWallet,
         libs.provenance.hdWallet.bip39,
-        libs.provenance.client,
-        libs.provenance.protoKotlin,
+        libs.provenance.keyAccessLib,
         libs.provenance.loanPackage,
-        libs.jackson.databind,
-        libs.jackson.datatype,
-        libs.jackson.protobuf,
-        libs.jackson.kotlinModule,
-        libs.protobuf.java.util,
-        libs.kong.unirest,
-        libs.grpc.protobuf,
-        libs.grpc.stub,
+        libs.provenance.protoKotlin,
+        libs.reactor.core, // Needed to play nice with WebFlux Coroutines stuff
         libs.reflections,
-        libs.bouncyCastle,
-        libs.bouncyCastle.provider,
-        libs.springdoc.openApi.webFluxSupport,
         libs.springdoc.openApi.kotlinSupport,
-        libs.assetClassification.client,
-        libs.assetClassification.verifier,
-        libs.objectStore.gateway,
+        libs.springdoc.openApi.webFluxSupport,
+        libs.springfox.swagger,
+        libs.springfox.swagger.ui,
+        libs.swagger.annotations,
     ).forEach { dependency ->
         implementation(dependency)
     }
@@ -82,15 +83,15 @@ dependencies {
 
     listOf(
         libs.hamkrest,
-        libs.mockk,
-        libs.kotlin.faker,
-        libs.kotlin.coroutines.test,
-        libs.spring.mockk,
         libs.kotest,
         libs.kotest.assertions,
         libs.kotest.assertions.arrow,
         libs.kotest.property,
         libs.kotest.spring,
+        libs.kotlin.coroutines.test,
+        libs.kotlin.faker,
+        libs.mockk,
+        libs.spring.mockk,
         libs.testContainers.core,
     ).forEach { testDependency ->
         testImplementation(testDependency)
