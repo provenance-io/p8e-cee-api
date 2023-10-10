@@ -1,4 +1,3 @@
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm") version "1.8.22"
     id("java")
