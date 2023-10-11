@@ -50,15 +50,14 @@ jobs:
       - name: Set Image Details
         id: ci-release-create-outputs
         run: |
-          DOCKER_IMAGE=provenanceio/p8e-cee-api
           VERSION=$( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' )
           if [ "$VERSION" == "" ] ; then
             VERSION=$( echo ${{ github.event.inputs.versionTag }} | sed -e 's/^v//' )
           fi
-          TAGS="${DOCKER_IMAGE}:${VERSION}"
+          TAGS="${VERSION}"
 
           if [ ${{ github.event.inputs.tagAsLatest }} == 'true' ] ; then
-            TAGS="${TAGS},${DOCKER_IMAGE}:latest"
+            TAGS="${TAGS},latest"
           fi
 
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
