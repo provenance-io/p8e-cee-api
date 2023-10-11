@@ -65,22 +65,13 @@ jobs:
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: service/docker/Dockerfile
-          context: .
-          push: true
-          tags: ${{ steps.ci-release-create-outputs.outputs.tags }}
+        env:
+          JIB_AUTH_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          JIB_AUTH_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_IMAGE_NAME: provenanceio/p8e-cee-api
+          DOCKER_IMAGE_TAGS: ${{ steps.ci-release-create-outputs.outputs.tags }}
+        run: ./gradlew :service:jib -Djib.console=plain -Pversion=${VERSION}
 
       - name: Install gpg secret key
         if: inputs.publishToMaven || github.event_name == 'release'

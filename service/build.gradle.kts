@@ -2,6 +2,7 @@ val ktlint: Configuration by configurations.creating
 
 plugins {
     alias(libs.plugins.detekt)
+    alias(libs.plugins.jib)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependencyManagement)
     kotlin("plugin.spring") version "1.8.22"
@@ -142,4 +143,41 @@ detekt {
    buildUponDefaultConfig = true
    config = files("${rootDir.path}/detekt.yml")
    source = files("src/main/kotlin", "src/test/kotlin")
+}
+
+val latestTag: String? = "latest".takeIf {
+    System.getenv("GITHUB_REF_NAME")
+        ?.takeIf { it.isNotBlank() }
+        ?.let { githubRefName -> setOf("main").any { githubRefName.endsWith(it) } }
+        ?: false
+}
+
+jib {
+    from {
+        auth {
+            username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
+            password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
+        }
+
+        image = "azul/zulu-openjdk:17-jre-latest"
+    }
+    to {
+        auth {
+            username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
+            password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
+        }
+        image = System.getenv("DOCKER_IMAGE_NAME") ?: "provenanceio/${rootProject.name}"
+        tags = System.getenv("DOCKER_IMAGE_TAGS")?.run {
+            split(",").toSet()
+        } ?: setOfNotNull(rootProject.version.toString(), latestTag)
+    }
+    extraDirectories {
+        permissions.set(mapOf("/service-configure" to "755"))
+    }
+    container {
+        mainClass = "io.provenance.api.ApplicationKt"
+        ports = listOf("8080")
+        entrypoint = listOf("/sbin/tini", "-v", "--", "/service-configure")
+        creationTime.set("USE_CURRENT_TIMESTAMP")
+    }
 }

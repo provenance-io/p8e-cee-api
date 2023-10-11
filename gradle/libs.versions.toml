@@ -9,6 +9,7 @@ hamkrest = "1.8.0.1"
 jackson = "2.15.2"
 jackson_protobuf = "0.9.14"
 jakarta_servlet = "5.0.0"
+jib = "3.4.0"
 kong_unirest = "3.13.6"
 kotest = "5.5.5"
 kotest_extensions_arrow = "1.2.+"
@@ -43,6 +44,7 @@ testContainers = "1.3.3"
 kotlin = { id = "kotlin", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 idea = { id = "idea" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 nexus_publishing = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus_publishing" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin" }
 spring_boot = { id = "org.springframework.boot", version.ref = "spring_boot" }

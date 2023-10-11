@@ -48,12 +48,12 @@ out/
 /.datastore
 
 # Vault
-service/docker/volumes/
-service/docker/vault/init.output
-service/docker/vault/keys.output
+service/local-docker/volumes/
+service/local-docker/vault/init.output
+service/local-docker/vault/keys.output
 service/src/test/resources/volumes/
 
 # Object store files
-service/docker/object-store-1/
-service/docker/object-store-2/
+service/local-docker/object-store-1/
+service/local-docker/object-store-2/
 
