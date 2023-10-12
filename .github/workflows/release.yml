@@ -49,6 +49,7 @@ jobs:
 
       - name: Set Image Details
         id: ci-release-create-outputs
+        shell: bash
         run: |
           VERSION=$( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' )
           if [ "$VERSION" == "" ] ; then
@@ -57,7 +58,7 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
           TAG_DOCKER_IMAGE_AS_LATEST=false
-          if [ "${{ inputs.tagAsLatest }}" == "true" ] || [ ("${{github.event_name}}" == "release" && "${{github.event.release.prerelease}}" == "false") ] ; then
+          if [[ "${{ inputs.tagAsLatest }}" == "true" || ("${{github.event_name}}" == "release" && "${{github.event.release.prerelease}}" == "false") ]] ; then
             TAG_DOCKER_IMAGE_AS_LATEST=true
           fi
           echo "tagAsLatest=${TAG_DOCKER_IMAGE_AS_LATEST}" >> $GITHUB_OUTPUT
