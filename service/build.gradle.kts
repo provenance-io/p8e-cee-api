@@ -152,14 +152,20 @@ val latestTag: String? = "latest".takeIf {
         ?: false
 }
 
+tasks.named("jib") {
+    dependsOn(tasks.named("bootJar"))
+}
+
+tasks.named("jibDockerBuild") {
+    dependsOn(tasks.named("bootJar"))
+}
+
+val jarFileName = "service.jar"
+val mainClassName = "io.provenance.api.ApplicationKt"
+
 jib {
     from {
-        auth {
-            username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
-            password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
-        }
-
-        image = "azul/zulu-openjdk:17-jre-latest"
+        image = "azul/zulu-openjdk:17.0.8.1"
     }
     to {
         auth {
@@ -172,12 +178,24 @@ jib {
         } ?: setOfNotNull(rootProject.version.toString(), latestTag)
     }
     extraDirectories {
-        permissions.set(mapOf("/service-configure" to "755"))
+        paths {
+            path {
+                setFrom(file("src/main/jib/"))
+                into = "/"
+                includes.set(listOf("service-configure"))
+            }
+            path {
+                setFrom(file("build/libs"))
+                into = "/"
+                includes.set(listOf(jarFileName))
+            }
+        }
+        permissions = mapOf("/service-configure" to "755", jarFileName to "755")
     }
     container {
-        mainClass = "io.provenance.api.ApplicationKt"
+        mainClass = mainClassName
         ports = listOf("8080")
-        entrypoint = listOf("/sbin/tini", "-v", "--", "/service-configure")
-        creationTime.set("USE_CURRENT_TIMESTAMP")
+        entrypoint = listOf("/bin/bash", "-c", "--", "/service-configure /$jarFileName")
+        creationTime = "USE_CURRENT_TIMESTAMP"
     }
 }
