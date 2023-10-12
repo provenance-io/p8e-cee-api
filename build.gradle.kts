@@ -1,6 +1,5 @@
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.8.22"
     id("java")
     id("maven-publish")
     id("java-library")
@@ -24,8 +23,8 @@ subprojects {
 
 allprojects {
     java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -33,11 +32,10 @@ allprojects {
             freeCompilerArgs = listOf(
                 "-Xjsr305=strict",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-Xskip-prerelease-check", // To support loan package contracts dependency using context receivers
             )
-            jvmTarget = "11"
-            apiVersion = "1.6"
-            languageVersion = "1.6"
+            jvmTarget = "17"
+            apiVersion = "1.8"
+            languageVersion = "1.8"
             allWarningsAsErrors = true
         }
     }
@@ -56,8 +54,8 @@ nexusPublishing {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 allprojects {

@@ -1,7 +1,7 @@
 package io.provenance.api.frameworks.config
 
 import io.provenance.api.domain.usecase.common.originator.DefaultAudience
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotNull
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
 
