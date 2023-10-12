@@ -54,21 +54,14 @@ jobs:
           if [ "$VERSION" == "" ] ; then
             VERSION=$( echo ${{ github.event.inputs.versionTag }} | sed -e 's/^v//' )
           fi
-          TAGS="${VERSION}"
-
-          if [ ${{ github.event.inputs.tagAsLatest }} == 'true' ] ; then
-            TAGS="${TAGS},latest"
-          fi
-
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Build and Push Docker Image
         env:
           JIB_AUTH_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           JIB_AUTH_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKER_IMAGE_NAME: provenanceio/p8e-cee-api
-          DOCKER_IMAGE_TAGS: ${{ steps.ci-release-create-outputs.outputs.tags }}
+          DOCKER_IMAGE_NAME: provenanceio/p8e-cee-api:${{ steps.ci-release-create-outputs.outputs.version }}
+          TAG_DOCKER_IMAGE_AS_LATEST: ${{ github.event.inputs.tagAsLatest }}
         run: ./gradlew :service:jib -Djib.console=plain -Pversion=${VERSION}
 
       - name: Install gpg secret key

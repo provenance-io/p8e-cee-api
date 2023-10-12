@@ -146,6 +146,7 @@ detekt {
 }
 
 val latestTag: String? = "latest".takeIf {
+    System.getenv("TAG_DOCKER_IMAGE_AS_LATEST") == "true" ||
     System.getenv("GITHUB_REF_NAME")
         ?.takeIf { it.isNotBlank() }
         ?.let { githubRefName -> setOf("main").any { githubRefName.endsWith(it) } }
@@ -165,6 +166,10 @@ val mainClassName = "io.provenance.api.ApplicationKt"
 
 jib {
     from {
+        auth {
+            username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
+            password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
+        }
         image = "azul/zulu-openjdk:17.0.8.1"
     }
     to {
@@ -172,10 +177,9 @@ jib {
             username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
             password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
         }
-        image = System.getenv("DOCKER_IMAGE_NAME") ?: "provenanceio/${rootProject.name}"
-        tags = System.getenv("DOCKER_IMAGE_TAGS")?.run {
-            split(",").toSet()
-        } ?: setOfNotNull(rootProject.version.toString(), latestTag)
+        // The base tag should be specified with `image`, and additional tags with `tags, to control setting of `latest`
+        image = System.getenv("DOCKER_IMAGE_NAME") ?: "provenanceio/${rootProject.name}:${rootProject.version}"
+        tags = setOfNotNull(latestTag)
     }
     extraDirectories {
         paths {
