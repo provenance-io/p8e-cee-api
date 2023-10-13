@@ -49,6 +49,7 @@ jobs:
 
       - name: Set Image Details
         id: ci-release-create-outputs
+        shell: bash
         run: |
           VERSION=$( echo ${{ github.event.release.tag_name }} | sed -e 's/^v//' )
           if [ "$VERSION" == "" ] ; then
@@ -56,12 +57,18 @@ jobs:
           fi
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
+          TAG_DOCKER_IMAGE_AS_LATEST=false
+          if [[ "${{ inputs.tagAsLatest }}" == "true" || ("${{github.event_name}}" == "release" && "${{github.event.release.prerelease}}" == "false") ]] ; then
+            TAG_DOCKER_IMAGE_AS_LATEST=true
+          fi
+          echo "tagAsLatest=${TAG_DOCKER_IMAGE_AS_LATEST}" >> $GITHUB_OUTPUT
+
       - name: Build and Push Docker Image
         env:
           JIB_AUTH_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           JIB_AUTH_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKER_IMAGE_NAME: provenanceio/p8e-cee-api:${{ steps.ci-release-create-outputs.outputs.version }}
-          TAG_DOCKER_IMAGE_AS_LATEST: ${{ github.event.inputs.tagAsLatest }}
+          TAG_DOCKER_IMAGE_AS_LATEST: ${{ steps.ci-release-create-outputs.outputs.tagAsLatest }}
         run: ./gradlew :service:jib -Djib.console=plain -Pversion=${VERSION}
 
       - name: Install gpg secret key
