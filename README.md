@@ -60,7 +60,7 @@ The default configuration assumes that the following ports are available:
 |     Vault      |       8200        |
 |   Provenance   | 1317, 9090, 26657 |
 
-If any are taken on your local machine, feel free to update the default values in the `/service/docker/dependencies.yaml` file and associated `/service/docker/*.env` files.
+If any are taken on your local machine, feel free to update the default values in the `/service/local-docker/dependencies.yaml` file and associated `/service/local-docker/*.env` files.
 
 Once ready, all you need to do is run the included docker setup script from the root directory:
 
@@ -95,4 +95,4 @@ For example:
 ./dc.sh -p ../../provenance-io/loan-package-contracts -v 0.3.2 publish
 ```
 
-Note: This convenience method uses preset environment variables found in `/service/docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/docker/prov-init/config/genesis.json`).
+Note: This convenience method uses preset environment variables found in `/service/local-docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/local-docker/prov-init/config/genesis.json`).
