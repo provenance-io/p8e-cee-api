@@ -38,7 +38,7 @@ spring_mockk = "3.0.1"
 springdoc = "1.5.13"
 springfox = "3.0.0"
 swagger = "1.6.2"
-testContainers = "1.3.3"
+testContainers = "1.3.4"
 
 [plugins]
 kotlin = { id = "kotlin", version.ref = "kotlin" }
