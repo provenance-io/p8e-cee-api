@@ -23,39 +23,52 @@ done
 shift "$((OPTIND -1))"
 
 function up {
+  source ./service/local-docker/vault/.env
   docker-compose -p p8e-contract-execution-environment -f service/local-docker/dependencies.yaml up --build -d
-
   sleep 2
-  export VAULT_ADDR="http://127.0.0.1:8200"
-  SECRET_PATH=kv2_originations
-  sh service/local-docker/vault/init-and-unseal.sh $VAULT_ADDR $SECRET_PATH
 
-  until vault status; do echo "Awaiting vault to be unsealed..."; sleep 5; done
+  VAULT_BINARY="docker exec -i --env-file ./service/local-docker/vault/.env $VAULT_DOCKER_CONTAINER_NAME vault"
+  if ! docker exec -i "$VAULT_DOCKER_CONTAINER_NAME" vault --help 2>/dev/null 1>&2
+  then
+      echo "No Docker container named '$VAULT_DOCKER_CONTAINER_NAME' was found running..."
+      if ! command -v vault &> /dev/null
+      then
+          echo "Vault must be running under an appropriately named Docker container or local machine installation"
+          exit 1
+      else
+          echo "Found a local installation of Vault to use instead."
+          VAULT_BINARY="vault"
+      fi
+  fi
+
+  sh service/local-docker/vault/init-and-unseal.sh "$VAULT_ADDR" "$SECRET_PATH"
+
+  until $VAULT_BINARY status; do echo "Awaiting vault to be unsealed..."; sleep 5; done
 
   # local-originator
-  < service/local-docker/vault/secrets/local-originator.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000001 - > /dev/null
-  < service/local-docker/vault/secrets/local-originator.json vault kv put $SECRET_PATH/originators/tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0 - > /dev/null
+  < service/local-docker/vault/secrets/local-originator.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000001 - > /dev/null
+  < service/local-docker/vault/secrets/local-originator.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1qy2mqx5x22a400pgd5p6u7mq9shxzvh767jar0 - > /dev/null
   # local-servicer
-  < service/local-docker/vault/secrets/local-servicer.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000002 - > /dev/null
-  < service/local-docker/vault/secrets/local-servicer.json vault kv put $SECRET_PATH/originators/tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd - > /dev/null
+  < service/local-docker/vault/secrets/local-servicer.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000002 - > /dev/null
+  < service/local-docker/vault/secrets/local-servicer.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1xr3wfqzlcz469wkex5c3ylaq8pq97crhsg57gd - > /dev/null
   # local-dart
-  < service/local-docker/vault/secrets/local-dart.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000003 - > /dev/null
-  < service/local-docker/vault/secrets/local-dart.json vault kv put $SECRET_PATH/originators/tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl - > /dev/null
+  < service/local-docker/vault/secrets/local-dart.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000003 - > /dev/null
+  < service/local-docker/vault/secrets/local-dart.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1s2c62ke0mmwhqxguf7e2pt6e98yq38m4atwhwl - > /dev/null
   # local-portfolio-manager
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000004 - > /dev/null
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000004 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc - > /dev/null
   # local-controller-a
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000005 - > /dev/null
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/tp138jtpz5zxa6yc33s0fk2jy9vahqcuvvtwnrzge - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000005 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp138jtpz5zxa6yc33s0fk2jy9vahqcuvvtwnrzge - > /dev/null
   # local-controller-b
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000006 - > /dev/null
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/tp1pz4tt4j802j2y3avs5mwy9uyyxtx7k5r8qlehw - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000006 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1pz4tt4j802j2y3avs5mwy9uyyxtx7k5r8qlehw - > /dev/null
   # local-validator
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000007 - > /dev/null
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/tp1he6rfnxyx2ssqyknq4ayzf5j46dp29pqt6z708 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000007 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1he6rfnxyx2ssqyknq4ayzf5j46dp29pqt6z708 - > /dev/null
   # local-investor
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/00000000-0000-0000-0000-000000000008 - > /dev/null
-  < service/local-docker/vault/secrets/local-portfolio-manager.json vault kv put $SECRET_PATH/originators/tp1f99dgtxxjmgczjsuc48utq4lkk0uhx6eqfqju0 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/00000000-0000-0000-0000-000000000008 - > /dev/null
+  < service/local-docker/vault/secrets/local-portfolio-manager.json $VAULT_BINARY kv put "$SECRET_PATH"/originators/tp1f99dgtxxjmgczjsuc48utq4lkk0uhx6eqfqju0 - > /dev/null
 
   docker ps -a
 

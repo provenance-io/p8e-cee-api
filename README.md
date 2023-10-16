@@ -25,17 +25,17 @@ The `p8e-cee-api` allows for operations against the encrypted object store, with
 The [Asset Originator's Guide](https://docs.provenance.io/integrating/asset-originators-guide) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain is recommended.
 
 ## Local Setup
-To run this service locally, be sure to have [Docker](https://www.docker.com/) and [Vault by Hashicorp](https://www.vaultproject.io/) installed:
+To run this service locally, be sure to have [Docker](https://www.docker.com/) installed:
 
 ```
 brew install docker
 ```
-
+You can also install [Vault](https://www.vaultproject.io/) if you wish to use a local installation over the provided Docker container:
 ```
 brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
-If you plan on running smart contracts for asset classification you'll need the following:
+If you plan on running smart contracts for asset classification, you may need the following packages:
 ```
 brew install rust
 brew install jq
