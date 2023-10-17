@@ -25,17 +25,17 @@ The `p8e-cee-api` allows for operations against the encrypted object store, with
 The [Asset Originator's Guide](https://docs.provenance.io/integrating/asset-originators-guide) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain is recommended.
 
 ## Local Setup
-To run this service locally, be sure to have [Docker](https://www.docker.com/) and [Vault by Hashicorp](https://www.vaultproject.io/) installed:
+To run this service locally, be sure to have [Docker](https://www.docker.com/) installed:
 
 ```
 brew install docker
 ```
-
+You can also install [Vault](https://www.vaultproject.io/) if you wish to use a local installation over the provided Docker container:
 ```
 brew tap hashicorp/tap
 brew install hashicorp/tap/vault
 ```
-If you plan on running smart contracts for asset classification you'll need the following:
+If you plan on running smart contracts for asset classification, you may need the following packages:
 ```
 brew install rust
 brew install jq
@@ -60,7 +60,7 @@ The default configuration assumes that the following ports are available:
 |     Vault      |       8200        |
 |   Provenance   | 1317, 9090, 26657 |
 
-If any are taken on your local machine, feel free to update the default values in the `/service/docker/dependencies.yaml` file and associated `/service/docker/*.env` files.
+If any are taken on your local machine, feel free to update the default values in the `/service/local-docker/dependencies.yaml` file and associated `/service/local-docker/*.env` files.
 
 Once ready, all you need to do is run the included docker setup script from the root directory:
 
@@ -95,4 +95,4 @@ For example:
 ./dc.sh -p ../../provenance-io/loan-package-contracts -v 0.3.2 publish
 ```
 
-Note: This convenience method uses preset environment variables found in `/service/docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/docker/prov-init/config/genesis.json`).
+Note: This convenience method uses preset environment variables found in `/service/local-docker/bootstrap.env` and assumes the address used to sign the transactions associated with publishing the contracts is listed in the genesis block (`/service/local-docker/prov-init/config/genesis.json`).
