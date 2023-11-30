@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.8.22"
 kotlin_coroutines = "1.6.4"
-assetClassification = "3.7.0"
+assetClassification = "3.8.1"
 bouncyCastle = "1.70"
 detekt = "1.18.1"
 grpc = "1.51.3"
