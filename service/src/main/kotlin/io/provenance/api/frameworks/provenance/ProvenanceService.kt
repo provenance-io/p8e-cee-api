@@ -121,7 +121,7 @@ class ProvenanceService : Provenance {
             assetClassificationClient.onboardAsset(
                 onboardAssetRequest, signer,
                 options = BroadcastOptions(
-                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    broadcastMode = config.broadcastMode,
                     sequenceOffset = offset,
                     baseAccount = account
                 )
@@ -140,7 +140,7 @@ class ProvenanceService : Provenance {
             assetClassificationClient.verifyAsset(
                 verifyAssetRequest, signer,
                 options = BroadcastOptions(
-                    broadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
+                    broadcastMode = config.broadcastMode,
                     sequenceOffset = offset,
                     baseAccount = account
                 )
