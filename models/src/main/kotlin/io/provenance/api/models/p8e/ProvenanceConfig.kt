@@ -8,4 +8,5 @@ data class ProvenanceConfig(
     val gasAdjustment: Double? = 1.5,
     val broadcastMode: ServiceOuterClass.BroadcastMode = ServiceOuterClass.BroadcastMode.BROADCAST_MODE_BLOCK,
     val feeGranter: String? = null,
+    val timeoutHeight: Long? = null,
 )
