@@ -79,7 +79,7 @@ class ProvenanceService : Provenance {
                 sequenceOffset = offset,
             )
 
-            val tx = messages.toTxBody(pbClient)
+            val tx = config.timeoutHeight?.let { messages.toTxBody(timeoutHeight = it) } ?: messages.toTxBody(pbClient)
 
             val result = pbClient.estimateAndBroadcastTx(
                 txBody = tx,
@@ -123,7 +123,8 @@ class ProvenanceService : Provenance {
                 options = BroadcastOptions(
                     broadcastMode = config.broadcastMode,
                     sequenceOffset = offset,
-                    baseAccount = account
+                    baseAccount = account,
+                    timeoutHeight = config.timeoutHeight,
                 )
             )
         }.txResponse.toTxResponse()
@@ -142,7 +143,8 @@ class ProvenanceService : Provenance {
                 options = BroadcastOptions(
                     broadcastMode = config.broadcastMode,
                     sequenceOffset = offset,
-                    baseAccount = account
+                    baseAccount = account,
+                    timeoutHeight = config.timeoutHeight,
                 )
             )
         }.txResponse.toTxResponse()

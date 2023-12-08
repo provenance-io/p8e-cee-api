@@ -54,6 +54,12 @@ fun Iterable<Any>.toTxBody(pbClient: PbClient) =
         .addAllMessages(this)
         .build()
 
+internal fun Iterable<Any>.toTxBody(timeoutHeight: Long): TxOuterClass.TxBody =
+    TxOuterClass.TxBody.newBuilder()
+        .setTimeoutHeight(timeoutHeight)
+        .addAllMessages(this)
+        .build()
+
 fun Any.toTxBody(pbClient: PbClient) =
     TxOuterClass.TxBody.newBuilder()
         .setTimeoutHeight(getCurrentHeight(pbClient) + 12L)
