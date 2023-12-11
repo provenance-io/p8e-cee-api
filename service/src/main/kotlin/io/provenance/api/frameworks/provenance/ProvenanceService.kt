@@ -99,14 +99,13 @@ class ProvenanceService : Provenance {
     override fun getScope(config: ProvenanceConfig, scopeUuid: UUID, height: Long?): ScopeResponse =
         PbClient(config.chainId, URI(config.nodeEndpoint), GasEstimationMethod.MSG_FEE_CALCULATION).use { pbClient ->
             pbClient.metadataClient.scope(
-                ScopeRequest.newBuilder()
-                    .setScopeId(scopeUuid.toString())
-                    .setIncludeRecords(true)
-                    .setIncludeSessions(true)
-                    .also {
-                        height?.let { pbClient.metadataClient.addBlockHeight(it.toString()) }
-                    }
-                    .build()
+                ScopeRequest.newBuilder().apply {
+                    scopeId = scopeUuid.toString()
+                    includeRecords = true
+                    includeSessions = true
+                    includeRequest = true
+                    height?.let { pbClient.metadataClient.addBlockHeight(it.toString()) }
+                }.build()
             )
         }
 
