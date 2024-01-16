@@ -11,3 +11,14 @@ private val debugObjectMapper by lazy {
 }
 
 fun Any.toPrettyJson(): String = debugObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
+
+fun buildLogMessage(message: String, args: List<Pair<String, Any?>>): String =
+    args.joinToString(
+        separator = ", ",
+        prefix = "[",
+        postfix = "]"
+    ) { "${it.first}=${it.second}" }.let { argString ->
+        "$message $argString".trim()
+    }
+
+fun buildLogMessage(message: String, vararg args: Pair<String, Any?>): String = buildLogMessage(message, args.toList())

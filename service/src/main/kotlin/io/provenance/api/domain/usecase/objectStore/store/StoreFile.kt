@@ -10,6 +10,7 @@ import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.util.awaitAllBytes
+import io.provenance.api.util.buildLogMessage
 import io.provenance.entity.KeyType
 import io.provenance.scope.util.toUuid
 import kotlinx.coroutines.reactor.awaitSingle
@@ -85,7 +86,12 @@ class StoreFile(
 
     private inline fun <reified T> Map<String, Part>.getAsType(key: String): T =
         T::class.java.cast(get(key))
-            ?: throw IllegalArgumentException("Failed to retrieve and cast provided argument.")
+            ?: throw IllegalArgumentException(
+                buildLogMessage(
+                    "Failed to retrieve and cast provided argument",
+                    "javaClass" to T::class.java.name,
+                )
+            )
 
     data class Args(
         val account: AccountInfo?,
