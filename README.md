@@ -2,7 +2,7 @@
 
 `p8e-cee-api` stands for the Provenance Contract Execution Environment API.
 
-The `p8e-cee-api` allows for operations against the encrypted object store, with included support for multi-store replication, and creating and broadcasting scoped transmissions to the Provenance Blockchain.
+`p8e-cee-api` allows for operations against [BlockVault](https://developer.provenance.io/docs/pb/p8e/overview/) (formerly nicknamed "p8e"), with included support for replication across multiple object stores along with other miscellaneous utilities to facilitate creating and broadcasting scoped transmissions to the Provenance Blockchain.
 
 ## Status
 
@@ -22,7 +22,7 @@ The `p8e-cee-api` allows for operations against the encrypted object store, with
 
 ## Overview
 
-The [Asset Originator's Guide](https://docs.provenance.io/integrating/asset-originators-guide) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain is recommended.
+The [BlockVault integration guide](https://developer.provenance.io/docs/pb/integrating/integrating-with-p8e/) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain & BlockVault is recommended.
 
 ## Local Setup
 To run this service locally, be sure to have [Docker](https://www.docker.com/) installed:
