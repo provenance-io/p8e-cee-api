@@ -8,11 +8,15 @@
 
 [![stability-release-candidate](https://img.shields.io/badge/stability-pre--release-48c9b0.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#release-candidate)
 [![Latest Release][release-badge]][release-latest]
+[![Docker Hub badge][dockerhub-badge]][dockerhub]
 [![License][license-badge]][license-url]
 [![LOC][loc-badge]][loc-report]
 
 [release-badge]: https://img.shields.io/github/v/tag/provenance-io/p8e-cee-api.svg
 [release-latest]: https://github.com/provenance-io/p8e-cee-api/releases/latest
+
+[dockerhub-badge]: https://img.shields.io/docker/pulls/provenanceio/p8e-cee-api
+[dockerhub]: https://hub.docker.com/r/provenanceio/p8e-cee-api/
 
 [license-badge]: https://img.shields.io/github/license/provenance-io/p8e-cee-api.svg
 [license-url]: https://github.com/provenance-io/p8e-cee-api/blob/main/LICENSE
@@ -24,7 +28,10 @@
 
 The [BlockVault integration guide](https://developer.provenance.io/docs/pb/integrating/integrating-with-p8e/) provides contextual support for the varied use cases supported by this API. Having a fundamental understanding of the Provenance Blockchain & BlockVault is recommended.
 
-## Local Setup
+## Deploying/Hosting
+[Instructions for how to deploy the service](DEPLOYING.md)
+
+## Local Development
 To run this service locally, be sure to have [Docker](https://www.docker.com/) installed:
 
 ```
@@ -74,14 +81,14 @@ Then, run the service - either via an Intellij run configuration or via the comm
 ./gradlew bootRun
 ```
 
-## Swagger Documentation
+### Swagger Documentation
 
 once the service is running, try out some local calls using Swagger!
 
 http://localhost:8080/p8e-cee-api/secure/docs/api.html
 
 
-## Publishing p8e Contracts Locally
+### Publishing p8e Contracts Locally
 
 As a convenience, you can publish contracts from another repository without leaving this project in the command line.
 
