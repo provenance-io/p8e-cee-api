@@ -17,6 +17,10 @@ A connection will be needed to the following services, which can be either an ex
   - `p8e-cee-api` consumes the [provenance-io/kms-connector](https://github.com/provenance-io/kms-connector) library to allow for fetching of Provenance account keys from any plugin defined there (as of writing, there is default support for [Vault](https://www.vaultproject.io/) & tentative support for Fortanix and Keystone)
 
 ## Common Pitfalls
+### Contract Execution Prerequisite
+`p8e-cee-api` runs as a Java JAR and uses Java & Kotlin reflection in order to instantiate [p8e-scope-sdk](https://github.com/provenance-io/p8e-scope-sdk) contracts based on classnames provided in a contract execution request's body. This means that the Java classes of contracts one wishes to execute need to be in `p8e-cee-api`'s classpath in order to run them.
+
+By default, `p8e-cee-api` includes the contracts defined in [loan-package-contracts](https://github.com/provenance-io/loan-package-contracts) in its classpath, allowing them to be executed via the contract execution endpoints. [The contracts in that repository are published as a JAR](https://search.maven.org/artifact/io.provenance.loan-package/contract) and then [included as a dependency in p8e-cee-api](https://github.com/provenance-io/p8e-cee-api/blob/5ffb3f5760cbff388eafd3e969311adaded9de74/service/build.gradle.kts#L59). In order to include your own contracts, you will need to pull `p8e-cee-api`, add your own contracts in a similar manner, and then build your own Docker image of `p8e-cee-api` from your local source.
 ### Environment Variables
 `p8e-cee-api` is a Spring application which sets various application properties based on [definitions determined by the active Spring profile](https://github.com/provenance-io/p8e-cee-api/tree/174f066aa91b510cdb777f1b09010693b34fe838/service/src/main/resources).
 Any environment variable defined in the active Spring profile's `*.properties` file will need to be defined in order for the service to run.
