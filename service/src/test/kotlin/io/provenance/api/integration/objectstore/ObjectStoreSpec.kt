@@ -8,15 +8,15 @@ import io.provenance.api.domain.usecase.objectStore.store.models.StoreProtoReque
 import io.provenance.api.integration.base.IntegrationTestBase
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.account.KeyManagementConfig
-import io.provenance.api.models.eos.get.GetProtoRequest
-import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.models.entity.Entity
 import io.provenance.api.models.entity.MemberUUID
+import io.provenance.api.models.eos.get.GetProtoRequest
+import io.provenance.api.models.eos.store.StoreProtoRequest
 import io.provenance.api.util.toPrettyJson
 import io.provenance.plugins.vault.VaultConfig
-import java.util.UUID
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.toProtoUUID
+import java.util.UUID
 
 class ObjectStoreSpec(
     private val storeProto: StoreProto,
@@ -29,54 +29,56 @@ class ObjectStoreSpec(
     )
 
     "Object Store" should {
-        val entity = entities.first()
-
         "Store Object and Return Hash" {
-            val assetToStore = Asset.newBuilder()
-                .setDescription("arvo")
-                .setType("tea")
-                .setId(UUID.randomUUID().toProtoUUID())
-                .build()
+            arrayOf(objectStore1Address, objectStore2Address).forEach { objectStoreAddress ->
+                entities.forEach { entity ->
+                    val assetToStore = Asset.newBuilder().apply {
+                        description = "arvo"
+                        type = "tea"
+                        id = UUID.randomUUID().toProtoUUID()
+                    }.build()
 
-            val response = storeProto.execute(
-                StoreProtoRequestWrapper(
-                    entity,
-                    StoreProtoRequest(
-                        objectStoreAddress = objectStore1Address,
-                        message = assetToStore,
-                        type = "tech.figure.asset.v1beta1.Asset",
-                        account = AccountInfo(
-                            keyManagementConfig = KeyManagementConfig(
-                                pluginConfig = VaultConfig(
-                                    "$vaultAddress/${entity.id}",
-                                    "src/test/resources/vault/token.output"
+                    val response = storeProto.execute(
+                        StoreProtoRequestWrapper(
+                            entity,
+                            StoreProtoRequest(
+                                objectStoreAddress = objectStoreAddress,
+                                message = assetToStore,
+                                type = "tech.figure.asset.v1beta1.Asset",
+                                account = AccountInfo(
+                                    keyManagementConfig = KeyManagementConfig(
+                                        pluginConfig = VaultConfig(
+                                            "$vaultAddress/${entity.id}",
+                                            "src/test/resources/vault/token.output"
+                                        )
+                                    )
                                 )
                             )
                         )
                     )
-                )
-            )
 
-            val retrievedAsset = getProto.execute(
-                GetProtoRequestWrapper(
-                    entity,
-                    GetProtoRequest(
-                        response.hash,
-                        objectStore1Address,
-                        type = "tech.figure.asset.v1beta1.Asset",
-                        account = AccountInfo(
-                            keyManagementConfig = KeyManagementConfig(
-                                pluginConfig = VaultConfig(
-                                    "$vaultAddress/${entity.id}",
-                                    "src/test/resources/vault/token.output"
+                    val retrievedAsset = getProto.execute(
+                        GetProtoRequestWrapper(
+                            entity,
+                            GetProtoRequest(
+                                response.hash,
+                                objectStoreAddress,
+                                type = "tech.figure.asset.v1beta1.Asset",
+                                account = AccountInfo(
+                                    keyManagementConfig = KeyManagementConfig(
+                                        pluginConfig = VaultConfig(
+                                            "$vaultAddress/${entity.id}",
+                                            "src/test/resources/vault/token.output"
+                                        )
+                                    )
                                 )
                             )
                         )
                     )
-                )
-            )
 
-            retrievedAsset shouldBe assetToStore.toPrettyJson()
+                    retrievedAsset shouldBe assetToStore.toPrettyJson()
+                }
+            }
         }
     }
 })
