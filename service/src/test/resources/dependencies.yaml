@@ -1,9 +1,8 @@
 version: '3.5'
 
 services:
-
     postgres-cee:
-        image: postgres:13-alpine
+        image: postgres:14-alpine
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password1
