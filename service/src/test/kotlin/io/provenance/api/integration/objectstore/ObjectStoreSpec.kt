@@ -42,7 +42,7 @@ class ObjectStoreSpec(
                 StoreProtoRequestWrapper(
                     entity,
                     StoreProtoRequest(
-                        objectStoreAddress = objectStoreAddress,
+                        objectStoreAddress = objectStore1Address,
                         message = assetToStore,
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
@@ -62,7 +62,7 @@ class ObjectStoreSpec(
                     entity,
                     GetProtoRequest(
                         response.hash,
-                        objectStoreAddress,
+                        objectStore1Address,
                         type = "tech.figure.asset.v1beta1.Asset",
                         account = AccountInfo(
                             keyManagementConfig = KeyManagementConfig(
