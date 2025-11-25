@@ -56,4 +56,3 @@ service/src/test/resources/volumes/
 # Object store files
 service/local-docker/object-store-1/
 service/local-docker/object-store-2/
-

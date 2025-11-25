@@ -1,11 +1,2 @@
 # CODEOWNERS: https://help.github.com/articles/about-codeowners/
-
-# NOTE: Order is important; the last matching pattern takes the
-# most precedence.
-
-# Secondary repo maintainers, substitutes of the primary
-# maintainers when they become MIA
-*       @jchickanosky @wjaramillo-figure @rromanowski-figure @rang-figure
-
-# Primary repo maintainers
-*       @cworsnop-figure @rpatel-figure
+* @rgipson-figure @rpatel-figure @divyapentela @rromanowski-figure

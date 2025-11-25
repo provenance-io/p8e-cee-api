@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 
 [*.{kt,kts}]
 disabled_rules=import-ordering
+
+[*.{yml,yaml}]
+indent_size = 2
