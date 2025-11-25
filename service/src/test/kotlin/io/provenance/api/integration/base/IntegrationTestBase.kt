@@ -52,8 +52,8 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
 
         // Ideally these should be replaced with the container states commented out below. For whatever reason when running on terminal, the containers
         // could not be found. related github issue: https://github.com/testcontainers/testcontainers-java/issues/4281
-        const val objectStore1Address = "grpc://localhost:9993"
-        const val objectStore2Address = "grpc://localhost:9994"
+        const val objectStore1Address = "grpc://localhost:9994"
+        const val objectStore2Address = "grpc://localhost:9995"
         const val vaultAddress = "http://localhost:8200/v1/kv2_originations/data/originators"
         const val provenanceAddress = "grpc://localhost:9090"
 
