@@ -3,7 +3,7 @@ name: Build
 # Runs build on every push up
 on:
   pull_request:
-    types: [ synchronize, opened, reopened, ready_for_review, converted_to_draft ]
+    types: [synchronize, opened, reopened, ready_for_review, converted_to_draft]
     branches:
       - main
   workflow_dispatch:
@@ -15,8 +15,8 @@ on:
         default: false
 
 concurrency:
-    group: ${{ github.ref }}
-    cancel-in-progress: true
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   linting:
@@ -30,8 +30,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
       - name: Linting
         run: ./gradlew clean ktlint detekt --parallel --refresh-dependencies
@@ -46,8 +46,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'zulu'
+          java-version: "17"
+          distribution: "zulu"
 
       # TODO: Figure out how to simplify integration test run below
 
@@ -56,26 +56,26 @@ jobs:
 
       - name: Setup Container
         run: |-
-            brew tap hashicorp/tap
-            brew install hashicorp/tap/vault
+          brew tap hashicorp/tap
+          brew install hashicorp/tap/vault
 
       - name: Gradle Build
         run: ./gradlew clean build -i --refresh-dependencies --parallel -x ktlint -x detekt
 
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-            name: Test Results
-            path: |
-                **/build/test-results/**/*.xml
+          name: Test Results
+          path: |
+            **/build/test-results/**/*.xml
 
   event_file:
     name: "Upload Event File"
     runs-on: ubuntu-latest
     steps:
-    - name: Upload
-      uses: actions/upload-artifact@v3
-      with:
-        name: Event File
-        path: ${{ github.event_path }}
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Event File
+          path: ${{ github.event_path }}
