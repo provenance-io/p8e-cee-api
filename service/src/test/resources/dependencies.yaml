@@ -1,9 +1,8 @@
 version: '3.5'
 
 services:
-
-    postgres-cee:
-        image: postgres:13-alpine
+    postgres-cee-1:
+        image: postgres:14-alpine
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password1
@@ -12,7 +11,7 @@ services:
         ports:
             - "9992:5432"
         volumes:
-            - postgres-cee:/var/lib/postgresql/data
+            - postgres-cee-1:/var/lib/postgresql/data
             - ./db-init:/docker-entrypoint-initdb.d/
         healthcheck:
             test: [ CMD-SHELL, pg_isready -U postgres ]
@@ -21,16 +20,35 @@ services:
             retries: 5
         command: postgres
 
-    object-store:
+    postgres-cee-2:
+      image: postgres:14-alpine
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=password1
+      networks:
+        - p8e-network-test
+      ports:
+        - "9993:5432"
+      volumes:
+        - postgres-cee-2:/var/lib/postgresql/data
+        - ./db-init:/docker-entrypoint-initdb.d/
+      healthcheck:
+        test: [ CMD-SHELL, pg_isready -U postgres ]
+        interval: 5s
+        timeout: 10s
+        retries: 5
+      command: postgres
+
+    object-store-1:
         image: ghcr.io/provenance-io/object-store:0.7.0
         depends_on:
-            - postgres-cee
+            - postgres-cee-1
         environment:
             - OS_URL=0.0.0.0
             - OS_PORT=8080
             - URI_HOST=localhost:8080
             - REPLICATION_ENABLED=true
-            - DB_HOST=postgres-cee
+            - DB_HOST=postgres-cee-1
             - DB_PORT=5432
             - DB_USER=postgres
             - DB_PASS=password1
@@ -45,9 +63,37 @@ services:
         networks:
             - p8e-network-test
         ports:
-            - "9993:8080"
+            - "9994:8080"
         volumes:
-            - ./object-store:/mnt/data
+            - ./object-store-1:/mnt/data
+
+    object-store-2:
+        image: ghcr.io/provenance-io/object-store:0.7.0
+        depends_on:
+            - postgres-cee-2
+        environment:
+            - OS_URL=0.0.0.0
+            - OS_PORT=8080
+            - URI_HOST=localhost:8080
+            - REPLICATION_ENABLED=true
+            - DB_HOST=postgres-cee-2
+            - DB_PORT=5432
+            - DB_USER=postgres
+            - DB_PASS=password1
+            - DB_PASSWORD=password1
+            - DB_NAME=object-store
+            - DB_SCHEMA=public
+            - DB_CONNECTION_POOL_SIZE=10
+            - TRACE_HEADER=x-trace-header
+            - STORAGE_TYPE=file_system
+            - STORAGE_BASE_PATH=/mnt/data
+            - RUST_LOG=warn,object_store=debug
+        networks:
+            - p8e-network-test
+        ports:
+            - "9995:8080"
+        volumes:
+            - ./object-store-2:/mnt/data
 
     provenance:
         image: provenanceio/provenance:v1.16.0
@@ -80,9 +126,11 @@ services:
         entrypoint: vault server -dev
 
 volumes:
-    postgres-cee:
+    postgres-cee-1:
+    postgres-cee-2:
     provenance:
-    object-store:
+    object-store-1:
+    object-store-2:
 
 networks:
   p8e-network-test:
