@@ -37,7 +37,7 @@ spring_dependencyManagement = "1.1.3"
 spring_mockk = "3.0.1"
 springdoc = "1.5.13"
 springfox = "3.0.0"
-swagger = "1.6.2"
+swagger = "1.6.16"
 testContainers = "1.3.4"
 
 [plugins]
