@@ -49,15 +49,24 @@ jobs:
           java-version: "17"
           distribution: "zulu"
 
-      # TODO: Figure out how to simplify integration test run below
-
-      - name: Add Homebrew to PATH
-        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-
-      - name: Setup Container
+      # The integration tests seed secrets into a dev Vault container by invoking the
+      # `vault` CLI directly, so the CLI must be on PATH. Vault is no longer in
+      # homebrew-core, and `brew tap hashicorp/tap` eagerly validates every cask in the
+      # tap (a broken unrelated cask there fails the whole step), so we install a pinned,
+      # checksum-verified binary directly from releases.hashicorp.com instead.
+      - name: Install Vault CLI
+        env:
+          # Keep in lockstep with the dev Vault container image
+          # (service/src/test/resources/dependencies.yaml).
+          VAULT_VERSION: "1.14.4"
+          VAULT_SHA256: "2e94ba5f3e6b361847763a4c4fba87050221e76f02c3a118605ec56155a7a3cf"
         run: |-
-          brew tap hashicorp/tap
-          brew install hashicorp/tap/vault
+          set -euo pipefail
+          curl -fsSL -o vault.zip "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+          echo "${VAULT_SHA256}  vault.zip" | sha256sum --check --status
+          sudo unzip -o vault.zip vault -d /usr/local/bin
+          rm vault.zip
+          vault --version
 
       - name: Gradle Build
         run: ./gradlew clean build -i --refresh-dependencies --parallel -x ktlint -x detekt
