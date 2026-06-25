@@ -13,7 +13,10 @@ import io.provenance.api.util.awaitAllBytes
 import io.provenance.api.util.buildLogMessage
 import io.provenance.entity.KeyType
 import io.provenance.scope.util.toUuid
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.withContext
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
@@ -28,7 +31,21 @@ class StoreFile(
     private val entityManager: EntityManager,
     private val storeObject: StoreObject,
 ) : AbstractUseCase<StoreFileRequestWrapper, StoreProtoResponse>() {
-    override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse {
+    override suspend fun execute(args: StoreFileRequestWrapper): StoreProtoResponse =
+        try {
+            store(args)
+        } finally {
+            /*
+             * The reactive multipart reader spills any part larger than its in-memory threshold to a
+             * temporary file on disk. Those temp files are only removed when FilePart.delete() is
+             * called, so we must delete every FilePart in the request on every exit path -- success,
+             * business error, or a validation/cast failure raised from getParams(). Skipping this is
+             * what caused /tmp/spring-multipart-* to grow unbounded over the lifetime of the pod.
+             */
+            args.request.deleteAllFileParts()
+        }
+
+    private suspend fun store(args: StoreFileRequestWrapper): StoreProtoResponse {
         val (account, permissions, objectStoreAddress, storeRawBytes, id, file, type) = getParams(args.request)
         val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.entity.id, account?.keyManagementConfig))
 
@@ -54,6 +71,28 @@ class StoreFile(
                 )
             )
         }.awaitSingle()
+    }
+
+    /**
+     * Deletes the temporary file backing every [FilePart] in the request, ignoring parts that were
+     * kept in memory or already removed. Errors are swallowed so cleanup never masks the original
+     * outcome of the request.
+     */
+    private suspend fun Map<String, Part>.deleteAllFileParts() {
+        val fileParts = values.filterIsInstance<FilePart>()
+        if (fileParts.isEmpty()) {
+            return
+        }
+        /*
+         * Run inside NonCancellable so the temp files are still deleted when the request coroutine
+         * was cancelled (e.g. the client aborted the upload mid-stream) -- otherwise the suspending
+         * delete() call would immediately throw CancellationException and leak the file on disk.
+         */
+        withContext(NonCancellable) {
+            fileParts.forEach { filePart ->
+                runCatching { filePart.delete().awaitFirstOrNull() }
+            }
+        }
     }
 
     private fun getParams(request: Map<String, Part>): Args {
