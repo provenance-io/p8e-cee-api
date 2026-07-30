@@ -6,13 +6,17 @@ import io.provenance.api.domain.usecase.common.originator.EntityManager
 import io.provenance.api.domain.usecase.common.originator.models.KeyManagementConfigWrapper
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreFileRequestWrapper
 import io.provenance.api.domain.usecase.objectStore.store.models.StoreObjectRequest
+import io.provenance.api.domain.usecase.objectStore.store.models.StoreObjectStreamRequest
 import io.provenance.api.models.account.AccountInfo
 import io.provenance.api.models.eos.store.StoreProtoResponse
 import io.provenance.api.models.p8e.PermissionInfo
 import io.provenance.api.util.awaitAllBytes
 import io.provenance.api.util.buildLogMessage
+import io.provenance.api.util.transferToPath
 import io.provenance.entity.KeyType
+import io.provenance.scope.encryption.model.KeyRef
 import io.provenance.scope.util.toUuid
+import java.nio.file.Files
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.awaitSingle
@@ -21,6 +25,7 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.http.codec.multipart.Part
 import org.springframework.stereotype.Component
+import org.springframework.util.MultiValueMap
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
@@ -46,40 +51,86 @@ class StoreFile(
         }
 
     private suspend fun store(args: StoreFileRequestWrapper): StoreProtoResponse {
-        val (account, permissions, objectStoreAddress, storeRawBytes, id, file, type) = getParams(args.request)
-        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.entity.id, account?.keyManagementConfig))
+        val params = getParams(args.request)
+        val entity = entityManager.getEntity(KeyManagementConfigWrapper(args.entity.id, params.account?.keyManagementConfig))
+        val keyRef = entity.getKeyRef(KeyType.ENCRYPTION)
 
-        return file.awaitAllBytes().map { bytes ->
+        /*
+         * Fast path for large raw uploads: when the caller wants the bytes stored verbatim (no Asset
+         * proto wrapping) and is not going through the gateway, stream the file straight from disk to
+         * the object store. This avoids loading the entire (potentially ~1GB) payload into a heap
+         * ByteArray, which is the dominant driver of the OutOfMemory errors on this endpoint. The
+         * proto-wrapping and gateway paths inherently need the bytes in memory and are left unchanged.
+         */
+        if (params.storeRawBytes && !args.useObjectStoreGateway) {
+            return streamRawBytes(params, keyRef)
+        }
+
+        return params.file.awaitAllBytes().map { bytes ->
             storeObject.executeBlocking(
                 StoreObjectRequest(
-                    if (!storeRawBytes)
+                    if (!params.storeRawBytes) {
                         Asset.newBuilder().also {
-                            it.id = id.toUuid().toProtoUUID()
+                            it.id = params.id.toUuid().toProtoUUID()
                             it.type = FileNFT.ASSET_TYPE
-                            it.description = file.filename()
-                            it.putKv(FileNFT.KEY_FILENAME, file.filename().toProtoAny())
+                            it.description = params.file.filename()
+                            it.putKv(FileNFT.KEY_FILENAME, params.file.filename().toProtoAny())
                             it.putKv(FileNFT.KEY_BYTES, bytes.toProtoAny())
                             it.putKv(FileNFT.KEY_SIZE, bytes.size.toString().toProtoAny())
-                            it.putKv(FileNFT.KEY_CONTENT_TYPE, file.headers().contentType.toString().toProtoAny())
-                        }.build().toByteArray() else bytes,
-                    type,
-                    objectStoreAddress,
+                            it.putKv(FileNFT.KEY_CONTENT_TYPE, params.file.headers().contentType.toString().toProtoAny())
+                        }.build().toByteArray()
+                    } else {
+                        bytes
+                    },
+                    params.type,
+                    params.objectStoreAddress,
                     args.useObjectStoreGateway,
-                    entity.getKeyRef(KeyType.ENCRYPTION),
-                    permissions,
-                    account ?: AccountInfo()
+                    keyRef,
+                    params.permissions,
+                    params.account ?: AccountInfo()
                 )
             )
         }.awaitSingle()
+    }
+
+    /*
+     * Spills the part to a dedicated temp file, streams it to the object store, then always removes
+     * that temp file. The reader may already have spilled the part to disk, but we transfer to our
+     * own file so ownership and cleanup are unambiguous (the reader-owned file is deleted separately
+     * via deleteAllFileParts()).
+     */
+    private suspend fun streamRawBytes(params: Args, keyRef: KeyRef): StoreProtoResponse {
+        val destination = Files.createTempFile("p8e-cee-stream-", ".upload")
+        return try {
+            params.file.transferToPath(destination).awaitSingle()
+            storeObject.executeStreaming(
+                StoreObjectStreamRequest(
+                    destination,
+                    Files.size(destination),
+                    params.type,
+                    params.objectStoreAddress,
+                    keyRef,
+                    params.permissions,
+                    params.account ?: AccountInfo()
+                )
+            )
+        } finally {
+            withContext(NonCancellable) {
+                runCatching { Files.deleteIfExists(destination) }
+            }
+        }
     }
 
     /**
      * Deletes the temporary file backing every [FilePart] in the request, ignoring parts that were
      * kept in memory or already removed. Errors are swallowed so cleanup never masks the original
      * outcome of the request.
+     *
+     * Iterates every value across all field names (not the single-value view) so that duplicate
+     * parts sharing a field name -- which the reader still spills to disk -- are also cleaned up.
      */
-    private suspend fun Map<String, Part>.deleteAllFileParts() {
-        val fileParts = values.filterIsInstance<FilePart>()
+    private suspend fun MultiValueMap<String, Part>.deleteAllFileParts() {
+        val fileParts = values.flatten().filterIsInstance<FilePart>()
         if (fileParts.isEmpty()) {
             return
         }
@@ -95,12 +146,12 @@ class StoreFile(
         }
     }
 
-    private fun getParams(request: Map<String, Part>): Args {
+    private fun getParams(request: MultiValueMap<String, Part>): Args {
         var permissions: PermissionInfo? = null
         var account: AccountInfo? = null
         var type: String? = null
 
-        request["account"]?.let {
+        request.getFirst("account")?.let {
             account = Gson().fromJson((it as FormFieldPart).value(), AccountInfo::class.java)
         }
 
@@ -108,11 +159,11 @@ class StoreFile(
             throw IllegalArgumentException("Request must provide the 'id' field for the file")
         }
 
-        request["permissions"]?.let {
+        request.getFirst("permissions")?.let {
             permissions = Gson().fromJson((it as FormFieldPart).value(), PermissionInfo::class.java)
         }
 
-        request["type"]?.let {
+        request.getFirst("type")?.let {
             type = request.getAsType<FormFieldPart>("type").value()
         }
 
@@ -123,8 +174,8 @@ class StoreFile(
         return Args(account, permissions, objectStoreAddress, storeRawBytes, id, file, type)
     }
 
-    private inline fun <reified T> Map<String, Part>.getAsType(key: String): T =
-        T::class.java.cast(get(key))
+    private inline fun <reified T> MultiValueMap<String, Part>.getAsType(key: String): T =
+        T::class.java.cast(getFirst(key))
             ?: throw IllegalArgumentException(
                 buildLogMessage(
                     "Failed to retrieve and cast provided argument",
