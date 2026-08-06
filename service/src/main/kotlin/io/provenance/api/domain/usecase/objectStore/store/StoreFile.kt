@@ -94,10 +94,12 @@ class StoreFile(
     }
 
     /*
-     * Spills the part to a dedicated temp file, streams it to the object store, then always removes
-     * that temp file. The reader may already have spilled the part to disk, but we transfer to our
-     * own file so ownership and cleanup are unambiguous (the reader-owned file is deleted separately
-     * via deleteAllFileParts()).
+     * Materializes ("Spills") the part to a dedicated temp file, streams it to the object store, then always
+     * removes that temp file. Transferring to our own file (rather than reading the part's reactive
+     * content() into memory) lets us hand `OsClient.put` a plain InputStream together with an
+     * authoritative content length taken from `Files.size()`, the real number of bytes on disk —
+     * not a client-supplied per-part Content-Length header, which multipart parts frequently omit.
+     * The reader-owned spill file is cleaned up separately via deleteAllFileParts().
      */
     private suspend fun streamRawBytes(params: Args, keyRef: KeyRef): StoreProtoResponse {
         val destination = Files.createTempFile("p8e-cee-stream-", ".upload")
