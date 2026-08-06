@@ -30,6 +30,13 @@ import kotlin.io.path.name
  * `spring-multipart-*` working directories and removes any regular file older than
  * [maxAge]. The age threshold must be comfortably larger than the longest legitimate in-flight
  * upload so that a file currently being written is never deleted out from under an active request.
+ *
+ * This is deliberately *not* redundant with the two other cleanup paths, both of which only cover
+ * requests that actually reach a handler: Spring's `cleanupMultipart` (which short-circuits while
+ * `multipartRead` is false) and this service's own per-request `FilePart.delete()` in
+ * `StoreFile` (which never runs because the handler is never invoked for an aborted parse). The
+ * sweeper is the only mechanism that reclaims files orphaned before the request lifecycle completes,
+ * a case WebFlux provides no built-in reaper or `deleteOnExit` fallback for.
  */
 @Component
 class MultipartTempFileSweeper(
