@@ -2,6 +2,7 @@ package io.provenance.api.frameworks.web.config
 
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.nio.file.Files
@@ -31,6 +32,9 @@ import kotlin.io.path.name
  * [maxAge]. The age threshold must be comfortably larger than the longest legitimate in-flight
  * upload so that a file currently being written is never deleted out from under an active request.
  *
+ * Disabled by default; enable with `multipart.sweep.enabled=true`
+ * (env: `MULTIPART_SWEEP_ENABLED=true`).
+ *
  * This is deliberately *not* redundant with the two other cleanup paths, both of which only cover
  * requests that actually reach a handler: Spring's `cleanupMultipart` (which short-circuits while
  * `multipartRead` is false) and this service's own per-request `FilePart.delete()` in
@@ -39,6 +43,7 @@ import kotlin.io.path.name
  * a case WebFlux provides no built-in reaper or `deleteOnExit` fallback for.
  */
 @Component
+@ConditionalOnProperty(name = ["multipart.sweep.enabled"], havingValue = "true", matchIfMissing = false)
 class MultipartTempFileSweeper(
     @Value("\${multipart.temp.max-age-ms:7200000}")
     private val maxAgeMs: Long,
