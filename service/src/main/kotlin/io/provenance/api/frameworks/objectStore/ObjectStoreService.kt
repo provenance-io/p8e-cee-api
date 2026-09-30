@@ -9,6 +9,7 @@ import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.model.KeyRef
 import io.provenance.scope.objectstore.client.OsClient
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.security.PublicKey
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -66,6 +67,34 @@ class ObjectStoreService(
                 ).toModel()
             }
             else -> throw IllegalArgumentException("Unsupported client type while storing object!")
+        }
+
+    /*
+     * Streaming store: the OsClient exposes an InputStream overload with an explicit content length,
+     * letting us upload directly from the temp file on disk without ever materializing the full
+     * payload as a ByteArray on the heap. The gateway client only accepts a byte[], so it cannot be
+     * streamed and is intentionally rejected here -- callers must gate this path on a direct client.
+     */
+    override fun <T> store(
+        client: T,
+        message: InputStream,
+        contentLength: Long,
+        keyRef: KeyRef,
+        additionalAudiences: Set<PublicKey>,
+        type: String?
+    ): StoreProtoResponse =
+        when (client) {
+            is OsClient -> {
+                client.put(
+                    message,
+                    keyRef.publicKey,
+                    keyRef.signer(),
+                    contentLength,
+                    additionalAudiences,
+                    type?.let { mapOf("type" to type) } ?: mapOf()
+                ).get(objectStoreProperties.timeoutMs, TimeUnit.MILLISECONDS).toModel()
+            }
+            else -> throw IllegalArgumentException("Streaming store is only supported for the direct object-store client!")
         }
 
     private fun decodeBase64(string: String): ByteArray =

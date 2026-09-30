@@ -40,7 +40,7 @@ class InternalObjectStoreHandler(
         storeFile.execute(
             StoreFileRequestWrapper(
                 req.getEntity(),
-                req.awaitMultipartData().toSingleValueMap()
+                req.awaitMultipartData()
             )
         )
     }.foldToServerResponse()
@@ -85,7 +85,7 @@ class InternalObjectStoreHandler(
         storeFile.execute(
             StoreFileRequestWrapper(
                 req.getEntity(),
-                req.awaitMultipartData().toSingleValueMap(),
+                req.awaitMultipartData(),
                 true
             )
         ).toModel()

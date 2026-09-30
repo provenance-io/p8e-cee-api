@@ -4,6 +4,7 @@ import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.codec.multipart.FilePart
 import reactor.core.publisher.Mono
+import java.nio.file.Path
 
 /**
  * Reads the full contents of this [FilePart] into a [ByteArray].
@@ -25,3 +26,18 @@ fun FilePart.awaitAllBytes(): Mono<ByteArray> =
             DataBufferUtils.release(dataBuffer)
         }
     }
+
+/**
+ * Transfers the full contents of this [FilePart] to [destination], returning it once the write
+ * completes.
+ *
+ * When the reactive multipart reader has already spilled this part to a temporary file, this is
+ * effectively a file move; when the part is still in memory it is written out. Either way the
+ * payload is never materialized as a single [ByteArray] on the heap, which is what makes this the
+ * memory-safe path for very large uploads.
+ *
+ * NOTE: callers remain responsible for invoking [FilePart.delete] on the original part and for
+ * removing [destination] once they are done with it.
+ */
+fun FilePart.transferToPath(destination: Path): Mono<Path> =
+    this.transferTo(destination).thenReturn(destination)
