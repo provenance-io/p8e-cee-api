@@ -12,6 +12,13 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 dependencyManagement {
     applyMavenExclusions(false)
+    imports {
+        /*
+         * Overrides the Testcontainers version from the Spring Boot BOM, which is too old to talk to
+         * the Docker Engine on current GitHub-hosted runners.
+         */
+        mavenBom(libs.testContainers.bom.get().toString())
+    }
 }
 
 dependencies {
@@ -170,7 +177,7 @@ jib {
             username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
             password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
         }
-        image = "azul/zulu-openjdk:17.0.8.1"
+        image = "azul/zulu-openjdk:17.0.21.1"
     }
     to {
         auth {
