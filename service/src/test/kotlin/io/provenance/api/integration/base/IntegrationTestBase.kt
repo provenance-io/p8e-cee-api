@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.containers.DockerComposeContainer
+import org.testcontainers.containers.ComposeContainer
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -44,9 +44,7 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
     }
 
     companion object {
-        class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)
-
-        internal val instance: KDockerComposeContainer by lazy {
+        internal val instance: ComposeContainer by lazy {
             defineDockerCompose()
         }
 
@@ -59,6 +57,6 @@ class IntegrationTestBase(body: WordSpec.() -> Unit = {}) : WordSpec(body) {
 
 //        val objectStoreContainer: ContainerState by lazy { instance.getContainerByServiceName("object-store_1").get() }
 //        val vaultContainer: ContainerState by lazy { instance.getContainerByServiceName("vault_1").get() }
-        private fun defineDockerCompose() = KDockerComposeContainer(File("src/test/resources/dependencies.yaml"))
+        private fun defineDockerCompose() = ComposeContainer(File("src/test/resources/dependencies.yaml"))
     }
 }

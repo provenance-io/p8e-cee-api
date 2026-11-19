@@ -12,6 +12,13 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 dependencyManagement {
     applyMavenExclusions(false)
+    imports {
+        /*
+         * Overrides the Testcontainers version from the Spring Boot BOM, which is too old to talk to
+         * the Docker Engine on current GitHub-hosted runners.
+         */
+        mavenBom(libs.testContainers.bom.get().toString())
+    }
 }
 
 dependencies {
