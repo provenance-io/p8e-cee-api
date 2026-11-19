@@ -1,0 +1,72 @@
+{
+  commitMessageExtra: 'from `{{#if isPinDigest}}{{{currentDigestShort}}}{{else}}{{#if isSingleVersion}}{{{currentVersion}}}{{else}}{{#if currentValue}}{{{currentValue}}}{{else}}{{{currentDigestShort}}}{{/if}}{{/if}}{{/if}}` to `{{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}v{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}`',
+  extends: [
+    'config:base',
+    'github>whitesource/merge-confidence:beta',
+  ],
+  schedule: ['on Monday'],
+  labels: ['dependencies'],
+  // Hold regular updates until they are a day old. Vulnerability fixes bypass this and the schedule.
+  minimumReleaseAge: '1 day',
+  // Also detect vulnerable Maven dependencies from OSV, not only from GitHub's Dependabot alerts.
+  osvVulnerabilityAlerts: true,
+  vulnerabilityAlerts: {
+    labels: ['dependencies', 'security'],
+  },
+  packageRules: [
+    {
+      matchPackagePatterns: ['.*'],
+      allowedVersions: '/^(v[0-9]+|v?[0-9]+.[0-9]+.[0-9]+|(main|master|develop)-[0-9]+)$/',
+    },
+    {
+      matchPackageNames: ['postgres'],
+      allowedVersions: '13',
+    },
+    {
+      /*
+       * Jib base image: no vulnerability feed covers Docker images, so raise its updates on any day.
+       * Keep it on the Java 17 line the service targets, and allow Zulu's 4-part security patch versions (e.g. 17.0.21.1).
+       * Docker Hub refuses anonymous tag listings past page 10, leaving this image without release timestamps, which
+       * would otherwise hold its updates forever under minimumReleaseAge.
+       */
+      matchDatasources: ['docker'],
+      matchPackageNames: ['azul/zulu-openjdk'],
+      allowedVersions: '/^17\\.[0-9]+\\.[0-9]+(\\.[0-9]+)*$/',
+      schedule: ['at any time'],
+      labels: ['dependencies', 'security'],
+      minimumReleaseAgeBehaviour: 'timestamp-optional',
+    },
+    {
+      groupName: 'Kotlin',
+      matchPackagePrefixes: [
+        'org.jetbrains.kotlin',
+      ],
+    },
+  ],
+  prConcurrentLimit: 4,
+  rangeStrategy: 'pin',
+  ignorePaths: [
+    '**/bower_components/**',
+    '**/vendor/**',
+    '**/examples/**',
+    '**/__tests__/**',
+    '**/__fixtures__/**',
+  ],
+  customManagers: [
+    {
+      // Jib base image in Gradle build scripts, which the gradle manager does not detect
+      customType: 'regex',
+      managerFilePatterns: ['/(^|/)build\\.gradle\\.kts$/'],
+      matchStrings: [
+        'from\\s*\\{[\\s\\S]*?image\\s*=\\s*"(?<depName>[^":@]+):(?<currentValue>[^"@]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"',
+      ],
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'docker',
+    },
+  ],
+  gradle: {
+    fileMatch: [
+      '(^|/)buildSrc/.*',
+    ],
+  },
+}

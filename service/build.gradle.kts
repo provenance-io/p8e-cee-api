@@ -170,7 +170,7 @@ jib {
             username = System.getenv("JIB_AUTH_USERNAME") ?: "_json_key"
             password = System.getenv("JIB_AUTH_PASSWORD") ?: "nopass"
         }
-        image = "azul/zulu-openjdk:17.0.8.1"
+        image = "azul/zulu-openjdk:17.0.21.1"
     }
     to {
         auth {
